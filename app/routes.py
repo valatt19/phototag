@@ -50,15 +50,18 @@ def project_create():
         # check if the post request has the file part
         if 'file[]' not in request.files:
             return redirect(request.url)
-        file = request.files['file[]']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == '':
+        uploaded_files = request.files.getlist('file[]')
+        
+        # check that at least 1 file
+        if len(uploaded_files) < 1:
             return redirect(request.url)
-        if file:
+
+        for i in range (len(uploaded_files)):
+            file = uploaded_files[i]
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('dataset_overview', project_id=0))
+            path = app.config['UPLOAD_FOLDER'] + "/" + filename
+            file.save(path)
+        return redirect(url_for('dataset_overview', project_id=0))
     
     return render_template("project/create.html")
 
