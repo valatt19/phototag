@@ -128,5 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Temporary folder with files
-app/tmp
+# Files in tmp folder
+app/tmp/*
