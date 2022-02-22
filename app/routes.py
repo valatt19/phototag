@@ -3,7 +3,11 @@ from app import app
 from flask import render_template, redirect
 from flask import url_for, request, flash
 
-from models import Image
+import os
+from werkzeug.utils import secure_filename
+from werkzeug.datastructures import  FileStorage
+
+from app.models import Image
 
 ##############
 # Home pages #
@@ -42,16 +46,21 @@ def project():
 # Create a new project (Sprint 1 : only load a dataset)
 @app.route("/project/new/", methods=["GET","POST"])
 def project_create():
-    if request.method == "GET":
-        return "hello world!"
-
-    # Otherwise POST
-    _folder = request.form["folder"]
-    if _folder :
-        # Save in db (Sprint 2)
-        print(_folder)
-
-        return redirect(url_for("dataset_overview")) 
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file[]' not in request.files:
+            return redirect(request.url)
+        file = request.files['file[]']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            return redirect(request.url)
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return redirect(url_for('dataset_overview', project_id=0))
+    
+    return render_template("project/create.html")
 
 # Join a project
 @app.route("/project/join/")
@@ -64,7 +73,7 @@ def project_join():
 
 # S1
 # Dataset overview of a project (list img and vid)
-@app.route("/project/<int:project_id>/dataset/<int:img_id>")
+@app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
     
     # Temp
