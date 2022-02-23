@@ -6,8 +6,9 @@ from flask import url_for, request, flash
 import os
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import  FileStorage
+from datetime import datetime
 
-from app.models import Image
+from app.models import Image, ds_images
 
 ##############
 # Home pages #
@@ -56,11 +57,22 @@ def project_create():
         if len(uploaded_files) < 1:
             return redirect(request.url)
 
+        # loop on each file on the folder imported
         for i in range (len(uploaded_files)):
+
+            # save the file in the server
             file = uploaded_files[i]
             filename = secure_filename(file.filename)
             path = app.config['UPLOAD_FOLDER'] + "/" + filename
             file.save(path)
+
+            # get the size of the file in KO
+            size = int(os.stat(path).st_size/1000)
+
+            # create Image object
+            img = Image(i,filename,path,size,datetime.now().strftime("%Y-%m-%d %H:%M"),"varioti")
+            ds_images.append(img)
+            
         return redirect(url_for('dataset_overview', project_id=0))
     
     return render_template("project/create.html")
@@ -78,15 +90,8 @@ def project_join():
 # Dataset overview of a project (list img and vid)
 @app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
-    
-    # Temp
-    img1 = Image("img1.jpg","flowers",106.5,"2022-02-20 17:30","varioti")
-    img2 = Image("img2.jpg","flowers",142,"2022-02-20 17:31","varioti")
-    img3 = Image("img3.jpg","flowers",85,"2022-02-21 12:00","iye")
-    dataset = [img1,img2,img3]
-
-    
-    return "hello world!"
+    dataset = ds_images
+    return render_template("project/dataset.html",dataset=dataset)
 
 # S1
 # Annotate an image of a project
