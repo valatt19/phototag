@@ -49,9 +49,10 @@ def project():
 def project_create():
     if request.method == 'POST':
         # check if the post request has the file part
-        if 'file[]' not in request.files:
+        print(request.files)
+        if 'files[]' not in request.files:
             return redirect(request.url)
-        uploaded_files = request.files.getlist('file[]')
+        uploaded_files = request.files.getlist('files[]')
         
         # check that at least 1 file
         if len(uploaded_files) < 1:
