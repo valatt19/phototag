@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html>
-    <head>
-    </head>
-    <body>
+{% extends "parent.html" %}
+{% block content %}
         <form action="" method="POST" enctype="multipart/form-data">
             <label for="file">Upload folder: </label>
-            <input type="file" name="file[]" id="file" multiple directory="" webkitdirectory="" mozdirectory=""><br/>
+            <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory=""><br/>
             <input type="submit" value="Upload">
         </form>
-    </body>
-</html>
+{% endblock %}
