@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js"></script>
+        
+        <script src="{{url_for('static', filename='js/annotate.js')}}"></script>
+        <link href="/static/css/annotate.css" rel="stylesheet">
+    </head>
+
+    <body>
+        <div id="container">
+            <img class='img' src="{{url_for('static', filename='tmp/'+img_path)}}" alt="" />
+            <canvas id="layerDraw" width="1200px" height="800px"></canvas>
+            <canvas id="layerShow" width="1200px" height="800px"></canvas>
+        </div>
+
+        <div id="pannel">
+            <button onclick="addRect()">Rect</button>
+            <button onclick="addLasso()">Lasso</button>
+
+            <h3>Annotations</h3>
+            <ul id="annotations">
+            </ul>
+        </div>
+        
+    </body>
+</html>

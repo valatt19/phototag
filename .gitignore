@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 # Files in tmp folder
-app/tmp/*
+app/static/tmp/*
+!app/static/tmp/empty

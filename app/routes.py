@@ -98,12 +98,13 @@ def project_join():
 @app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
     dataset = ds_images
-    return render_template("project/dataset.html", dataset=dataset)
+    return render_template("project/dataset.html", dataset=dataset, id=project_id)
 
 
 # S1
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
-    return "hello world!"
+    img_path = ds_images[img_id].name
+    return render_template("project/annotate.html", img_path=img_path, img_id=img_id)
 

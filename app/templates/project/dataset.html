@@ -11,7 +11,7 @@
             </tr>
             {% for file in dataset %}
             <tr>
-              <td>{{file.name}}</td>
+              <td><a href="../annotate/{{loop.index-1}}">{{file.name}}</a></td>
               <td>{{file.size}} ko</td>
               <td>{{file.last_time}} - {{file.last_person}}</td>
               <td>{{file.annotations}}</td>
