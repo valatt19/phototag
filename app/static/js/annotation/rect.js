@@ -61,6 +61,8 @@ function addRect(){
         }
         isDown = false;
         canvas.removeEventListener("mousedown",handleMouseDown);
+        canvas.removeEventListener("mousemove",handleMouseMove);
+        canvas.removeEventListener("mouseup",handleMouseUp);
     }
     
     //FUNCTION
@@ -107,6 +109,9 @@ function addRect(){
         li.appendChild(document.createTextNode(message));
         annotations.appendChild(li);
     }
+    canvas.removeEventListener("mousedown",handleMouseDown);
+    canvas.removeEventListener("mousemove",handleMouseMove);
+    canvas.removeEventListener("mouseup",handleMouseUp);
 
     // Add listeners
     canvas.addEventListener("mousedown", handleMouseDown);

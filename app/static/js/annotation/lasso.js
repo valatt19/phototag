@@ -127,6 +127,8 @@ function addLasso(){
         Render(); 
         saveForm();
         canvas.removeEventListener("mousedown",handleMouseDown);
+        canvas.removeEventListener("mousemove",handleMouseMove);
+        canvas.removeEventListener("mouseup",handleMouseUp);
     }
 
     // Add listeners

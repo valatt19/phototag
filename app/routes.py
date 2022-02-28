@@ -105,6 +105,6 @@ def dataset_overview(project_id):
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
-    img_path = ds_images[img_id].name
-    return render_template("project/annotate.html", img_path=img_path, img_id=img_id)
+    image = ds_images[img_id]
+    return render_template("project/annotate.html", image=image, img_id=img_id)
 
