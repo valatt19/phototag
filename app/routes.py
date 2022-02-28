@@ -106,5 +106,11 @@ def dataset_overview(project_id):
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
     image = ds_images[img_id]
-    return render_template("project/annotate.html", image=image, img_id=img_id)
+
+    # Compute id of previous and next images
+    len_images = len(ds_images)
+    prev = (img_id+len_images-1)%len_images
+    next = (img_id+1)%len_images
+
+    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next)
 

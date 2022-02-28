@@ -12,10 +12,13 @@
 
     <body>
         <div id="pannel">
-            <a>{{image.name}}</a>
+            {{image.name}}
+            <a href="{{prev}}" class="next">&#8249;</a>
+            <a href="{{next}}" class="next">&#8250;</a>
 
             <button onclick="addRect()">Rect</button>
             <button onclick="addLasso()">Lasso</button>
+
         </div>
 
         <div id="container">
@@ -24,10 +27,9 @@
             <canvas id="layerShow"></canvas>
         </div>
 
-        <div id="pannel">
+        <div id="right-pannel">
             <h3>Annotations</h3>
-            <ul id="annotations">
-            </ul>
+            <ul id="annotations"></ul>
         </div>
         
     </body>

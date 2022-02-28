@@ -22,3 +22,13 @@ body{background: #f2f6f8;}
     position:absolute;
     z-index:19;
 }
+  
+.next {
+    background-color: #cac7c7;
+    color: black;
+}
+  
+.next:hover {
+    background-color: #2e2e2e;
+    color: white;
+}
