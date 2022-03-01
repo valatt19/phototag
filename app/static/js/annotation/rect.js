@@ -1,3 +1,4 @@
+
 function addRect(){
     // get references to the canvas and context
     var canvas = document.getElementById("layerDraw");
@@ -102,9 +103,10 @@ function addRect(){
     // FUNCTION
     function saveRect() {
         // Save rectangle in layer
-        ctxo.strokeRect(prevStartX, prevStartY, prevWidth, prevHeight);
+        ctxo.rect(prevStartX, prevStartY, prevWidth, prevHeight);
+        ctxo.stroke();
         // Save in list
-        var message = "r" + startX + "-" + startY + "-" + width + "-" + height
+        var message = "r" + Math.round(startX/zoom) + "-" + Math.round(startY/zoom) + "-" + Math.round(width/zoom) + "-" + Math.round(height/zoom)
         var li = document.createElement("li");
         li.appendChild(document.createTextNode(message));
         annotations.appendChild(li);

@@ -1,5 +1,7 @@
+let zoom = 1;
 $(document).ready(function() {
-    let zoom = 1;
+    zoom = 1;
+
     let w_height = $(window).height()
     let w_width = $(window).width()
 
@@ -11,10 +13,9 @@ $(document).ready(function() {
     // Compute zoom and sizes
     let img_h = image.height;
     let img_w = image.width;
-    let img_ratio = img_w/img_h;
 
     let ratio_h = 0.8*w_height/img_h
-    let ratio_w = 0.8*w_height/img_h
+    let ratio_w = 0.8*w_width/img_w
 
     // Zoom container and images following height max or weight max 
     if (ratio_h<ratio_w) {

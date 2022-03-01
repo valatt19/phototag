@@ -67,7 +67,7 @@ function addLasso(){
         for (var index = 0; index < points.length; index ++){
             // add in list
             var point = points[index];
-            message = message + "-(" + point.x + ":" + point.y + ")"
+            message = message + "-(" + Math.round(point.x/zoom) + ":" + Math.round(point.y/zoom) + ")"
             
             // draw in ctxo
             if (index == 0){
@@ -82,7 +82,9 @@ function addLasso(){
         annotations.appendChild(li);
 
         // Save free form in layer
+        ctxo.fillStyle = 'rgba(0,0,255,0.2)';
         ctxo.lineTo(start.x, start.y);
+        ctxo.fill();
         ctxo.stroke();
         ctxo.closePath();
     }
