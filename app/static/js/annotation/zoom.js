@@ -2,10 +2,12 @@ let zoom = 1;
 $(document).ready(function() {
     zoom = 1;
 
-    let w_height = $(window).height()
-    let w_width = $(window).width()
+    let w_height = $(window).height();
+    let w_width = $(window).width()-500;
 
-    let container = document.getElementById("container");
+    let nav1 = document.getElementById("nav1").style.height;
+    let nav2 = document.getElementById("nav2").style.height;
+    let container = document.getElementById("principal");
     let image = document.getElementById("image");
     let canvas = document.getElementById("layerDraw");
     let overlay = document.getElementById("layerShow");
@@ -14,8 +16,8 @@ $(document).ready(function() {
     let img_h = image.height;
     let img_w = image.width;
 
-    let ratio_h = 0.8*w_height/img_h
-    let ratio_w = 0.8*w_width/img_w
+    let ratio_h = 0.8*(w_height-nav1-nav2)/img_h;
+    let ratio_w = w_width/img_w;
 
     // Zoom container and images following height max or weight max 
     if (ratio_h<ratio_w) {
@@ -25,9 +27,6 @@ $(document).ready(function() {
     }
     
     // Resize all elements (container, image, 2 layers)
-    container.style.height = img_h*zoom;
-    container.style.width = img_w*zoom;
-
     image.height = img_h*zoom;
     image.width = img_w*zoom;
 
@@ -37,4 +36,6 @@ $(document).ready(function() {
     overlay.width = img_w*zoom;
     overlay.height = img_h*zoom;
 
+    container.style.height = img_h*zoom+10+"px";
+    container.style.width = img_w*zoom+10+"px";
 });

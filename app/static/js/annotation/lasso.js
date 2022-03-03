@@ -6,11 +6,7 @@ function addLasso(){
     var ctx = canvas.getContext("2d");
     var ctxo = overlay.getContext("2d");
 
-    // style the context
-    ctx.strokeStyle = "blue";
-    ctx.lineWidth = 3;
-    ctxo.strokeStyle = "blue";
-    ctxo.lineWidth = 3;
+    var annotations = document.getElementById("annotations");
 
     // calculate where the canvas is on the window
     // (used to help calculate mouseX/mouseY)
@@ -82,7 +78,7 @@ function addLasso(){
         annotations.appendChild(li);
 
         // Save free form in layer
-        ctxo.fillStyle = 'rgba(0,0,255,0.2)';
+        ctxo.fillStyle = `hsla(${colors[current]},75%,50%,0.2)`;
         ctxo.lineTo(start.x, start.y);
         ctxo.fill();
         ctxo.stroke();
@@ -93,6 +89,12 @@ function addLasso(){
     function handleMouseDown(e){
         e.preventDefault();
         e.stopPropagation();
+
+        // style the context
+        ctx.strokeStyle = `hsl(${colors[current]},75%,50%)`;
+        ctx.lineWidth = 3;
+        ctxo.strokeStyle = `hsl(${colors[current]},75%,50%)`;
+        ctxo.lineWidth = 3;
 
         mouseX = parseInt(e.clientX - offsetX);
         mouseY = parseInt(e.clientY - offsetY);

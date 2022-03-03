@@ -6,12 +6,6 @@ function addRect(){
     var ctx = canvas.getContext("2d");
     var ctxo = overlay.getContext("2d");
 
-    // style the context
-    ctx.strokeStyle = "blue";
-    ctx.lineWidth = 3;
-    ctxo.strokeStyle = "blue";
-    ctxo.lineWidth = 3;
-
     // calculate where the canvas is on the window
     // (used to help calculate mouseX/mouseY)
     var $canvas = $("#layerDraw");
@@ -42,6 +36,11 @@ function addRect(){
     function handleMouseDown(e) {
         e.preventDefault();
         e.stopPropagation();
+
+        ctx.strokeStyle = `hsl(${colors[current]},75%,50%)`;
+        ctx.lineWidth = 3;
+        ctxo.strokeStyle = `hsl(${colors[current]},75%,50%)`;
+        ctxo.lineWidth = 3;
     
         // save the starting x/y of the rectangle
         startX = parseInt(e.clientX - offsetX);
@@ -98,13 +97,24 @@ function addRect(){
         prevStartY = startY;
         prevWidth  = width;
         prevHeight = height;
+        prevEndX = startX + width;
+        prevEndY = startY + height;
     }
     
     // FUNCTION
     function saveRect() {
         // Save rectangle in layer
-        ctxo.rect(prevStartX, prevStartY, prevWidth, prevHeight);
+        ctxo.beginPath();
+        ctxo.moveTo(prevStartX, prevStartY);
+        ctxo.lineTo(prevEndX, prevStartY);
+        ctxo.lineTo(prevEndX, prevEndY);
+        ctxo.lineTo(prevStartX, prevEndY);
+        ctxo.lineTo(prevStartX, prevStartY);
+        ctxo.fillStyle = `hsla(${colors[current]},75%,50%,0.2)`;
+        ctxo.fill();
         ctxo.stroke();
+        ctxo.closePath();
+
         // Save in list
         var message = "r" + Math.round(startX/zoom) + "-" + Math.round(startY/zoom) + "-" + Math.round(width/zoom) + "-" + Math.round(height/zoom)
         var li = document.createElement("li");

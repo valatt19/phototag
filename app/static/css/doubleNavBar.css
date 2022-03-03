@@ -9,18 +9,17 @@
   font-family: "Josefin Sans", sans-serif;
 }
 
-
-.wrapper .top_nav{
+.top_nav{
   background-color: #333;
   overflow: hidden;
 }
 
-.wrapper .top_nav .left{
+.top_nav .left{
     float: left;
     align-items: center;
 }
 
-.wrapper .top_nav .bottom_nav p{
+.top_nav .bottom_nav p{
   font-size: 24px;
   font-weight: bold;
   color: #494949;
@@ -28,7 +27,7 @@
   margin-right: 25px;
 }
 
-.wrapper .top_nav .logo a.active span{
+.top_nav .logo a.active span{
   background-color: #04AA6D;
   color: white;
   font-family: "Mountains of Christmas", cursive;
@@ -36,17 +35,16 @@
 
 
 
-.wrapper .top_nav .right ul{
+.top_nav .right ul{
   display: flex;
 }
 
-.wrapper .top_nav .right ul li{
+.top_nav .right ul li{
   margin: 0 12px;
 }
 
 
-
-.wrapper .bottom_nav{
+.bottom_nav{
   width: 100%;
   background: #f9f9f9;
   height: 45px;

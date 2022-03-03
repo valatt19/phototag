@@ -3,10 +3,6 @@
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js"></script>
-        
-        <script src="{{url_for('static', filename='js/annotation/lasso.js')}}"></script>
-        <script src="{{url_for('static', filename='js/annotation/rect.js')}}"></script>
-        <script src="{{url_for('static', filename='js/annotation/zoom.js')}}"></script>
 
         <link href="/static/css/annotate.css" rel="stylesheet">
     </head>
@@ -23,15 +19,36 @@
         </div>
 
         <div id="container">
-            <img id="image" class='img' src="{{url_for('static', filename='tmp/'+image.name)}}" alt="" />
-            <canvas id="layerDraw"></canvas>
-            <canvas id="layerShow"></canvas>
+
+            <div id="principal">
+                <img id="image" class='img' src="{{url_for('static', filename='tmp/'+image.name)}}" alt="" />
+                <canvas id="layerDraw"></canvas>
+                <canvas id="layerShow"></canvas>
+            </div>
+    
+            <div id="right-pannel">
+                <div id="current">
+                    <h3>Current object</h3>
+                    <ul id="classes">
+                        {% for c in classes %}
+                            <li id="c{{loop.index-1}}" style="cursor: pointer;" onclick="set_current('{{loop.index-1}}')">{{c}}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div id="annotations">
+                    <h3>Objects</h3>
+                </div>
+                <div id="imagetools">
+                    <h3>Image</h3>
+                </div>
+            </div>
+
         </div>
 
-        <div id="right-pannel">
-            <h3>Annotations</h3>
-            <ul id="annotations"></ul>
-        </div>
+        <script src="{{url_for('static', filename='js/annotation/lasso.js')}}"></script>
+        <script src="{{url_for('static', filename='js/annotation/rect.js')}}"></script>
+        <script src="{{url_for('static', filename='js/annotation/zoom.js')}}"></script>
+        <script src="{{url_for('static', filename='js/annotation/color.js')}}"></script>
         
     </body>
 {% endblock %}

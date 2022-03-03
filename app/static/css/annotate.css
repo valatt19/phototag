@@ -6,11 +6,18 @@ body{background: #f2f6f8;}
 }
 
 #container{
-    display:inline-block;
-    margin: 0 auto; 
+    display: flex;
+}
+
+#principal{
     background: white; 
     position:relative; 
     border:5px solid black;
+}
+
+#right-pannel{
+    flex: 1;
+    margin: 10px;
 }
 
 #layerDraw{

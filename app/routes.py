@@ -112,5 +112,5 @@ def annotate_image(project_id, img_id):
     prev = (img_id+len_images-1)%len_images
     next = (img_id+1)%len_images
 
-    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next)
+    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["first","second","third"])
 
