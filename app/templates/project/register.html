@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link href="/static/css/style_navbar.css" rel="stylesheet">
+    <title>Register</title>
+</head>
+<body>
+<div class="topnav" id="nav1">
+
+        <a class="active" href="#"><span class="">PHOTOTAG</span></a>
+
+    </div>
+
+<div class="container">
+<div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">Register</div>
+                            <div class="card-body">
+
+                                <form class="form-horizontal" method="post" action="#">
+                                    {{ form.csrf_token }}
+                                    <!-- {{ form.hidden_tag() }} -->
+                                    <div class="form-group">
+                                        <label for="name" class="cols-sm-2 control-label">Your Name</label>
+                                        <div class="cols-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                                {{ form.firstname (class="form-control bg-white text-primary", placeholder="Your firstname") }}
+                                                <small class="form-text text-danger">
+                        {% if form.firstname.errors %} {% for message in form.firstname.errors %}
+                        {{ message }}
+                        {% endfor %}{% endif %}
+                    </small><br>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="surname" class="cols-sm-2 control-label">Your Surname</label>
+                                        <div class="cols-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                                                {{ form.surname (class="form-control bg-white text-primary", placeholder="Your surname") }}
+                                                <small class="form-text text-danger">
+                         {% if form.surname.errors %} {% for message in form.surname.errors %}
+                             {{ message }}
+                        {% endfor %}{% endif %}
+                     </small><br>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="username" class="cols-sm-2 control-label">Username</label>
+                                        <div class="cols-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                                                {{ form.username (class="form-control bg-white text-primary", placeholder="Your username") }}
+                                                <small class="form-text text-danger">
+                                                    {% if form.username.errors %} {% for message in form.username.errors %}{{ message }}
+                                                    {% endfor %}{% endif %}
+                                                </small><br>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="password" class="cols-sm-2 control-label">Password</label>
+                                        <div class="cols-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                                                {{ form.password (class="form-control bg-white text-primary", placeholder="Password") }}
+                                                <small class="form-text text-danger">
+                                                    {% if form.password.errors %} {% for message in form.password.errors %}
+                                                    {{ message }}
+                                                    {% endfor %}{% endif %}
+                                                </small><br>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="confirm" class="cols-sm-2 control-label">Confirm Password</label>
+                                        <div class="cols-sm-10">
+                                            <div class="input-group">
+                                                <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                                                {{ form.checkpassword (class="form-control bg-white text-primary", placeholder="Confirm password") }}
+                                                <small class="form-text text-danger">
+                        {% if form.checkpassword.errors %} {% for message in form.checkpassword.errors %}
+                            {{ message }}
+                        {% endfor %}{% endif %}
+                    </small><br>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group ">
+                                        {{ form.submit (class="btn btn-primary") }}
+                                    </div>
+
+                                    <div class="login-register">
+                                        <a href="/login">Login</a>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+</div>
+
+</body>
+</html>

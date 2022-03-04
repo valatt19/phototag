@@ -2,14 +2,16 @@ from app import app
 
 from flask import render_template, redirect
 from flask import url_for, request, flash
+from flask_login import login_required, login_user, logout_user, current_user
+from app.forms import LoginForm, RegisterForm
 
 import os
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from datetime import datetime
 
-from app.models import Image, ds_images
-
+from app.models import Image, ds_images, User,  Group, gr1, gr2, users
+from app import db
 
 ##############
 # Home pages #
@@ -18,19 +20,72 @@ from app.models import Image, ds_images
 # Homepage (redirect to login page) - (sprint 1 : redirect to load dataset page)
 @app.route('/')
 def home():
-    return redirect(url_for("project_create"))
+    return redirect(url_for("login"))
 
 
 # Login
 @app.route("/login/", methods=["GET", "POST"])
 def login():
-    return "hello world!"
+    # check is current user already authenticated
+
+    print("ok1")
+    print(current_user.is_authenticated)
+    print("2")
+    if current_user.is_authenticated:
+        print("ok2")
+        return redirect(url_for("project_create"))
+
+    # Form data
+    form = LoginForm()
+    print("ok3")
+    #print(form)
+    if request.method == 'POST':
+        print("post")
+        if form.validate_on_submit():
+
+            user = User.query.filter_by(username=form.username.data).first()
+            if user is None:
+                flash("You are not registered yet.", "log_warning")
+                return redirect(url_for("login"))
+
+            if not user.check_password(form.password.data):
+                flash("Username or password incorrect.", "log_warning")
+                return redirect(url_for("login"))
+
+            # Ok for log in
+            login_user(user)
+            flash("Logged in successfully.", "info")
+            return redirect(url_for("project_create"))
+
+    # GET
+    print("get")
+    return render_template("project/login.html",form=form)
 
 
 # Register
 @app.route("/register/", methods=["GET", "POST"])
 def register():
-    return "hello world!"
+
+    # check is current user already authenticated
+    if current_user.is_authenticated:
+        return redirect(url_for("project_create"))
+
+    # Form data
+    form = RegisterForm()
+    if form.validate_on_submit():
+        # Add the user in the dict of users
+        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data,password=form.password.data, group=gr2)
+
+        user.set_password(form.password.data)
+
+        db.session.add(user)
+        db.session.commit()
+        users.append(form.username.data)
+        flash("Congratulations, you are now a registered user!", "info")
+
+        return redirect(url_for("login"))
+
+    return render_template("project/register.html", form=form)
 
 
 # Logout

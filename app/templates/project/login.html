@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<link href="/static/css/style_navbar.css" rel="stylesheet">
+    <title>login</title>
+</head>
+<body>
+<div class="topnav" id="nav1">
+
+        <a class="active" href="#"><span class="">PHOTOTAG</span></a>
+
+    </div>
+<div id="login">
+        <div class="container">
+            <div id="login-row" class="row justify-content-center align-items-center">
+                <div id="login-column" class="col-md-6">
+                    <div id="login-box" class="col-md-12">
+                        <form id="login-form" class="form" action="" method="post">
+                            <h3 class="text-center text-info">Login</h3>
+                             {{ form.csrf_token }}
+                            <!-- {{ form.hidden_tag() }} -->
+                            <div class="form-group">
+                                 {{ form.username.label (class="text-primary")}} {{ form.username (class="form-control bg-white text-primary", placeholder="Your login") }}<br>
+                                {% if form.username.errors %} {% for message in form.username.errors %}
+            <small class="form-text text-danger">{{ message }}</small> {% endfor %}{% endif %}<br>
+                            </div>
+                            <div class="form-group">
+                                {{ form.password.label (class="text-primary")}} {{ form.password (class="form-control bg-white text-primary", placeholder="Your password") }}<br>
+                                {% if form.password.errors %} {% for message in form.password.errors %}
+                                <small class="form-text text-info">{{ message }}</small> {% endfor %}{% endif %}<br>
+                            </div>
+                            <div class="form-group">
+                                {{ form.submit (class="btn btn-info btn-md") }}
+
+                            </div>
+                            <div id="register-link" class="text-right">
+                                <a href="/register" class="text-info">Register here</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
