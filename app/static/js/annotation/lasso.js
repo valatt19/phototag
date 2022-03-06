@@ -57,13 +57,25 @@ function addLasso(){
     function saveForm() {
         
         // Save in list
-        var message = "l"
+        const sel = {type:current, p:[]};
+        var nb_boxes = boxes.length;
+        var message = nb_boxes + "-" + document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
+
+        var button_delete = document.createElement("button");
+        button_delete.innerHTML = "Delete";
+        button_delete.onclick = function() {deleteLasso(nb_boxes);}
+
+        var li = document.createElement("li");
+        li.appendChild(document.createTextNode(message));
+        li.appendChild(button_delete);
+
+        annotations.appendChild(li);
 
         ctxo.beginPath();
         for (var index = 0; index < points.length; index ++){
             // add in list
             var point = points[index];
-            message = message + "-(" + Math.round(point.x/zoom) + ":" + Math.round(point.y/zoom) + ")"
+            sel.p.push(point);
             
             // draw in ctxo
             if (index == 0){
@@ -72,10 +84,8 @@ function addLasso(){
                 ctxo.lineTo(point.x, point.y);
             }
         }
-        // add list
-        var li = document.createElement("li");
-        li.appendChild(document.createTextNode(message));
-        annotations.appendChild(li);
+
+        boxes.push(sel);
 
         // Save free form in layer
         ctxo.fillStyle = `hsla(${colors[current]},75%,50%,0.2)`;
@@ -139,4 +149,29 @@ function addLasso(){
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
+}
+
+function deleteLasso(index) {
+    clear(ctx);
+    // make mainDraw() fire every INTERVAL milliseconds
+    setInterval(mainDraw, INTERVAL);
+    var toDelete = document.getElementById("annotations").getElementsByTagName("li")[index];
+
+    var l = boxes.length;
+    var i = index+1;
+    for (i; i < l; i++) {
+        var toChange = document.getElementById("annotations").getElementsByTagName("li")[i].getElementsByTagName("button");
+        var newi = i-1;
+        // Rectangle = 2 buttons and lasso = 1 button
+        if (toChange.length == 2 ) {           
+            toChange[0].onclick = function() {modifyRect(newi);}
+            toChange[1].onclick = function() {deleteRect(newi);}
+        } else {
+            toChange[0].onclick = function() {deleteLasso(newi);}
+        }
+    }
+
+    toDelete.parentNode.removeChild(toDelete);
+    boxes.splice(index,1);
+    invalidate();
 }

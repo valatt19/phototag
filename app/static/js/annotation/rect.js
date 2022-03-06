@@ -54,9 +54,7 @@ function addRect(){
         e.preventDefault();
         e.stopPropagation();
 
-        ctx.strokeStyle = `hsl(${colors[current]},75%,50%)`;
         ctx.lineWidth = 3;
-        ctxo.strokeStyle = `hsl(${colors[current]},75%,50%)`;
         ctxo.lineWidth = 3;
     
         // save the starting x/y of the rectangle
@@ -108,7 +106,7 @@ function addRect(){
     
         // draw a new rect from the start position 
         // to the current mouse position
-        ctx.strokeRect(startX, startY, width, height);
+        drawRect(ctx,current,startX,startY,startX+width,startY+height);
     
         prevStartX = startX;
         prevStartY = startY;
@@ -121,10 +119,11 @@ function addRect(){
     // FUNCTION
     function saveRect() {
         // Save rectangle in layer
+        clear(ctx);
         drawRect(ctxo,current,prevStartX,prevStartY,prevEndX,prevEndY);
 
         // Save in list
-        const rect = {type:current, x:startX, y:startY, w:width,h:height};
+        const rect = {tool:"rect",type:current, x:startX, y:startY, w:width,h:height};
         var nb_boxes = boxes.length;
         var message = nb_boxes + "-" + document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
         boxes.push(rect);
@@ -165,6 +164,7 @@ function drawRect(c,type,x1,y1,x2,y2) {
     c.lineTo(x1, y2);
     c.lineTo(x1, y1);
     c.fillStyle = `hsla(${colors[type]},75%,50%,0.2)`;
+    c.strokeStyle = `hsla(${colors[type]},75%,50%,1)`;
     c.fill();
     c.stroke();
     c.closePath();
@@ -205,7 +205,7 @@ function modifyRect(index) {
     // get correct rec
     var updateRect = boxes[index];
 
-    ctx.strokeStyle = mySelColor;
+    ctx.strokeStyle = "black";
     ctx.lineWidth = mySelWidth;
     ctx.strokeRect(updateRect.x,updateRect.y,updateRect.w,updateRect.h);
     
@@ -285,7 +285,17 @@ function modifyRect(index) {
                 boxes[mySel].w = mx - oldx;
                 boxes[mySel].h = my - oldy;
                 break;
-            }   
+            }
+            var b = boxes[mySel];
+            selectionHandles = [{x:b.x-half, y:b.y-half}, 
+                {x:b.x+b.w/2-half, y:b.y-half},
+                {x:b.x+b.w-half, y:b.y-half},
+                {x:b.x-half, y:b.y+b.h/2-half},
+                {x:b.x+b.w-half, y:b.y+b.h/2-half},
+                {x:b.x-half, y:b.y+b.h-half},
+                {x:b.x+b.w/2-half, y:b.y+b.h-half},
+                {x:b.x+b.w-half, y:b.y+b.h-half}];   
+
             invalidate();
         }
 
@@ -391,6 +401,7 @@ function modifyRect(index) {
         isDrag = false;
         isResizeDrag = false;
         expectResize = -1;
+        clear(ctx);
     }
 
 
@@ -427,7 +438,33 @@ function mainDraw() {
         var l = boxes.length;
         for (var i = 0; i < l; i++) {
             var b = boxes[i];
-            drawRect(ctxo,b.type,b.x,b.y,b.x+b.w,b.y+b.h);
+            if (b.tool == "rect") {
+                // Box is a rectangle
+                drawRect(ctxo,b.type,b.x,b.y,b.x+b.w,b.y+b.h);
+            } else {
+                // Box is a free form
+                var b2_points = b.p;
+                ctxo.beginPath();
+                for (var index = 0; index < b2_points.length; index ++){
+                    // add in list
+                    var point = b2_points[index];
+                    
+                    // draw in ctxo
+                    if (index == 0){
+                        ctxo.moveTo(point.x, point.y);
+                    } else {
+                        ctxo.lineTo(point.x, point.y);
+                    }
+                }
+
+                // Save free form in layer
+                ctxo.fillStyle = `hsla(${colors[b.type]},75%,50%,0.2)`;
+                ctxo.strokeStyle = `hsla(${colors[b.type]},75%,50%,1)`;
+                ctxo.lineTo(b2_points[0].x, b2_points[0].y);
+                ctxo.fill();
+                ctxo.stroke();
+                ctxo.closePath();
+            }
         }
         canvasValid = true;
     }
@@ -436,7 +473,23 @@ function mainDraw() {
 function deleteRect(index) {
     // make mainDraw() fire every INTERVAL milliseconds
     setInterval(mainDraw, INTERVAL);
-    var toDelete = document.getElementById("annotations").getElementsByTagName("li")[index]
+    
+    var toDelete = document.getElementById("annotations").getElementsByTagName("li")[index];
+
+    var l = boxes.length;
+    var i = index+1;
+    for (i; i < l; i++) {
+        var toChange = document.getElementById("annotations").getElementsByTagName("li")[i].getElementsByTagName("button");
+        var newi = i-1;
+        // Rectangle = 2 buttons and lasso = 1 button
+        if (toChange.length == 2 ) {           
+            toChange[0].onclick = function() {modifyRect(newi);}
+            toChange[1].onclick = function() {deleteRect(newi);}
+        } else {
+            toChange[0].onclick = function() {deleteLasso(newi);}
+        }
+    }
+
     toDelete.parentNode.removeChild(toDelete);
     boxes.splice(index,1);
     invalidate();
