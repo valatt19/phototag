@@ -16,7 +16,13 @@ class Image():
         self.last_time = last_time
         self.last_person = last_person
         self.collaborators = [] 
-        self.annotations = 0
+        self.annotations = []
+        self.nb_annotations = 0
+
+    def update_annotations(self,json_list):
+        self.annotations = json_list
+        self.nb_annotations = len(json_list)
+
 
 #----------------------------User-----------------------------------------------
 

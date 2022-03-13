@@ -1,4 +1,3 @@
-boxes = []
 var canvasValid = false;
 var INTERVAL = 20;  // how often, in milliseconds, we check to see if a redraw is needed
 
@@ -212,24 +211,17 @@ function modifyRect(index) {
     // draw the boxes
     
     var half = 2.5;
-    var selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
-                            {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
-                            {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
-                            {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
-                            {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h/2-half},
-                            {x:updateRect.x-half, y:updateRect.y+updateRect.h-half},
-                            {x:updateRect.x+updateRect.w/2-half, y:updateRect.y+updateRect.h-half},
-                            {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h-half}];
-    // 0  1  2
-    // 3     4
-    // 5  6  7
 
-    // Draw all boxes
-    ctx.fillStyle = mySelBoxColor;
-    for (var i = 0; i < 8; i ++) {
-        var cur = selectionHandles[i];
-        ctx.fillRect(cur.x, cur.y, mySelBoxSize, mySelBoxSize);
-    }
+    var selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
+        {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
+        {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
+        {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
+        {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h/2-half},
+        {x:updateRect.x-half, y:updateRect.y+updateRect.h-half},
+        {x:updateRect.x+updateRect.w/2-half, y:updateRect.y+updateRect.h-half},
+        {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h-half}];
+    
+    drawHandles();
 
     // Happens when the mouse is moving inside the canvas
     function myMove(e){
@@ -294,7 +286,9 @@ function modifyRect(index) {
                 {x:b.x+b.w-half, y:b.y+b.h/2-half},
                 {x:b.x-half, y:b.y+b.h-half},
                 {x:b.x+b.w/2-half, y:b.y+b.h-half},
-                {x:b.x+b.w-half, y:b.y+b.h-half}];   
+                {x:b.x+b.w-half, y:b.y+b.h-half}]; 
+                
+            drawHandles();
 
             invalidate();
         }
@@ -410,6 +404,35 @@ function modifyRect(index) {
         my = parseInt(e.clientY - offsetY);
     }
 
+    function drawHandles() {
+        clear(ctx);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = mySelWidth;
+        ctx.strokeRect(updateRect.x,updateRect.y,updateRect.w,updateRect.h);
+        
+        // draw the boxes
+        
+        var half = 2.5;
+        var selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
+                                {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
+                                {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
+                                {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
+                                {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h/2-half},
+                                {x:updateRect.x-half, y:updateRect.y+updateRect.h-half},
+                                {x:updateRect.x+updateRect.w/2-half, y:updateRect.y+updateRect.h-half},
+                                {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h-half}];
+        // 0  1  2
+        // 3     4
+        // 5  6  7
+    
+        // Draw all boxes
+        ctx.fillStyle = mySelBoxColor;
+        for (var i = 0; i < 8; i ++) {
+            var cur = selectionHandles[i];
+            ctx.fillRect(cur.x, cur.y, mySelBoxSize, mySelBoxSize);
+        }
+    }
+
     // make mainDraw() fire every INTERVAL milliseconds
     setInterval(mainDraw, INTERVAL);
     // Add listeners
@@ -493,4 +516,5 @@ function deleteRect(index) {
     toDelete.parentNode.removeChild(toDelete);
     boxes.splice(index,1);
     invalidate();
+    list_to_json(boxes,0);
 }
