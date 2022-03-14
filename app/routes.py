@@ -95,8 +95,8 @@ def logout():
 
 # All projects of the user (created and joined by him)
 @app.route("/project/")
-def project():
-    return "hello world!"
+def project(user_id):
+        return render_template("project/project.html", user_id=user_id)
 
 
 # S1
@@ -125,12 +125,15 @@ def project_create():
             size = int(os.stat(path).st_size / 1000)
 
             # create Image object
-            img = Image(i, filename, path, size, datetime.now().strftime("%Y-%m-%d %H:%M"), "varioti")
+            img = Image(name = filename, path = path, size=size,last_time=datetime.now(),last_person=current_user.id,nb_annotations=0)#
             ds_images.append(img)
+        for im in ds_images:
+            db.session.add(im)
 
         return redirect(url_for('dataset_overview', project_id=0))
 
     return render_template("project/create.html")
+
 
 
 # Join a project

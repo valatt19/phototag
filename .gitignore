@@ -5,7 +5,8 @@ __pycache__/
 
 # C extensions
 *.so
-
+# base de données 
+*.db
 # Distribution / packaging
 .Python
 build/
@@ -97,7 +98,7 @@ __pypackages__/
 # Celery stuff
 celerybeat-schedule
 celerybeat.pid
-
+ 
 # SageMath parsed files
 *.sage.py
 
