@@ -7,7 +7,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from sqlalchemy.ext.mutable import MutableList
 
-
 #-------------------------Image---------------------------------------------
 ds_images = []
 
@@ -21,13 +20,12 @@ class Image(db.Model):
     last_person = db.Column(db.Integer,db.ForeignKey("users.id"))
     #self.collaborators = [] 
     nb_annotations =db.Column(db.Integer)
-    #annotation = db.Column(MutableList.as_mutable(PickleType),default=[])
+    annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
     #projet =  db.Column(db.Integer, db.ForeignKey("projets.id"))
 
     def update_annotations(self,json_list):
         self.annotations = json_list
         self.nb_annotations = len(json_list)
-
 
 #-------------------------------Projets------------------------------------
 

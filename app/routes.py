@@ -1,7 +1,8 @@
+from __future__ import annotations
 from app import app
 
 from flask import render_template, redirect
-from flask import url_for, request, flash
+from flask import url_for, request, flash, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from app.forms import LoginForm, RegisterForm
 
@@ -9,6 +10,7 @@ import os
 from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from datetime import datetime
+import json
 
 from app.models import Image, ds_images, User,  Group, gr1, gr2, users
 from app import db
@@ -27,20 +29,14 @@ def home():
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     # check is current user already authenticated
-
-    print("ok1")
     print(current_user.is_authenticated)
-    print("2")
     if current_user.is_authenticated:
-        print("ok2")
         return redirect(url_for("project_create"))
 
     # Form data
     form = LoginForm()
-    print("ok3")
     #print(form)
     if request.method == 'POST':
-        print("post")
         if form.validate_on_submit():
 
             user = User.query.filter_by(username=form.username.data).first()
@@ -58,7 +54,6 @@ def login():
             return redirect(url_for("project_create"))
 
     # GET
-    print("get")
     return render_template("project/login.html",form=form)
 
 
@@ -151,24 +146,38 @@ def project_join():
 # In a project pages #
 ######################
 
-# S1
 # Dataset overview of a project (list img and vid)
 @app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
     dataset = ds_images
     return render_template("project/dataset.html", dataset=dataset, id=project_id)
 
-
-# S1
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
     image = ds_images[img_id]
+    if image.nb_annotations == 0:
+        boxes = "[]"
+    else:
+        boxes = json.dumps(image.annotations)
+    print(annotations)
 
     # Compute id of previous and next images
     len_images = len(ds_images)
     prev = (img_id+len_images-1)%len_images
     next = (img_id+1)%len_images
 
-    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["first","second","third"])
+    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["first","second","third"], boxes=boxes)
+
+# Receive the json file from an image
+@app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
+def save_json(project_id, img_id):
+    image = ds_images[img_id]
+
+    # Get the annotations data and update it for image
+    data = request.get_json()
+    image.update_annotations(data['html_data'])
+
+    resp = {"success": True, "response": "file saved!"}
+    return jsonify(resp), 200    
 

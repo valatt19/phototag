@@ -15,6 +15,7 @@
 
             <button onclick="addRect()">Rect</button>
             <button onclick="addLasso()">Lasso</button>
+            <button onclick="download_image()">Download</button>
 
         </div>
 
@@ -35,8 +36,9 @@
                         {% endfor %}
                     </ul>
                 </div>
-                <div id="annotations">
+                <div id="objects">
                     <h3>Objects</h3>
+                    <table id="annotations"></table>
                 </div>
                 <div id="imagetools">
                     <h3>Image</h3>
@@ -44,7 +46,8 @@
             </div>
 
         </div>
-
+        <meta id="my_data" data-img="{{img_id}}" data-boxes="{{boxes}}">
+        <script src="{{url_for('static', filename='js/annotation/main.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/lasso.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/rect.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/zoom.js')}}"></script>
