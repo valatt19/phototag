@@ -100,8 +100,8 @@ def logout():
 
 # All projects of the user (created and joined by him)
 @app.route("/project/")
-def project():
-    return "hello world!"
+def project(user_id):
+        return render_template("project/project.html", user_id=user_id)
 
 
 # S1
