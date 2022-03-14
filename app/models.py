@@ -1,25 +1,53 @@
+from email.policy import default
 from flask_login import UserMixin
+from sqlalchemy import null, PickleType
 from app import db,login_manager
 from copy import deepcopy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from sqlalchemy.ext.mutable import MutableList
+
 
 #-------------------------Image---------------------------------------------
 ds_images = []
 
-class Image():
-    def __init__(self,id, name, path, size, last_time, last_person):
-        self.id = id
-        self.name = name
-        self.path = path
-        self.size = size
-        self.last_time = last_time
-        self.last_person = last_person
-        self.collaborators = [] 
-        self.annotations = 0
+class Image(db.Model):
+    __tablename__ = "image"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(80),unique = True, nullable=False)
+    path = db.Column(db.String(80),unique=False,nullable=False)
+    size = db.Column(db.Integer)
+    last_time = db.Column(db.DateTime, unique=False, nullable=False)
+    last_person = db.Column(db.Integer,db.ForeignKey("users.id"))
+    #self.collaborators = [] 
+    nb_annotations =db.Column(db.Integer)
+    #annotation = db.Column(MutableList.as_mutable(PickleType),default=[])
+    #projet =  db.Column(db.Integer, db.ForeignKey("projets.id"))
+
+    def update_annotations(self,json_list):
+        self.annotations = json_list
+        self.nb_annotations = len(json_list)
+
+
+#-------------------------------Projets------------------------------------
+
+"""class Projet(db.Model):
+    __tablename__ = "projets"
+    id = db.column(db.Integer, primary_key = True, autoincrement=True)
+    name = db.Column(db.String(80),unique = True, nullable=False)
+    privacy = db.column(db.Boolean,default = True)
+    nb_membre = db.column(db.Integer)
+    members =  db.Column(MutableList.as_mutable(PickleType),default=[])
+
+#--------------------------Fichiers d'images------------------------------------
+class Files(db.Model):
+    __tablename__ ="file"
+    id= db.column(db.Integer,primary_key=True,autoincrement=True)
+    filename = db.Column(db.String(80),unique = True, nullable=False)
+    size = db.Column(db.Integer)
+"""
 
 #----------------------------User-----------------------------------------------
-
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
