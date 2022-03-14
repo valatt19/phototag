@@ -26,6 +26,7 @@ class Image(db.Model):
     def update_annotations(self,json_list):
         self.annotations = json_list
         self.nb_annotations = len(json_list)
+        db.session.commit()
 
 #-------------------------------Projets------------------------------------
 

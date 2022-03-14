@@ -125,10 +125,9 @@ def project_create():
             size = int(os.stat(path).st_size / 1000)
 
             # create Image object
-            img = Image(name = filename, path = path, size=size,last_time=datetime.now(),last_person=current_user.id,nb_annotations=0)#
-            ds_images.append(img)
-        for im in ds_images:
-            db.session.add(im)
+            img = Image(name = filename, path = path, size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
+            db.session.add(img)
+            db.session.commit()
 
         return redirect(url_for('dataset_overview', project_id=0))
 
@@ -149,18 +148,19 @@ def project_join():
 # Dataset overview of a project (list img and vid)
 @app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
-    dataset = ds_images
+    dataset = Image.query.all()
     return render_template("project/dataset.html", dataset=dataset, id=project_id)
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
+    ds_images = Image.query.all()
     image = ds_images[img_id]
+    
     if image.nb_annotations == 0:
         boxes = "[]"
     else:
         boxes = json.dumps(image.annotations)
-    print(annotations)
 
     # Compute id of previous and next images
     len_images = len(ds_images)
@@ -172,7 +172,7 @@ def annotate_image(project_id, img_id):
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
 def save_json(project_id, img_id):
-    image = ds_images[img_id]
+    image = Image.query.all()[img_id]
 
     # Get the annotations data and update it for image
     data = request.get_json()
