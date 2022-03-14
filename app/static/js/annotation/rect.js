@@ -124,23 +124,42 @@ function addRect(){
         // Save in list
         const rect = {tool:"rect",type:current, x:startX, y:startY, w:width,h:height};
         var nb_boxes = boxes.length;
-        var message = nb_boxes + "-" + document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
         boxes.push(rect);
+        
+        // Save in HTML table
+        var tr = document.createElement("tr");
 
+        // Cell 1 
+        var td1 = document.createElement("td");
+        td1.innerHTML = nb_boxes;
+        tr.appendChild(td1);
+
+        // Cell 2
+        var td2 = document.createElement("td");
+        var message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
+        td2.style.background = `hsla(${colors[current]},75%,50%,0.6)`;
+        td2.innerHTML = message;
+        tr.appendChild(td2);
+
+        // Cell 3
+        var td3 = document.createElement("td");
         var button_modify = document.createElement("button");
         button_modify.innerHTML = "Modify";
-        button_modify.onclick = function() {modifyRect(nb_boxes);}
+        button_modify.onclick = function() {modifyRect(nb_boxes);};
+        td3.appendChild(button_modify);
+        tr.appendChild(td3);
 
+        // Cell 4
+        var td4 = document.createElement("td");
         var button_delete = document.createElement("button");
         button_delete.innerHTML = "Delete";
-        button_delete.onclick = function() {deleteRect(nb_boxes);}
+        button_delete.onclick = function() {deleteRect(nb_boxes);};
+        td4.appendChild(button_delete);
+        tr.appendChild(td4);
 
-        var li = document.createElement("li");
-        li.appendChild(document.createTextNode(message));
-        li.appendChild(button_modify);
-        li.appendChild(button_delete);
-
-        annotations.appendChild(li);
+        // Add in table
+        annotations.appendChild(tr);
+        list_to_json(boxes);
 
     }
 
@@ -396,6 +415,7 @@ function modifyRect(index) {
         isResizeDrag = false;
         expectResize = -1;
         clear(ctx);
+        list_to_json(boxes);
     }
 
 
@@ -497,24 +517,107 @@ function deleteRect(index) {
     // make mainDraw() fire every INTERVAL milliseconds
     setInterval(mainDraw, INTERVAL);
     
-    var toDelete = document.getElementById("annotations").getElementsByTagName("li")[index];
+    var toDelete = document.getElementById("annotations").getElementsByTagName("tr")[index];
 
     var l = boxes.length;
     var i = index+1;
     for (i; i < l; i++) {
-        var toChange = document.getElementById("annotations").getElementsByTagName("li")[i].getElementsByTagName("button");
         var newi = i-1;
+        var toChange = document.getElementById("annotations").getElementsByTagName("tr")[i].getElementsByTagName("td");
+
+        // Change color
+        var colorToChange = toChange[1];
+        colorToChange.style.background = `hsla(${colors[boxes[newi].type]},75%,50%,0.6)`;
+
+        // Change index
+        var numToChange = toChange[0];
+        numToChange.innerHTML = newi;
+
         // Rectangle = 2 buttons and lasso = 1 button
         if (toChange.length == 2 ) {           
-            toChange[0].onclick = function() {modifyRect(newi);}
-            toChange[1].onclick = function() {deleteRect(newi);}
+            toChange[2].getElementsByTagName("button")[0].onclick = function() {modifyRect(newi);}
+            toChange[3].getElementsByTagName("button")[0].onclick = function() {deleteRect(newi);}
         } else {
-            toChange[0].onclick = function() {deleteLasso(newi);}
+            toChange[3].getElementsByTagName("button")[0].onclick = function() {deleteLasso(newi);}
         }
     }
 
     toDelete.parentNode.removeChild(toDelete);
     boxes.splice(index,1);
     invalidate();
-    list_to_json(boxes,0);
+    list_to_json(boxes);
 }
+
+// Load previously saved annotations
+$(document).ready(function() {
+  var saved = $('#my_data').data("boxes");
+  if (saved.length > 0 ) {
+      boxes = saved;
+      setInterval(mainDraw, INTERVAL);
+      for (let i=0; i < boxes.length; i++) {
+        if (boxes[i].tool == "rect" ) {           
+            // Save in HTML table
+            var tr = document.createElement("tr");
+
+            // Cell 1 
+            var td1 = document.createElement("td");
+            td1.innerHTML = i;
+            tr.appendChild(td1);
+
+            // Cell 2
+            var td2 = document.createElement("td");
+            var message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
+            td2.style.background = `hsla(${colors[current]},75%,50%,0.6)`;
+            tr.appendChild(td2);
+
+            // Cell 3
+            var td3 = document.createElement("td");
+            var button_modify = document.createElement("button");
+            button_modify.innerHTML = "Modify";
+            button_modify.onclick = function() {modifyRect(nb_boxes);}
+            tr.appendChild(td3);
+
+            // Cell 4
+            var td4 = document.createElement("td");
+            var button_delete = document.createElement("button");
+            button_delete.innerHTML = "Delete";
+            button_delete.onclick = function() {deleteRect(nb_boxes);}
+            tr.appendChild(td4);
+
+            annotations.appendChild(tr);
+        } else {
+ 
+            // Save in HTML table
+            var tr = document.createElement("tr");
+
+            // Cell 1 
+            var td1 = document.createElement("td");
+            td1.innerHTML = i;
+            tr.appendChild(td1);
+
+            // Cell 2
+            var td2 = document.createElement("td");
+            var message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
+            td2.style.background = `hsla(${colors[current]},75%,50%,0.6)`;
+            tr.appendChild(td2);
+
+            // Cell 3
+            var td3 = document.createElement("td");
+            var button_modify = document.createElement("button");
+            button_modify.innerHTML = "Modify";
+            button_modify.onclick = function() {modifyRect(nb_boxes);}
+            tr.appendChild(td3);
+
+            // Cell 4
+            var td4 = document.createElement("td");
+            var button_delete = document.createElement("button");
+            button_delete.innerHTML = "Delete";
+            button_delete.onclick = function() {deleteRect(nb_boxes);}
+            tr.appendChild(td4);
+
+            annotations.appendChild(tr);
+        }
+        invalidate();
+    }
+  }
+});
