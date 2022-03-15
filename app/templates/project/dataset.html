@@ -13,7 +13,7 @@
             <tr>
               <td><a href="../annotate/{{loop.index-1}}">{{file.name}}</a></td>
               <td>{{file.size}} ko</td>
-              <td>{{file.last_time}} - {{file.last_person}}</td>
+              <td>{{file.last_time.strftime('%Y-%m-%d %H:%M')}}</td>
               <td>{{file.nb_annotations}}</td>
               <td>0</td>
             </tr>

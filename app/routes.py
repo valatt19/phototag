@@ -129,7 +129,14 @@ def project_create():
             db.session.add(img)
             db.session.commit()
 
-        pr = Project(name = request.form["pname"], privacy=bool(request.form["ptype"]), nb_membre=0)
+        # Check if project is public or not
+        if request.form["ptype"] == "1":
+            ptype = True
+        else:
+            ptype = False 
+
+        # Add project in DB
+        pr = Project(name = request.form["pname"], privacy=ptype, nb_membre=0)
         db.session.add(pr)
         db.session.commit()
 
@@ -153,13 +160,15 @@ def project_join():
 @app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
     dataset = Image.query.all()
-    return render_template("project/dataset.html", dataset=dataset, id=project_id)
+    project = Project.query.all()[project_id]
+    return render_template("project/dataset.html", dataset=dataset, id=project_id, project=project)
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
     ds_images = Image.query.all()
     image = ds_images[img_id]
+    project = Project.query.all()[project_id]
     
     if image.nb_annotations == 0:
         boxes = "[]"
@@ -171,7 +180,7 @@ def annotate_image(project_id, img_id):
     prev = (img_id+len_images-1)%len_images
     next = (img_id+1)%len_images
 
-    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["first","second","third"], boxes=boxes)
+    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["CLASS 1","CLASS 2","CLASS 3"], boxes=boxes, project=project)
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
