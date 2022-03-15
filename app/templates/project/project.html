@@ -5,18 +5,14 @@
     <table>
         <tr>
           <th>Name</th>
-          <th>Last Update</th>
           <th>Members</th>
-          <th>Images</th>
-          <th>Size</th>
+          <th>Privacy</th>
         </tr>
         {% for project in projects %}
         <tr>
-          <td><a href="../project/{{loop.index-1}}">{{project.name}}</a></td>
-          <td>{{project.last_time}} - {{project.last_person}}</td>
+          <td><a href="../project/{{loop.index-1}}/dataset">{{project.name}}</a></td>
           <td>{{project.members}}</td>
-          <td>{{project.images}}</td>
-          <td>{{project.size} Go}</td>
+          <td>{{project.privacy}}</td>
         </tr>
         {% endfor %}
   </table>
