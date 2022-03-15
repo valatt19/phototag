@@ -30,6 +30,7 @@ class Image(db.Model):
 
 #-------------------------------Projets------------------------------------
 
+
 class Project(db.Model):
     __tablename__ = "project"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -37,7 +38,6 @@ class Project(db.Model):
     privacy = db.Column(db.Boolean,default = True)
     nb_membre = db.Column(db.Integer)
     members = db.Column(MutableList.as_mutable(PickleType),default=[])
-
 
 """
 #--------------------------Fichiers d'images------------------------------------
