@@ -19,9 +19,9 @@ class Image(db.Model):
     last_time = db.Column(db.DateTime, unique=False, nullable=False)
     last_person = db.Column(db.Integer,db.ForeignKey("users.id"))
     #self.collaborators = [] 
-    nb_annotations =db.Column(db.Integer)
+    nb_annotations = db.Column(db.Integer)
     annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
-    #projet =  db.Column(db.Integer, db.ForeignKey("projets.id"))
+    project = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     def update_annotations(self,json_list):
         self.annotations = json_list
@@ -30,14 +30,17 @@ class Image(db.Model):
 
 #-------------------------------Projets------------------------------------
 
-"""class Projet(db.Model):
-    __tablename__ = "projets"
+
+class Project(db.Model):
+    __tablename__ = "project"
     id = db.column(db.Integer, primary_key = True, autoincrement=True)
     name = db.Column(db.String(80),unique = True, nullable=False)
     privacy = db.column(db.Boolean,default = True)
     nb_membre = db.column(db.Integer)
-    members =  db.Column(MutableList.as_mutable(PickleType),default=[])
+    members = db.Column(MutableList.as_mutable(PickleType),default=[])
 
+
+"""
 #--------------------------Fichiers d'images------------------------------------
 class Files(db.Model):
     __tablename__ ="file"
