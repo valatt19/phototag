@@ -12,7 +12,7 @@ from werkzeug.datastructures import FileStorage
 from datetime import datetime
 import json
 
-from app.models import Image, ds_images, User,  Group, gr1, gr2, users
+from app.models import Image, ds_images, User,  Group, gr1, gr2, users, Project
 from app import db
 
 ##############
@@ -128,6 +128,10 @@ def project_create():
             img = Image(name = filename, path = path, size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
             db.session.add(img)
             db.session.commit()
+
+        pr = Project(name = request.form["pname"], privacy=bool(request.form["ptype"]), nb_membre=0)
+        db.session.add(pr)
+        db.session.commit()
 
         return redirect(url_for('dataset_overview', project_id=0))
 

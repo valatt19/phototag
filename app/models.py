@@ -21,7 +21,7 @@ class Image(db.Model):
     #self.collaborators = [] 
     nb_annotations = db.Column(db.Integer)
     annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
-    project = db.Column(db.Integer, db.ForeignKey("project.id"))
+    #project = db.Column(db.Integer, db.ForeignKey("project.id"))
 
     def update_annotations(self,json_list):
         self.annotations = json_list
@@ -30,13 +30,12 @@ class Image(db.Model):
 
 #-------------------------------Projets------------------------------------
 
-
 class Project(db.Model):
     __tablename__ = "project"
-    id = db.column(db.Integer, primary_key = True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80),unique = True, nullable=False)
-    privacy = db.column(db.Boolean,default = True)
-    nb_membre = db.column(db.Integer)
+    privacy = db.Column(db.Boolean,default = True)
+    nb_membre = db.Column(db.Integer)
     members = db.Column(MutableList.as_mutable(PickleType),default=[])
 
 
