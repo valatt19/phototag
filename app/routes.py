@@ -51,7 +51,7 @@ def login():
             # Ok for log in
             login_user(user)
             flash("Logged in successfully.", "info")
-            return redirect(url_for("project_create"))
+            return redirect(url_for("project"))
 
     # GET
     return render_template("project/login.html",form=form)
@@ -63,7 +63,7 @@ def register():
 
     # check is current user already authenticated
     if current_user.is_authenticated:
-        return redirect(url_for("project_create"))
+        return redirect(url_for("project"))
 
     # Form data
     form = RegisterForm()
@@ -95,9 +95,14 @@ def logout():
 
 # All projects of the user (created and joined by him)
 @app.route("/project/")
-def project(user_id):
-        return render_template("project/project.html", user_id=user_id)
+def project(user_id = current_user):
+    """project_query = "SELECT * FROM Project WHERE members"
+    query = Project.query(project_query)
 
+    projects = query.all()
+    print(projects)"""
+    projects = Project.query.all()
+    return render_template("project/project.html", projects=projects)
 
 # S1
 # Create a new project (Sprint 1 : only load a dataset)
@@ -132,7 +137,7 @@ def project_create():
         pr = Project(name = request.form["pname"], privacy=bool(request.form["ptype"]), nb_membre=0)
         db.session.add(pr)
         db.session.commit()
-
+        #changer project_id pour créer plusieurs projets
         return redirect(url_for('dataset_overview', project_id=0))
 
     return render_template("project/create.html")
