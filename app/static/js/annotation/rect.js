@@ -1,41 +1,6 @@
-let canvasValid = false;
-let INTERVAL = 20;  // how often, in milliseconds, we check to see if a redraw is needed
-
-let canvas = document.getElementById("layerDraw");
-let overlay = document.getElementById("layerShow");
-let ctx = canvas.getContext("2d");
-let ctxo = overlay.getContext("2d");
-
-// calculate where the canvas is on the window
-// (used to help calculate mouseX/mouseY)
-let $canvas = $("#layerDraw");
-let canvasOffset = $canvas.offset();
-let offsetX = canvasOffset.left;
-let offsetY = canvasOffset.top;
-let scrollX = $canvas.scrollLeft();
-let scrollY = $canvas.scrollTop();
-
 function addRect(){
-    // get references to the canvas and context
-    let canvas = document.getElementById("layerDraw");
-    let overlay = document.getElementById("layerShow");
-    let ctx = canvas.getContext("2d");
-    let ctxo = overlay.getContext("2d");
-
-    // calculate where the canvas is on the window
-    // (used to help calculate mouseX/mouseY)
-    let $canvas = $("#layerDraw");
-    let canvasOffset = $canvas.offset();
-    let offsetX = canvasOffset.left;
-    let offsetY = canvasOffset.top;
-    let scrollX = $canvas.scrollLeft();
-    let scrollY = $canvas.scrollTop();
-
     // updateRect flag is true when the user is dragging the mouse
     let isDown = false;
-
-    // List of all annotations
-    let annotations = document.getElementById("annotations");
 
     // these lets will hold the starting and stoping mouse position 
     let startX;
@@ -43,18 +8,10 @@ function addRect(){
     let width;
     let height;
 
-    let prevStartX = 0;
-    let prevStartY = 0;
-    let prevWidth  = 0;
-    let prevHeight = 0;
-
     //FUNCTION
     function handleMouseDown(e) {
         e.preventDefault();
         e.stopPropagation();
-
-        ctx.lineWidth = 3;
-        ctxo.lineWidth = 3;
     
         // save the starting x/y of the rectangle
         startX = parseInt(e.clientX - offsetX);
@@ -71,7 +28,15 @@ function addRect(){
     
         // the drag is over, clear the dragging flag + save coordinates
         if (isDown) {
-            saveRect();
+            // Add the new rect
+            const rect = {tool:"rect",type:current, x:startX, y:startY, w:width,h:height};
+            boxes.push(rect);
+            
+            // Redraw new canvas and update annotations list
+            invalidate();
+            setInterval(mainDraw, INTERVAL);
+            setAnnotationsList(boxes);
+            clear(ctx);
         }
         isDown = false;
         canvas.removeEventListener("mousedown",handleMouseDown);
@@ -106,61 +71,6 @@ function addRect(){
         // draw a new rect from the start position 
         // to the current mouse position
         drawRect(ctx,current,startX,startY,startX+width,startY+height);
-    
-        prevStartX = startX;
-        prevStartY = startY;
-        prevWidth  = width;
-        prevHeight = height;
-        prevEndX = startX + width;
-        prevEndY = startY + height;
-    }
-    
-    // FUNCTION
-    function saveRect() {
-        // Save rectangle in layer
-        clear(ctx);
-        drawRect(ctxo,current,prevStartX,prevStartY,prevEndX,prevEndY);
-
-        // Save in list
-        const rect = {tool:"rect",type:current, x:startX, y:startY, w:width,h:height};
-        let nb_boxes = boxes.length;
-        boxes.push(rect);
-        
-        // Save in HTML table
-        let tr = document.createElement("tr");
-
-        // Cell 1 
-        let td1 = document.createElement("td");
-        td1.innerHTML = nb_boxes;
-        tr.appendChild(td1);
-
-        // Cell 2
-        let td2 = document.createElement("td");
-        let message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
-        td2.style.background = `hsla(${colors[current]},75%,50%,0.6)`;
-        td2.innerHTML = message;
-        tr.appendChild(td2);
-
-        // Cell 3
-        let td3 = document.createElement("td");
-        let button_modify = document.createElement("button");
-        button_modify.innerHTML = "Modify";
-        button_modify.onclick = function() {modifyRect(nb_boxes);};
-        td3.appendChild(button_modify);
-        tr.appendChild(td3);
-
-        // Cell 4
-        let td4 = document.createElement("td");
-        let button_delete = document.createElement("button");
-        button_delete.innerHTML = "Delete";
-        button_delete.onclick = function() {deleteRect(nb_boxes);};
-        td4.appendChild(button_delete);
-        tr.appendChild(td4);
-
-        // Add in table
-        annotations.appendChild(tr);
-        list_to_json(boxes);
-
     }
 
     // Remove previous listeners
@@ -197,28 +107,9 @@ function modifyRect(index) {
     let expectResize = -1; // New, will save the # of the selection handle if the mouse is over one.
     let mx, my; // mouse coordinates
 
-    // get references to the canvas and context
-    let canvas = document.getElementById("layerDraw");
-    let overlay = document.getElementById("layerShow");
-    let ctx = canvas.getContext("2d");
-    let ctxo = overlay.getContext("2d");
-
-    let mySelColor = '#CC0000';
     let mySelWidth = 4;
     let mySelBoxColor = 'black'; // New for selection boxes
     let mySelBoxSize = 8;
-
-    // calculate where the canvas is on the window
-    // (used to help calculate mouseX/mouseY)
-    let $canvas = $("#layerDraw");
-    let canvasOffset = $canvas.offset();
-    let offsetX = canvasOffset.left;
-    let offsetY = canvasOffset.top;
-    let scrollX = $canvas.scrollLeft();
-    let scrollY = $canvas.scrollTop();
-
-    // updateRect flag is true when the user is dragging the mouse
-    let isDown = false;
 
     // get correct rec
     let updateRect = boxes[index];
@@ -228,7 +119,6 @@ function modifyRect(index) {
     ctx.strokeRect(updateRect.x,updateRect.y,updateRect.w,updateRect.h);
     
     // draw the boxes
-    
     let half = 2.5;
 
     selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
@@ -461,59 +351,8 @@ function modifyRect(index) {
     canvas.addEventListener("mouseup", myUp);
 }
 
-function invalidate() {
-    canvasValid = false;
-}
 
-//wipes the canvas context
-function clear(c) {
-    c.clearRect(0, 0, canvas.width, canvas.height);
-}
-    
-// Main draw loop.
-// While draw is called as often as the INTERVAL letiable demands,
-// It only ever does something if the canvas gets invalidated by our code
-function mainDraw() {
-    if (canvasValid == false) {
-        clear(ctxo);
-    
-        // draw all boxes
-        let l = boxes.length;
-        for (let i = 0; i < l; i++) {
-            let b = boxes[i];
-            if (b.tool == "rect") {
-                // Box is a rectangle
-                drawRect(ctxo,b.type,b.x,b.y,b.x+b.w,b.y+b.h);
-            } else {
-                // Box is a free form
-                let b2_points = b.p;
-                ctxo.beginPath();
-                for (let index = 0; index < b2_points.length; index ++){
-                    // add in list
-                    let point = b2_points[index];
-                    
-                    // draw in ctxo
-                    if (index == 0){
-                        ctxo.moveTo(point.x, point.y);
-                    } else {
-                        ctxo.lineTo(point.x, point.y);
-                    }
-                }
-
-                // Save free form in layer
-                ctxo.fillStyle = `hsla(${colors[b.type]},75%,50%,0.2)`;
-                ctxo.strokeStyle = `hsla(${colors[b.type]},75%,50%,1)`;
-                ctxo.lineTo(b2_points[0].x, b2_points[0].y);
-                ctxo.fill();
-                ctxo.stroke();
-                ctxo.closePath();
-            }
-        }
-        canvasValid = true;
-    }
-}
-
-function deleteRect(index) {
+function deleteBoxe(index) {
     // make mainDraw() fire every INTERVAL milliseconds
     setInterval(mainDraw, INTERVAL);
     
@@ -547,64 +386,3 @@ function deleteRect(index) {
     invalidate();
     list_to_json(boxes);
 }
-
-// Load previously saved annotations
-$(document).ready(function() {
-  let saved = $('#my_data').data("boxes");
-  if (saved.length > 0 ) {
-      boxes = saved;
-      setInterval(mainDraw, INTERVAL);
-      for (let i=0; i < boxes.length; i++) {
-
-        // Save in HTML table
-        let tr = document.createElement("tr");
-
-        // Cell 1 
-        let td1 = document.createElement("td");
-        td1.innerHTML = i;
-        tr.appendChild(td1);
-
-        // Cell 2
-        let td2 = document.createElement("td");
-        let message = document.getElementById("classes").getElementsByTagName("li")[boxes[i].type].innerHTML;
-        let t = boxes[i].type
-        alert(colors[t]);
-        td2.style.background = `hsla(${colors[t]},75%,50%,0.6)`;
-        td2.innerHTML = message;
-        tr.appendChild(td2);
-        
-        // Cell 3
-        let button_delete;
-        if (boxes[i].tool == "rect" ) {           
-            // Cell 3 (RECT)
-            let td3 = document.createElement("td");
-            let button_modify = document.createElement("button");
-            button_modify.innerHTML = "Modify";
-            button_modify.onclick = function() {modifyRect(i);};
-            td3.appendChild(button_modify);
-            tr.appendChild(td3);
-
-            // Cell 4 button
-            button_delete = document.createElement("button");
-            button_delete.onclick = function() {deleteRect(i);};
-        } else {
-            // Cell 3 (LASSO)
-            let td3 = document.createElement("td");
-            tr.appendChild(td3);
-            
-            // Cell 4 button
-            button_delete = document.createElement("button");
-            button_delete.onclick = function() {deleteLasso(i);};
-        }
-        // Cell 4
-        let td4 = document.createElement("td");
-        button_delete.innerHTML = "Delete";
-        td4.appendChild(button_delete);
-        tr.appendChild(td4);
-
-        annotations.appendChild(tr);
-
-        invalidate();
-    }
-  }
-});

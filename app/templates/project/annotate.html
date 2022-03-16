@@ -13,8 +13,8 @@
             <a href="{{prev}}" class="next">&#8249;</a>
             <a href="{{next}}" class="next">&#8250;</a>
 
-            <button onclick="addRect()">Rect</button>
-            <button onclick="addLasso()">Lasso</button>
+            <button onclick="addBoxe('rect')">Rect</button>
+            <button onclick="addBoxe('lasso')">Lasso</button>
             <button onclick="download_image()">Download</button>
 
         </div>
@@ -48,6 +48,7 @@
         </div>
         <meta id="my_data" data-img="{{img_id}}" data-boxes="{{boxes}}">
         <script src="{{url_for('static', filename='js/annotation/main.js')}}"></script>
+        <script src="{{url_for('static', filename='js/annotation/tools.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/lasso.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/rect.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/zoom.js')}}"></script>
