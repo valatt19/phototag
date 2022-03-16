@@ -1,6 +1,3 @@
-let colors = [];
-let current = 0;
-
 // Function to generate a new color
 function generateColor(number){
     const hue = number * 137.508; // use golden angle approximation
@@ -19,7 +16,7 @@ function set_current(new_current){
 }
 
 // When document ready : add background color for all classes and select first by default
-$(document).ready(function() {
+function set_colors() {
     let classes = document.getElementById("classes").getElementsByTagName("li");
     for (let i = 0 ; i<classes.length ; i++) {
         let rand_color = generateColor(i)
@@ -27,4 +24,4 @@ $(document).ready(function() {
         classes[i].style.background = `hsla(${rand_color},75%,50%,0.6)`;
     }
     classes[0].style.border = "thick solid black";
-});
+};
