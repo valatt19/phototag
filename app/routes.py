@@ -171,9 +171,10 @@ def dataset_overview(project_id):
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
-    ds_images = Image.query.all()
-    image = ds_images[img_id]
-    project = Project.query.all()[project_id]
+    #ds_images = Image.query.all()
+    image = Image(name = "test_girafes.jpg", path = "test_girafes.jpg", size=25, last_time=datetime.now(),last_person="varioti",annotations=[],nb_annotations=0)
+    ds_images = [image]
+    project = Project(name = "p", privacy=False, nb_membre=1)
     
     if image.nb_annotations == 0:
         boxes = "[]"
