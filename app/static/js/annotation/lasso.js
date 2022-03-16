@@ -1,28 +1,28 @@
 function addLasso(){
 
     // get references to the canvas and context
-    var canvas = document.getElementById("layerDraw");
-    var overlay = document.getElementById("layerShow");
-    var ctx = canvas.getContext("2d");
-    var ctxo = overlay.getContext("2d");
+    let canvas = document.getElementById("layerDraw");
+    let overlay = document.getElementById("layerShow");
+    let ctx = canvas.getContext("2d");
+    let ctxo = overlay.getContext("2d");
 
-    var annotations = document.getElementById("annotations");
+    let annotations = document.getElementById("annotations");
 
     // calculate where the canvas is on the window
     // (used to help calculate mouseX/mouseY)
-    var $canvas = $("#layerDraw");
-    var canvasOffset = $canvas.offset();
-    var offsetX = canvasOffset.left;
-    var offsetY = canvasOffset.top;
-    var scrollX = $canvas.scrollLeft();
-    var scrollY = $canvas.scrollTop();
+    let $canvas = $("#layerDraw");
+    let canvasOffset = $canvas.offset();
+    let offsetX = canvasOffset.left;
+    let offsetY = canvasOffset.top;
+    let scrollX = $canvas.scrollLeft();
+    let scrollY = $canvas.scrollTop();
 
     // this flage is true when the user is dragging the mouse
-    var isDown = false;
+    let isDown = false;
 
     // starting point and list containing all the points of the form
-    var start = {x:0,y:0};
-    var points = [];
+    let start = {x:0,y:0};
+    let points = [];
 
     // FUNCTION
     function Render(){
@@ -39,8 +39,8 @@ function addLasso(){
         }
       
         ctx.beginPath();
-        for (var index = 0; index < points.length; index ++){
-            var point = points[index];
+        for (let index = 0; index < points.length; index ++){
+            let point = points[index];
             if (index == 0){
                 ctx.moveTo(point.x, point.y);
             } else {
@@ -58,30 +58,30 @@ function addLasso(){
         
         // Save in list
         const sel = {type:current, p:[]};
-        var nb_boxes = boxes.length;
+        let nb_boxes = boxes.length;
 
         // Save in HTML table
-        var tr = document.createElement("tr");
+        let tr = document.createElement("tr");
 
         // Cell 1 
-        var td1 = document.createElement("td");
+        let td1 = document.createElement("td");
         td1.innerHTML = nb_boxes;
         tr.appendChild(td1);
 
         // Cell 2
-        var td2 = document.createElement("td");
-        var message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
+        let td2 = document.createElement("td");
+        let message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
         td2.style.background = `hsla(${colors[current]},75%,50%,0.6)`;
         td2.innerHTML = message;
         tr.appendChild(td2);
 
         // Cell 3
-        var td3 = document.createElement("td");
+        let td3 = document.createElement("td");
         tr.appendChild(td3);
 
         // Cell 4
-        var td4 = document.createElement("td");
-        var button_delete = document.createElement("button");
+        let td4 = document.createElement("td");
+        let button_delete = document.createElement("button");
         button_delete.innerHTML = "Delete";
         button_delete.onclick = function() {deleteLasso(nb_boxes);};
         td4.appendChild(button_delete);
@@ -91,9 +91,9 @@ function addLasso(){
         annotations.appendChild(tr);
 
         ctxo.beginPath();
-        for (var index = 0; index < points.length; index ++){
+        for (let index = 0; index < points.length; index ++){
             // add in list
-            var point = points[index];
+            let point = points[index];
             sel.p.push(point);
             
             // draw in ctxo
@@ -175,20 +175,20 @@ function deleteLasso(index) {
     clear(ctx);
     // make mainDraw() fire every INTERVAL milliseconds
     setInterval(mainDraw, INTERVAL);
-    var toDelete = document.getElementById("annotations").getElementsByTagName("tr")[index];
+    let toDelete = document.getElementById("annotations").getElementsByTagName("tr")[index];
 
-    var l = boxes.length;
-    var i = index+1;
+    let l = boxes.length;
+    let i = index+1;
     for (i; i < l; i++) {
-        var newi = i-1;
-        var toChange = document.getElementById("annotations").getElementsByTagName("tr")[i].getElementsByTagName("td");
+        let newi = i-1;
+        let toChange = document.getElementById("annotations").getElementsByTagName("tr")[i].getElementsByTagName("td");
 
         // Change color
-        var colorToChange = toChange[1];
+        let colorToChange = toChange[1];
         colorToChange.style.background = `hsla(${colors[boxes[newi].type]},75%,50%,0.6)`;
 
         // Change index
-        var numToChange = toChange[0];
+        let numToChange = toChange[0];
         numToChange.innerHTML = newi;
 
         // Rectangle = 2 buttons and lasso = 1 button

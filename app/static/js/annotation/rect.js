@@ -1,52 +1,52 @@
-var canvasValid = false;
-var INTERVAL = 20;  // how often, in milliseconds, we check to see if a redraw is needed
+let canvasValid = false;
+let INTERVAL = 20;  // how often, in milliseconds, we check to see if a redraw is needed
 
-var canvas = document.getElementById("layerDraw");
-var overlay = document.getElementById("layerShow");
-var ctx = canvas.getContext("2d");
-var ctxo = overlay.getContext("2d");
+let canvas = document.getElementById("layerDraw");
+let overlay = document.getElementById("layerShow");
+let ctx = canvas.getContext("2d");
+let ctxo = overlay.getContext("2d");
 
 // calculate where the canvas is on the window
 // (used to help calculate mouseX/mouseY)
-var $canvas = $("#layerDraw");
-var canvasOffset = $canvas.offset();
-var offsetX = canvasOffset.left;
-var offsetY = canvasOffset.top;
-var scrollX = $canvas.scrollLeft();
-var scrollY = $canvas.scrollTop();
+let $canvas = $("#layerDraw");
+let canvasOffset = $canvas.offset();
+let offsetX = canvasOffset.left;
+let offsetY = canvasOffset.top;
+let scrollX = $canvas.scrollLeft();
+let scrollY = $canvas.scrollTop();
 
 function addRect(){
     // get references to the canvas and context
-    var canvas = document.getElementById("layerDraw");
-    var overlay = document.getElementById("layerShow");
-    var ctx = canvas.getContext("2d");
-    var ctxo = overlay.getContext("2d");
+    let canvas = document.getElementById("layerDraw");
+    let overlay = document.getElementById("layerShow");
+    let ctx = canvas.getContext("2d");
+    let ctxo = overlay.getContext("2d");
 
     // calculate where the canvas is on the window
     // (used to help calculate mouseX/mouseY)
-    var $canvas = $("#layerDraw");
-    var canvasOffset = $canvas.offset();
-    var offsetX = canvasOffset.left;
-    var offsetY = canvasOffset.top;
-    var scrollX = $canvas.scrollLeft();
-    var scrollY = $canvas.scrollTop();
+    let $canvas = $("#layerDraw");
+    let canvasOffset = $canvas.offset();
+    let offsetX = canvasOffset.left;
+    let offsetY = canvasOffset.top;
+    let scrollX = $canvas.scrollLeft();
+    let scrollY = $canvas.scrollTop();
 
     // updateRect flag is true when the user is dragging the mouse
-    var isDown = false;
+    let isDown = false;
 
     // List of all annotations
-    var annotations = document.getElementById("annotations");
+    let annotations = document.getElementById("annotations");
 
-    // these vars will hold the starting and stoping mouse position 
-    var startX;
-    var startY;
-    var width;
-    var height;
+    // these lets will hold the starting and stoping mouse position 
+    let startX;
+    let startY;
+    let width;
+    let height;
 
-    var prevStartX = 0;
-    var prevStartY = 0;
-    var prevWidth  = 0;
-    var prevHeight = 0;
+    let prevStartX = 0;
+    let prevStartY = 0;
+    let prevWidth  = 0;
+    let prevHeight = 0;
 
     //FUNCTION
     function handleMouseDown(e) {
@@ -123,35 +123,35 @@ function addRect(){
 
         // Save in list
         const rect = {tool:"rect",type:current, x:startX, y:startY, w:width,h:height};
-        var nb_boxes = boxes.length;
+        let nb_boxes = boxes.length;
         boxes.push(rect);
         
         // Save in HTML table
-        var tr = document.createElement("tr");
+        let tr = document.createElement("tr");
 
         // Cell 1 
-        var td1 = document.createElement("td");
+        let td1 = document.createElement("td");
         td1.innerHTML = nb_boxes;
         tr.appendChild(td1);
 
         // Cell 2
-        var td2 = document.createElement("td");
-        var message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
+        let td2 = document.createElement("td");
+        let message = document.getElementById("classes").getElementsByTagName("li")[current].innerHTML;
         td2.style.background = `hsla(${colors[current]},75%,50%,0.6)`;
         td2.innerHTML = message;
         tr.appendChild(td2);
 
         // Cell 3
-        var td3 = document.createElement("td");
-        var button_modify = document.createElement("button");
+        let td3 = document.createElement("td");
+        let button_modify = document.createElement("button");
         button_modify.innerHTML = "Modify";
         button_modify.onclick = function() {modifyRect(nb_boxes);};
         td3.appendChild(button_modify);
         tr.appendChild(td3);
 
         // Cell 4
-        var td4 = document.createElement("td");
-        var button_delete = document.createElement("button");
+        let td4 = document.createElement("td");
+        let button_delete = document.createElement("button");
         button_delete.innerHTML = "Delete";
         button_delete.onclick = function() {deleteRect(nb_boxes);};
         td4.appendChild(button_delete);
@@ -190,38 +190,38 @@ function drawRect(c,type,x1,y1,x2,y2) {
 
 function modifyRect(index) {
     // The node (if any) being selected.
-    var mySel = index;
-    var selectionHandles = [];
-    var isDrag = false;
-    var isResizeDrag = false;
-    var expectResize = -1; // New, will save the # of the selection handle if the mouse is over one.
-    var mx, my; // mouse coordinates
+    let mySel = index;
+    let selectionHandles = [];
+    let isDrag = false;
+    let isResizeDrag = false;
+    let expectResize = -1; // New, will save the # of the selection handle if the mouse is over one.
+    let mx, my; // mouse coordinates
 
     // get references to the canvas and context
-    var canvas = document.getElementById("layerDraw");
-    var overlay = document.getElementById("layerShow");
-    var ctx = canvas.getContext("2d");
-    var ctxo = overlay.getContext("2d");
+    let canvas = document.getElementById("layerDraw");
+    let overlay = document.getElementById("layerShow");
+    let ctx = canvas.getContext("2d");
+    let ctxo = overlay.getContext("2d");
 
-    var mySelColor = '#CC0000';
-    var mySelWidth = 4;
-    var mySelBoxColor = 'black'; // New for selection boxes
-    var mySelBoxSize = 8;
+    let mySelColor = '#CC0000';
+    let mySelWidth = 4;
+    let mySelBoxColor = 'black'; // New for selection boxes
+    let mySelBoxSize = 8;
 
     // calculate where the canvas is on the window
     // (used to help calculate mouseX/mouseY)
-    var $canvas = $("#layerDraw");
-    var canvasOffset = $canvas.offset();
-    var offsetX = canvasOffset.left;
-    var offsetY = canvasOffset.top;
-    var scrollX = $canvas.scrollLeft();
-    var scrollY = $canvas.scrollTop();
+    let $canvas = $("#layerDraw");
+    let canvasOffset = $canvas.offset();
+    let offsetX = canvasOffset.left;
+    let offsetY = canvasOffset.top;
+    let scrollX = $canvas.scrollLeft();
+    let scrollY = $canvas.scrollTop();
 
     // updateRect flag is true when the user is dragging the mouse
-    var isDown = false;
+    let isDown = false;
 
     // get correct rec
-    var updateRect = boxes[index];
+    let updateRect = boxes[index];
 
     ctx.strokeStyle = "black";
     ctx.lineWidth = mySelWidth;
@@ -229,9 +229,9 @@ function modifyRect(index) {
     
     // draw the boxes
     
-    var half = 2.5;
+    let half = 2.5;
 
-    var selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
+    selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
         {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
         {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
         {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
@@ -255,8 +255,8 @@ function modifyRect(index) {
         } else if (isResizeDrag) {
 
             // time ro resize!
-            var oldx = boxes[mySel].x;
-            var oldy = boxes[mySel].y;
+            let oldx = boxes[mySel].x;
+            let oldy = boxes[mySel].y;
         
             // 0  1  2
             // 3     4
@@ -297,7 +297,7 @@ function modifyRect(index) {
                 boxes[mySel].h = my - oldy;
                 break;
             }
-            var b = boxes[mySel];
+            let b = boxes[mySel];
             selectionHandles = [{x:b.x-half, y:b.y-half}, 
                 {x:b.x+b.w/2-half, y:b.y-half},
                 {x:b.x+b.w-half, y:b.y-half},
@@ -315,12 +315,12 @@ function modifyRect(index) {
         getMouse(e);
         // if there's a selection see if we grabbed one of the selection handles
         if (mySel !== -1 && !isResizeDrag) {
-            for (var i = 0; i < 8; i++) {
+            for (let i = 0; i < 8; i++) {
             // 0  1  2
             // 3     4
             // 5  6  7
         
-            var cur = selectionHandles[i];
+            let cur = selectionHandles[i];
         
             // we dont need to use the ghost context because
             // selection handles will always be rectangles
@@ -378,14 +378,14 @@ function modifyRect(index) {
         }
 
         clear(ctx);
-        var l = boxes.length;
-        for (var i = l-1; i >= 0; i--) {
+        let l = boxes.length;
+        for (let i = l-1; i >= 0; i--) {
             // draw shape onto ghost context
-            var b = boxes[i];
+            let b = boxes[i];
             drawRect(ctxo,b.type,b.x,b.y,b.x+b.w,b.y+b.h);
             
             // get image data at the mouse x,y pixel
-            var imageData = ctx.getImageData(mx, my, 1, 1);
+            let imageData = ctx.getImageData(mx, my, 1, 1);
             
             // if the mouse pixel exists, select and break
             if (imageData.data[3] > 0) {
@@ -432,8 +432,8 @@ function modifyRect(index) {
         
         // draw the boxes
         
-        var half = 2.5;
-        var selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
+        let half = 2.5;
+        let selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
                                 {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
                                 {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
                                 {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
@@ -447,8 +447,8 @@ function modifyRect(index) {
     
         // Draw all boxes
         ctx.fillStyle = mySelBoxColor;
-        for (var i = 0; i < 8; i ++) {
-            var cur = selectionHandles[i];
+        for (let i = 0; i < 8; i ++) {
+            let cur = selectionHandles[i];
             ctx.fillRect(cur.x, cur.y, mySelBoxSize, mySelBoxSize);
         }
     }
@@ -471,26 +471,26 @@ function clear(c) {
 }
     
 // Main draw loop.
-// While draw is called as often as the INTERVAL variable demands,
+// While draw is called as often as the INTERVAL letiable demands,
 // It only ever does something if the canvas gets invalidated by our code
 function mainDraw() {
     if (canvasValid == false) {
         clear(ctxo);
     
         // draw all boxes
-        var l = boxes.length;
-        for (var i = 0; i < l; i++) {
-            var b = boxes[i];
+        let l = boxes.length;
+        for (let i = 0; i < l; i++) {
+            let b = boxes[i];
             if (b.tool == "rect") {
                 // Box is a rectangle
                 drawRect(ctxo,b.type,b.x,b.y,b.x+b.w,b.y+b.h);
             } else {
                 // Box is a free form
-                var b2_points = b.p;
+                let b2_points = b.p;
                 ctxo.beginPath();
-                for (var index = 0; index < b2_points.length; index ++){
+                for (let index = 0; index < b2_points.length; index ++){
                     // add in list
-                    var point = b2_points[index];
+                    let point = b2_points[index];
                     
                     // draw in ctxo
                     if (index == 0){
@@ -517,20 +517,20 @@ function deleteRect(index) {
     // make mainDraw() fire every INTERVAL milliseconds
     setInterval(mainDraw, INTERVAL);
     
-    var toDelete = document.getElementById("annotations").getElementsByTagName("tr")[index];
+    let toDelete = document.getElementById("annotations").getElementsByTagName("tr")[index];
 
-    var l = boxes.length;
-    var i = index+1;
+    let l = boxes.length;
+    let i = index+1;
     for (i; i < l; i++) {
-        var newi = i-1;
-        var toChange = document.getElementById("annotations").getElementsByTagName("tr")[i].getElementsByTagName("td");
+        let newi = i-1;
+        let toChange = document.getElementById("annotations").getElementsByTagName("tr")[i].getElementsByTagName("td");
 
         // Change color
-        var colorToChange = toChange[1];
+        let colorToChange = toChange[1];
         colorToChange.style.background = `hsla(${colors[boxes[newi].type]},75%,50%,0.6)`;
 
         // Change index
-        var numToChange = toChange[0];
+        let numToChange = toChange[0];
         numToChange.innerHTML = newi;
 
         // Rectangle = 2 buttons and lasso = 1 button
@@ -550,51 +550,54 @@ function deleteRect(index) {
 
 // Load previously saved annotations
 $(document).ready(function() {
-  var saved = $('#my_data').data("boxes");
+  let saved = $('#my_data').data("boxes");
   if (saved.length > 0 ) {
       boxes = saved;
       setInterval(mainDraw, INTERVAL);
       for (let i=0; i < boxes.length; i++) {
 
         // Save in HTML table
-        var tr = document.createElement("tr");
+        let tr = document.createElement("tr");
 
         // Cell 1 
-        var td1 = document.createElement("td");
+        let td1 = document.createElement("td");
         td1.innerHTML = i;
         tr.appendChild(td1);
 
         // Cell 2
-        var td2 = document.createElement("td");
-        var message = document.getElementById("classes").getElementsByTagName("li")[boxes[i].type].innerHTML;
-        td2.style.background = `hsla(${colors[boxes[i].type]},75%,50%,0.6)`;
+        let td2 = document.createElement("td");
+        let message = document.getElementById("classes").getElementsByTagName("li")[boxes[i].type].innerHTML;
+        let t = boxes[i].type
+        alert(colors[t]);
+        td2.style.background = `hsla(${colors[t]},75%,50%,0.6)`;
         td2.innerHTML = message;
         tr.appendChild(td2);
         
         // Cell 3
+        let button_delete;
         if (boxes[i].tool == "rect" ) {           
             // Cell 3 (RECT)
-            var td3 = document.createElement("td");
-            var button_modify = document.createElement("button");
+            let td3 = document.createElement("td");
+            let button_modify = document.createElement("button");
             button_modify.innerHTML = "Modify";
             button_modify.onclick = function() {modifyRect(i);};
             td3.appendChild(button_modify);
             tr.appendChild(td3);
 
             // Cell 4 button
-            var button_delete = document.createElement("button");
+            button_delete = document.createElement("button");
             button_delete.onclick = function() {deleteRect(i);};
         } else {
             // Cell 3 (LASSO)
-            var td3 = document.createElement("td");
+            let td3 = document.createElement("td");
             tr.appendChild(td3);
             
             // Cell 4 button
-            var button_delete = document.createElement("button");
+            button_delete = document.createElement("button");
             button_delete.onclick = function() {deleteLasso(i);};
         }
         // Cell 4
-        var td4 = document.createElement("td");
+        let td4 = document.createElement("td");
         button_delete.innerHTML = "Delete";
         td4.appendChild(button_delete);
         tr.appendChild(td4);
