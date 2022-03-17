@@ -9,6 +9,8 @@ function addBoxe(tool) {
         addRect();
     } else if (tool == "lasso") {
         addLasso();
+    } else if (tool == "polygon") {
+        addPolygon();
     }
 }
 
