@@ -1,5 +1,4 @@
-let zoom = 1;
-$(document).ready(function() {
+function setZoom() {
     zoom = 1;
 
     let w_height = $(window).height();
@@ -38,4 +37,13 @@ $(document).ready(function() {
 
     container.style.height = img_h*zoom+10+"px";
     container.style.width = img_w*zoom+10+"px";
-});
+}
+
+function download_image(){
+    var canvas = document.getElementById("layerShow");
+    image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+    var link = document.createElement('a');
+    link.download = "my-image.png";
+    link.href = image;
+    link.click();
+}
