@@ -20,7 +20,7 @@ function addPolygon(){
         isDrawing = true;
 
         // Draw
-        clear(ctx);
+        ctx.strokeStyle = `hsla(${colors[current]},75%,50%,1)`;
         ctx.beginPath();
         for (let index = 0; index < points.length; index ++){
             let point = points[index];
@@ -42,7 +42,6 @@ function addPolygon(){
             invalidate();
             setInterval(mainDraw, INTERVAL);
             setAnnotationsList(boxes);
-            clear(ctx);
 
             // Remove previous listeners
             canvas.removeEventListener("mousedown",handleMouseDown);
@@ -50,6 +49,8 @@ function addPolygon(){
         }
         ctx.stroke();
         ctx.closePath();
+        clear(ctx);
+        canvas.style.cursor = "default";
     }
     
     //FUNCTION
