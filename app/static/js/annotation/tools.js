@@ -20,6 +20,8 @@ function addBoxe(tool) {
 function modifyBoxe(tool, index) {
     if (tool == "rect") {
         modifyRect(index);
+    } else if (tool == "polygon") {
+        modifyPolygon(index);
     }
 }
 
