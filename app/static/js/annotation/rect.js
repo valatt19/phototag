@@ -350,39 +350,3 @@ function modifyRect(index) {
     canvas.addEventListener("mousemove", myMove);
     canvas.addEventListener("mouseup", myUp);
 }
-
-
-function deleteBoxe(index) {
-    // make mainDraw() fire every INTERVAL milliseconds
-    setInterval(mainDraw, INTERVAL);
-    
-    let toDelete = document.getElementById("annotations").getElementsByTagName("tr")[index];
-
-    let l = boxes.length;
-    let i = index+1;
-    for (i; i < l; i++) {
-        let newi = i-1;
-        let toChange = document.getElementById("annotations").getElementsByTagName("tr")[i].getElementsByTagName("td");
-
-        // Change color
-        let colorToChange = toChange[1];
-        colorToChange.style.background = `hsla(${colors[boxes[newi].type]},75%,50%,0.6)`;
-
-        // Change index
-        let numToChange = toChange[0];
-        numToChange.innerHTML = newi;
-
-        // Rectangle = 2 buttons and lasso = 1 button
-        if (toChange.length == 2 ) {           
-            toChange[2].getElementsByTagName("button")[0].onclick = function() {modifyRect(newi);}
-            toChange[3].getElementsByTagName("button")[0].onclick = function() {deleteRect(newi);}
-        } else {
-            toChange[3].getElementsByTagName("button")[0].onclick = function() {deleteLasso(newi);}
-        }
-    }
-
-    toDelete.parentNode.removeChild(toDelete);
-    boxes.splice(index,1);
-    invalidate();
-    list_to_json(boxes);
-}

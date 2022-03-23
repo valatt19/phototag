@@ -9,6 +9,8 @@ function addBoxe(tool) {
         addRect();
     } else if (tool == "lasso") {
         addLasso();
+    } else if (tool == "polygon") {
+        addPolygon();
     }
 }
 
@@ -18,6 +20,8 @@ function addBoxe(tool) {
 function modifyBoxe(tool, index) {
     if (tool == "rect") {
         modifyRect(index);
+    } else if (tool == "polygon") {
+        modifyPolygon(index);
     }
 }
 
