@@ -110,6 +110,7 @@ def project(user_id = current_user):
 def project_create():
     if request.method == 'POST':
         # check if the post request has the file part
+        print(request.form.getlist('mytext[]'))
         if 'files[]' not in request.files:
             return redirect(request.url)
         uploaded_files = request.files.getlist('files[]')

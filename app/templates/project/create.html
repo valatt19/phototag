@@ -1,5 +1,83 @@
 {% extends "parent.html" %}
 {% block content %}
+<head>
+<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+
+    <script>
+
+    /*$(document).ready(function(){
+
+$("ul").on("click", "li", function(){
+$(this).toggleClass("completed");
+});
+
+
+$("ul").on("click", "span", function(event){
+$(this).parent().fadeOut(500,function(){
+$(this).remove();
+});
+event.stopPropagation();
+});
+
+$("input[type='text']").keypress(function(event){
+if(event.which === 13){
+var classText = $(this).val();
+$(this).val("");
+mylist.push(classText)
+$("ul").append("<li><span><i class='fa fa-trash'></i></span> " + classText + "</li>")
+    console.log(mylist);
+
+}
+});
+
+$(".fa-plus").click(function(){
+$("input[type='text']").fadeToggle();
+});
+
+
+});*/
+    $(document).ready(function() {
+
+
+$(".fa-plus").click(function(){
+$("input[type='text']").fadeToggle();
+});
+    var max_fields = 10;
+    var wrapper = $(".modal-body");
+    var add_button = $(".add_form_field");
+    var confirm_button = $(".confirm");
+
+    var x = 1;
+    $(add_button).click(function(e) {
+        e.preventDefault();
+        if (x < max_fields) {
+            x++;
+            $(wrapper).append('<div><input type="text" name="mytext[]"/><a href="#" class="delete">Delete</a></div>'); //add input box
+        } else {
+            alert('You Reached the limits')
+        }
+    });
+
+    $(wrapper).on("click", ".delete", function(e) {
+        e.preventDefault();
+        $(this).parent('div').remove();
+        x--;
+    })
+
+        $(confirm_button).click(function(e){
+            e.preventDefault();
+            $(".modal").modal('hide');
+        });
+});
+</script>
+
         <form action="" method="POST" enctype="multipart/form-data">
             <label for="pname">Project name: </label><br>
             <input type="text" name="pname" id="pname"><br><br>
@@ -7,10 +85,39 @@
             <label for="ptype">Privacy: </label><br>
             <input type="radio" id="public" name="ptype" value="1"checked>Public<br>
             <input type="radio" id="private" name="ptype" value="0">Private<br><br>
+            <h2>Set configuration</h2>
+            <div>
+
+                <button type="button" class="btn btn-outline-primary"><input type="file" id="importConfig" accept=".xml"></button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create</button>
+                    <div id="popup" name="popup" class="modal">
+                    <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <p> Ajout de classe </p>
+                        </div>
+                          <div id="container1" class="modal-body">
+                           <button class="add_form_field">Add New Field &nbsp;
+                          <span style="font-size:16px; font-weight:bold;">+ </span>
+                        </button>
+                        <div><input type="text" name="mytext[]"></div>
+                        </div>
+                          <div class="modal-footer">
+                            <button type="button" class="confirm">Confirm</button>
+                          </div>
+          </div>
+        </div>
+      </div>
+
+            </div>
 
             <label for="file">Upload folder: </label><br>
             <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory=""><br><br>
 
             <input type="submit" value="Create">
         </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+
 {% endblock %}
