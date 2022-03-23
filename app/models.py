@@ -37,6 +37,7 @@ class Project(db.Model):
     name = db.Column(db.String(80),unique = True, nullable=False)
     privacy = db.Column(db.Boolean,default = True)
     nb_membre = db.Column(db.Integer)
+    classes = db.Column(MutableList.as_mutable(PickleType),default=[])
     members = db.Column(MutableList.as_mutable(PickleType),default=[])
 
 """

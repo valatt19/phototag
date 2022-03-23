@@ -142,7 +142,7 @@ def project_create():
             ptype = False 
 
         # Add project in DB
-        pr = Project(name = request.form["pname"], privacy=ptype, nb_membre=0)
+        pr = Project(name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
         db.session.add(pr)
         db.session.commit()
         #changer project_id pour créer plusieurs projets
@@ -186,7 +186,7 @@ def annotate_image(project_id, img_id):
     prev = (img_id+len_images-1)%len_images
     next = (img_id+1)%len_images
 
-    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["CLASS 1","CLASS 2","CLASS 3"], boxes=boxes, project=project)
+    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project)
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
