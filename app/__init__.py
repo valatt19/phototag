@@ -2,7 +2,7 @@ from flask import Flask
 from config import Config
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'app/static/tmp' # where files uploaded go
+UPLOAD_FOLDER = 'app/static/datasets' # where files uploaded go
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 

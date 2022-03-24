@@ -86,7 +86,7 @@ def register():
 # Logout
 @app.route("/logout/")
 def logout():
-    return "hello world!"
+    return redirect(url_for("login"))
 
 
 ##################
@@ -118,13 +118,16 @@ def project_create():
         # check that at least 1 file
         if len(uploaded_files) < 1:
             return redirect(request.url)
+        
+        path = app.config['UPLOAD_FOLDER'] +"/"+ current_user.username +"/"+ request.form["pname"]
+        os.mkdir(path)
 
         # loop on each file on the folder imported
         for i in range(len(uploaded_files)):
             # save the file in the server
             file = uploaded_files[i]
             filename = secure_filename(file.filename)
-            path = app.config['UPLOAD_FOLDER'] + "/" + filename
+            path = path + filename
             file.save(path)
 
             # get the size of the file in KO
@@ -142,7 +145,7 @@ def project_create():
             ptype = False 
 
         # Add project in DB
-        pr = Project(name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
+        pr = Project(creator = current_user, name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
         db.session.add(pr)
         db.session.commit()
         #changer project_id pour créer plusieurs projets
