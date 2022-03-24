@@ -17,10 +17,8 @@ function addPolygon(){
 
         // Polygon finished : save it on show layer and in annotations list
         if (points.length > 2 && isNear(mouseX,mouseY,points[0].x,points[0].y,isNearZone)) {
-            // Add starting point for last point
-            //points.push({x:points[0].x, y:points[0].y});
             
-            // Add the new rect
+            // Add the new polygon
             const poly = {tool:"polygon",type:current, p:points};
             boxes.push(poly);
             
@@ -32,6 +30,9 @@ function addPolygon(){
             // Remove previous listeners
             canvas.removeEventListener("mousedown",handleMouseDown);
             canvas.removeEventListener("mousemove",handleMouseMove);
+
+            list_to_json(boxes);
+
         } else {
             // Add mouse position 
             points.push({x:mouseX, y:mouseY});

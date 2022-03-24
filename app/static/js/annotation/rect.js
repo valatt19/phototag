@@ -42,6 +42,7 @@ function addRect(){
         canvas.removeEventListener("mousedown",handleMouseDown);
         canvas.removeEventListener("mousemove",handleMouseMove);
         canvas.removeEventListener("mouseup",handleMouseUp);
+        list_to_json(boxes);
     }
     
     //FUNCTION

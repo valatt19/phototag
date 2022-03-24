@@ -78,6 +78,10 @@ def register():
         users.append(form.username.data)
         flash("Congratulations, you are now a registered user!", "info")
 
+        # add new project dir
+        new_dir = app.config['UPLOAD_FOLDER'] +"/"+ form.username.data
+        os.mkdir(new_dir)
+
         return redirect(url_for("login"))
 
     return render_template("project/register.html", form=form)
@@ -119,22 +123,24 @@ def project_create():
         if len(uploaded_files) < 1:
             return redirect(request.url)
         
-        path = app.config['UPLOAD_FOLDER'] +"/"+ current_user.username +"/"+ request.form["pname"]
-        os.mkdir(path)
+        # add new project dir
+        new_dir = app.config['UPLOAD_FOLDER'] +"/"+ current_user.username +"/"+ request.form["pname"]
+        if not os.path.isdir(new_dir):
+            os.mkdir(new_dir)
 
         # loop on each file on the folder imported
         for i in range(len(uploaded_files)):
             # save the file in the server
             file = uploaded_files[i]
             filename = secure_filename(file.filename)
-            path = path + filename
+            path = new_dir +"/"+ filename
             file.save(path)
 
             # get the size of the file in KO
             size = int(os.stat(path).st_size / 1000)
 
             # create Image object
-            img = Image(name = filename, path = path, size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
+            img = Image(name = filename, path = path[3:], size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
             db.session.add(img)
             db.session.commit()
 

@@ -34,6 +34,7 @@ class Image(db.Model):
 class Project(db.Model):
     __tablename__ = "project"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     creator = db.relationship("User", backref=db.backref('posts', lazy=True))
     name = db.Column(db.String(80),unique = True, nullable=False)
     privacy = db.Column(db.Boolean,default = True)
