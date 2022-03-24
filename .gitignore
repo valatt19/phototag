@@ -131,4 +131,4 @@ dmypy.json
 
 # Files in tmp folder
 app/static/datasets/*
-!app/static/tmp/admin/empty
+!app/static/datasets/admin/empty
