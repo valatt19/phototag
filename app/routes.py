@@ -78,6 +78,10 @@ def register():
         users.append(form.username.data)
         flash("Congratulations, you are now a registered user!", "info")
 
+        # add new project dir
+        new_dir = app.config['UPLOAD_FOLDER'] +"/"+ form.username.data
+        os.mkdir(new_dir)
+
         return redirect(url_for("login"))
 
     return render_template("project/register.html", form=form)
@@ -86,7 +90,7 @@ def register():
 # Logout
 @app.route("/logout/")
 def logout():
-    return "hello world!"
+    return redirect(url_for("login"))
 
 
 ##################
@@ -118,20 +122,25 @@ def project_create():
         # check that at least 1 file
         if len(uploaded_files) < 1:
             return redirect(request.url)
+        
+        # add new project dir
+        new_dir = app.config['UPLOAD_FOLDER'] +"/"+ current_user.username +"/"+ request.form["pname"]
+        if not os.path.isdir(new_dir):
+            os.mkdir(new_dir)
 
         # loop on each file on the folder imported
         for i in range(len(uploaded_files)):
             # save the file in the server
             file = uploaded_files[i]
             filename = secure_filename(file.filename)
-            path = app.config['UPLOAD_FOLDER'] + "/" + filename
+            path = new_dir +"/"+ filename
             file.save(path)
 
             # get the size of the file in KO
             size = int(os.stat(path).st_size / 1000)
 
             # create Image object
-            img = Image(name = filename, path = path, size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
+            img = Image(name = filename, path = path[3:], size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
             db.session.add(img)
             db.session.commit()
 
@@ -142,7 +151,7 @@ def project_create():
             ptype = False 
 
         # Add project in DB
-        pr = Project(name = request.form["pname"], privacy=ptype, nb_membre=0)
+        pr = Project(creator = current_user, name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
         db.session.add(pr)
         db.session.commit()
         #changer project_id pour créer plusieurs projets
@@ -186,7 +195,7 @@ def annotate_image(project_id, img_id):
     prev = (img_id+len_images-1)%len_images
     next = (img_id+1)%len_images
 
-    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=["CLASS 1","CLASS 2","CLASS 3"], boxes=boxes, project=project)
+    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project)
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])

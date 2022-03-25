@@ -129,6 +129,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Files in tmp folder
-app/static/tmp/*
-!app/static/tmp/empty
+# Files in tmp and dataset folder
+app/static/datasets/
+app/static/tmp/
+!app/static/datasets/admin/empty

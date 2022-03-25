@@ -15,6 +15,7 @@
 
             <button onclick="addRect()">Rect</button>
             <button onclick="addLasso()">Lasso</button>
+            <button onclick="addPolygon()">Polygon</button>
             <button onclick="download_image()">Download</button>
 
         </div>
@@ -22,7 +23,7 @@
         <div id="container">
 
             <div id="principal">
-                <img id="image" class='img' src="{{url_for('static', filename='tmp/'+image.name)}}" alt="" />
+                <img id="image" class='img' src="{{url_for('static', filename='../../'+image.path)}}" alt="" />
                 <canvas id="layerDraw"></canvas>
                 <canvas id="layerShow"></canvas>
             </div>
@@ -48,9 +49,12 @@
         </div>
         <meta id="my_data" data-img="{{img_id}}" data-boxes="{{boxes}}">
         <script src="{{url_for('static', filename='js/annotation/main.js')}}"></script>
+
         <script src="{{url_for('static', filename='js/annotation/tools.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/lasso.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/rect.js')}}"></script>
+        <script src="{{url_for('static', filename='js/annotation/polygon.js')}}"></script>
+
         <script src="{{url_for('static', filename='js/annotation/zoom.js')}}"></script>
         <script src="{{url_for('static', filename='js/annotation/color.js')}}"></script>
         

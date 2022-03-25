@@ -29,6 +29,8 @@ let scrollY = $canvas.scrollTop();
 let annotations = document.getElementById("annotations")
 let boxes = []
 
+var isNearZone = 4; // For polygon tool, distance within magic join is done
+
 ///////////////////////////////
 // When document is ready do //
 ///////////////////////////////

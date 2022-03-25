@@ -13,7 +13,7 @@ ds_images = []
 class Image(db.Model):
     __tablename__ = "image"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(80),unique = True, nullable=False)
+    name = db.Column(db.String(80),unique = False, nullable=False)
     path = db.Column(db.String(80),unique=False,nullable=False)
     size = db.Column(db.Integer)
     last_time = db.Column(db.DateTime, unique=False, nullable=False)
@@ -34,9 +34,12 @@ class Image(db.Model):
 class Project(db.Model):
     __tablename__ = "project"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    creator = db.relationship("User", backref=db.backref('posts', lazy=True))
     name = db.Column(db.String(80),unique = True, nullable=False)
     privacy = db.Column(db.Boolean,default = True)
     nb_membre = db.Column(db.Integer)
+    classes = db.Column(MutableList.as_mutable(PickleType),default=[])
     members = db.Column(MutableList.as_mutable(PickleType),default=[])
 
 """
