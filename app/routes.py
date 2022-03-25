@@ -176,7 +176,8 @@ def project_join():
 def dataset_overview(project_id):
     dataset = Image.query.all()
     project = Project.query.all()[project_id]
-    return render_template("project/dataset.html", dataset=dataset, id=project_id, project=project)
+    project_name = project.name
+    return render_template("project/dataset.html", dataset=dataset, id=project_id, name= project_name,project=project,user =current_user.username)
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")

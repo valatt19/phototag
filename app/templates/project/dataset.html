@@ -5,7 +5,7 @@ img {
   border: 1px solid #ddd; /* Gray border */
   border-radius: 4px;  /* Rounded border */
   padding: 5px; /* Some padding */
-  width: 150px; /* Set a small width */
+  width: 100px; /* Set a small width */
 }
 
 /* Add a hover effect (blue shadow) */
@@ -16,10 +16,10 @@ img:hover {
 /* Parent Container */
 .content_img{
  position: relative;
- width: 200px;
- height: 200px;
+ width: 150px;
+ height: 150px;
  float: left;
- margin-right: 10px;
+ margin-right: 8px;
 }
 
 /* Child Text Container */
@@ -56,7 +56,7 @@ img:hover {
 
               <a href="../annotate/{{loop.index-1}}">
 
-                  <img id="image" class='img' src="{{url_for('static', filename='tmp/'+file.name)}}" alt="" />
+                  <img id="image" class='img' src="{{url_for('static', filename='datasets/'+user+'/'+name+'/'+file.name)}}" alt="" />
                   <div>
                 <p> last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
                 <p>number of annotations : {{file.nb_annotations}}</p>
