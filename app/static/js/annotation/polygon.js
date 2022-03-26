@@ -18,8 +18,13 @@ function addPolygon(){
         // Polygon finished : save it on show layer and in annotations list
         if (points.length > 2 && isNear(mouseX,mouseY,points[0].x,points[0].y,isNearZone)) {
             
-            // Add the new polygon
-            const poly = {tool:"polygon",type:current, p:points};
+            // Add the new polygon (without zoom)
+            let bp = [];
+            for (let j = 0; j < points.length; j++) {
+                let point = points[j]
+                bp.push({x:point.x/zoom, y:point.y/zoom})
+            }
+            const poly = {tool:"polygon",type:current, p:bp};
             boxes.push(poly);
             
             // Redraw new canvas and update annotations list

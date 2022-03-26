@@ -66,8 +66,8 @@ function addLasso(){
 
         ctxo.beginPath();
         for (let index = 0; index < points.length; index ++){
-            // add in list
-            let point = points[index];
+            // add in list (without zoom)
+            let point = {x:points[index].x/zoom,y:points[index].y/zoom};
             sel.p.push(point);
         }
         boxes.push(sel);

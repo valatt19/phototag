@@ -29,7 +29,7 @@ function addRect(){
         // the drag is over, clear the dragging flag + save coordinates
         if (isDown) {
             // Add the new rect
-            const rect = {tool:"rect",type:current, x:startX, y:startY, w:width,h:height};
+            const rect = {tool:"rect",type:current, x:startX/zoom, y:startY/zoom, w:width/zoom,h:height/zoom};
             boxes.push(rect);
             
             // Redraw new canvas and update annotations list

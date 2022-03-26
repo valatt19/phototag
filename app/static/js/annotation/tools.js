@@ -57,10 +57,16 @@ function mainDraw() {
             let b = boxes[i];
             if (b.tool == "rect") {
                 // Box is a rectangle
-                drawRect(ctxo,b.type,b.x,b.y,b.x+b.w,b.y+b.h);
+                drawRect(ctxo,b.type,b.x*zoom,b.y*zoom,b.x*zoom+b.w*zoom,b.y*zoom+b.h*zoom);
             } else {
                 // Box is a free form
-                drawFree(ctxo,b.type,b.p);
+                // Adapt coordinates with zoom factor
+                let bp = [];
+                for (let j = 0; j < b.p.length; j++) {
+                    let point = b.p[j]
+                    bp.push({x:point.x*zoom, y:point.y*zoom})
+                }
+                drawFree(ctxo,b.type,bp);
             }
         }
         canvasValid = true;
