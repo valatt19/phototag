@@ -28,6 +28,8 @@ class Image(db.Model):
         self.nb_annotations = len(json_list)
         db.session.commit()
 
+#-----------------------------Projets/User---------------------------------
+
 class ProjectUser(db.Model):
     __tablename__ = 'projectuser'
     id = db.Column(db.Integer, primary_key=True, index=True)
@@ -50,6 +52,9 @@ class Project(db.Model):
     def addMember(self, user):
         self.members.append(user)
         self.nb_membre+=1
+
+    def getMembers(self):
+        return self.members
 
 #----------------------------User-----------------------------------------------
 class User(UserMixin, db.Model):
