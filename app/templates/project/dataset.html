@@ -1,23 +1,72 @@
 {% extends "parent2.html" %}
 {% block content %}
+    <style>
+img {
+  border: 1px solid #ddd; /* Gray border */
+  border-radius: 4px;  /* Rounded border */
+  padding: 5px; /* Some padding */
+  width: 100px; /* Set a small width */
+}
+
+/* Add a hover effect (blue shadow) */
+img:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+}
+
+/* Parent Container */
+.content_img{
+ position: relative;
+ width: 150px;
+ height: 150px;
+ float: left;
+ margin-right: 8px;
+}
+
+/* Child Text Container */
+.content_img a div{
+ position: absolute;
+ bottom: 0;
+ right: 0;
+ background: black;
+ color: white;
+ margin-bottom: 5px;
+ font-family: sans-serif;
+ opacity: 0;
+ visibility: hidden;
+ -webkit-transition: visibility 0s, opacity 0.5s linear;
+ transition: visibility 0s, opacity 0.5s linear;
+}
+
+/* Hover on Parent Container */
+.content_img:hover{
+ cursor: pointer;
+}
+
+.content_img:hover a div{
+ width: 150px;
+ padding: 8px 15px;
+ visibility: visible;
+ opacity: 0.7;
+}
+</style>
     <body>
-        <table>
-            <tr>
-              <th>Name</th>
-              <th>Size</th>
-              <th>Last update</th>
-              <th>Annotations</th>
-              <th>Users live</th>
-            </tr>
+
             {% for file in dataset %}
-            <tr>
-              <td><a href="../annotate/{{loop.index-1}}">{{file.name}}</a></td>
-              <td>{{file.size}} ko</td>
-              <td>{{file.last_time.strftime('%Y-%m-%d %H:%M')}}</td>
-              <td>{{file.nb_annotations}}</td>
-              <td>0</td>
-            </tr>
+            <div class="content_img">
+
+              <a href="../annotate/{{loop.index-1}}">
+
+                  <img id="image" class='img' src="{{url_for('static', filename='datasets/'+user+'/'+name+'/'+file.name)}}" alt="" />
+                  <div>
+                <p> last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
+                <p>number of annotations : {{file.nb_annotations}}</p>
+              </div>
+              </a>
+
+            </div>
+
             {% endfor %}
-          </table>
+
+
     </body>
 {% endblock %}

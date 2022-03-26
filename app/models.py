@@ -13,7 +13,7 @@ ds_images = []
 class Image(db.Model):
     __tablename__ = "image"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(80),unique = True, nullable=False)
+    name = db.Column(db.String(80),unique = False, nullable=False)
     path = db.Column(db.String(80),unique=False,nullable=False)
     size = db.Column(db.Integer)
     last_time = db.Column(db.DateTime, unique=False, nullable=False)
