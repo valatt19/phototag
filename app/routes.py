@@ -105,7 +105,7 @@ def project(user_id = current_user):
 
     projects = query.all()
     print(projects)"""
-    projects = Project.query.all()
+    projects = current_user.getMyProjects()
     return render_template("project/project.html", projects=projects)
 
 # S1
@@ -152,6 +152,8 @@ def project_create():
 
         # Add project in DB
         pr = Project(creator = current_user, name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
+        pr.addMember(current_user)
+
         db.session.add(pr)
         db.session.commit()
         #changer project_id pour créer plusieurs projets

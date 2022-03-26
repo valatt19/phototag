@@ -28,8 +28,13 @@ class Image(db.Model):
         self.nb_annotations = len(json_list)
         db.session.commit()
 
-#-------------------------------Projets------------------------------------
+class ProjectUser(db.Model):
+    __tablename__ = 'projectuser'
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    projectId = db.Column(db.Integer, db.ForeignKey('project.id'))
+    userId = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+#-------------------------------Projets------------------------------------
 
 class Project(db.Model):
     __tablename__ = "project"
@@ -38,18 +43,13 @@ class Project(db.Model):
     creator = db.relationship("User", backref=db.backref('posts', lazy=True))
     name = db.Column(db.String(80),unique = True, nullable=False)
     privacy = db.Column(db.Boolean,default = True)
-    nb_membre = db.Column(db.Integer)
     classes = db.Column(MutableList.as_mutable(PickleType),default=[])
-    members = db.Column(MutableList.as_mutable(PickleType),default=[])
+    members = db.relationship("User", secondary=ProjectUser.__table__, backref="Project")
+    nb_membre = db.Column(db.Integer)
 
-"""
-#--------------------------Fichiers d'images------------------------------------
-class Files(db.Model):
-    __tablename__ ="file"
-    id= db.column(db.Integer,primary_key=True,autoincrement=True)
-    filename = db.Column(db.String(80),unique = True, nullable=False)
-    size = db.Column(db.Integer)
-"""
+    def addMember(self, user):
+        self.members.append(user)
+        self.nb_membre+=1
 
 #----------------------------User-----------------------------------------------
 class User(UserMixin, db.Model):
@@ -61,7 +61,7 @@ class User(UserMixin, db.Model):
     surname = db.Column(db.String(80), nullable=False)
     password = db.Column(db.String(16))
     password_hash = db.Column(db.String(16))
-    #myProject = db.relationship("UserProjet", backref="author", lazy="dynamic")
+    projects = db.relationship("Project", secondary=ProjectUser.__table__, backref="User")
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
     group = db.relationship("Group", backref=db.backref('posts', lazy=True))
 
@@ -86,16 +86,14 @@ class User(UserMixin, db.Model):
     def getGroup(self):
         return self.group
 
-    def getMyMovies(self):
-        userMovies = self.mymovies
-        return userMovies
+    def getMyProjects(self):
+        return self.projects
 
     def checkIsAdmin(self):
         return self.group.name == "mod"
 
     def __repr__(self):
-        return ("username = %s\nfirstname = %s\nfirst name = %s\nsurname = %s" % (
-        self.username, self.firstName, self.surname))
+        return self.username
 
 # GROUPS
 class Group(db.Model):
