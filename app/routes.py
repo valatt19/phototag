@@ -162,7 +162,7 @@ def project_create():
         db.session.add(pr)
         db.session.commit()
         #changer project_id pour créer plusieurs projets
-        return redirect(url_for('dataset_overview', project_id=pr.id))
+        return redirect(url_for('project'))
 
     return render_template("project/create.html")
 
