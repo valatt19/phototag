@@ -90,7 +90,9 @@ def register():
 # Logout
 @app.route("/logout/")
 def logout():
+    logout_user()
     return redirect(url_for("login"))
+
 
 
 ##################
@@ -99,6 +101,7 @@ def logout():
 
 # All projects of the user (created and joined by him)
 @app.route("/project/")
+@login_required
 def project(user_id = current_user):
     """project_query = "SELECT * FROM Project WHERE members"
     query = Project.query(project_query)
@@ -111,6 +114,7 @@ def project(user_id = current_user):
 # S1
 # Create a new project (Sprint 1 : only load a dataset)
 @app.route("/project/new/", methods=["GET", "POST"])
+@login_required
 def project_create():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -156,8 +160,9 @@ def project_create():
 
         db.session.add(pr)
         db.session.commit()
-        #changer project_id pour créer plusieurs projets
-        return redirect(url_for('dataset_overview', project_id=0))
+
+
+        return redirect(url_for('project'))
 
     return render_template("project/create.html")
 
@@ -165,6 +170,7 @@ def project_create():
 
 # Join a project
 @app.route("/project/join/")
+@login_required
 def project_join():
     return "hello world!"
 
@@ -175,6 +181,7 @@ def project_join():
 
 # Dataset overview of a project (list img and vid)
 @app.route("/project/<int:project_id>/dataset/")
+@login_required
 def dataset_overview(project_id):
     dataset = Image.query.all()
     project = Project.query.all()[project_id]
@@ -183,6 +190,7 @@ def dataset_overview(project_id):
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
+@login_required
 def annotate_image(project_id, img_id):
     ds_images = Image.query.all()
     image = ds_images[img_id]
@@ -202,6 +210,7 @@ def annotate_image(project_id, img_id):
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
+@login_required
 def save_json(project_id, img_id):
     image = Image.query.all()[img_id]
 
