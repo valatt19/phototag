@@ -56,7 +56,7 @@ img:hover {
 
               <a href="../annotate/{{file.project_pos}}">
 
-                  <img id="image" class='img' src="{{url_for('static', filename='datasets/'+user+'/'+name+'/'+file.name)}}" alt="" />
+                  <img id="image" class='img' src="{{url_for('static', filename='../../'+file.path)}}" alt="" />
                   <div>
                 <p>Last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
                 <p>{{file.last_person.username}}</p>
