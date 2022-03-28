@@ -138,6 +138,10 @@ gr2 = Group(name="normal")
 admin = User(username="admin",firstname="Admin",surname="Admin",group=gr1)
 admin.set_password("admin")
 db.session.add(admin)
+
+pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
+pr.addMember(admin)
+
 db.session.commit()
 
 users = ["admin"]
