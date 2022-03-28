@@ -14,20 +14,27 @@ ds_images = []
 
 class Image(db.Model):
     __tablename__ = "image"
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80),unique = False, nullable=False)
     path = db.Column(db.String(80),unique=False,nullable=False)
     size = db.Column(db.Integer)
     last_time = db.Column(db.DateTime, unique=False, nullable=False)
-    last_person = db.Column(db.Integer,db.ForeignKey("users.id"))
-    #self.collaborators = [] 
+    project_pos = db.Column(db.Integer, nullable=False)
     nb_annotations = db.Column(db.Integer)
     annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
-    #project = db.Column(db.Integer, db.ForeignKey("project.id"))
 
-    def update_annotations(self,json_list):
+    last_person_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    last_person = db.relationship("User", backref=db.backref('posts1', lazy=True))
+
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
+    project = db.relationship("Project", backref=db.backref('posts2', lazy=True))
+
+    def update_annotations(self,json_list, date, user):
         self.annotations = json_list
         self.nb_annotations = len(json_list)
+        self.last_time = date
+        self.last_person = user
         db.session.commit()
 
 #-----------------------------Projets/User---------------------------------

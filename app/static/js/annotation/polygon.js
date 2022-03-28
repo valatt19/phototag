@@ -105,49 +105,53 @@ function modifyPolygon(index) {
     // get correct rec
     let updatePoly = boxes[mySel];
     let updatePoints = updatePoly.p;
+    let zoomedPoints = [];
 
     ctx.strokeStyle = "black";
     ctx.lineWidth = mySelWidth;
-    drawPolygon(ctx, updatePoly.p, false);
     
     // draw the boxes
-    let half = 2.5;
+    let half = mySelBoxSize/2;
     for (let index = 0; index < updatePoints.length; index ++){
-        let cur = {x:updatePoints[index].x-half, y:updatePoints[index].y-half};
+        let cur = {x:updatePoints[index].x*zoom-half, y:updatePoints[index].y*zoom-half};
         selectionHandles.push(cur);
         ctx.fillStyle = mySelBoxColor;
         ctx.fillRect(cur.x, cur.y, mySelBoxSize, mySelBoxSize);
+
+        zoomedPoints.push({x:updatePoints[index].x*zoom, y:updatePoints[index].y*zoom})
     }
+    drawPolygon(ctx, zoomedPoints, false);
 
     // Happens when the mouse is moving inside the canvas
     function myMove(e){
         if (isDrag) {
             getMouse(e);
         
-            boxes[mySel].p[expectResize].x = mx - offsetX;
-            boxes[mySel].p[expectResize].y = my - offsetY;  
+            boxes[mySel].p[expectResize].x = mx/zoom - offsetX;
+            boxes[mySel].p[expectResize].y = my/zoom - offsetY;  
         
             // something is changing position so we better invalidate the canvas!
             invalidate();
         } else if (isResizeDrag) {
+            boxes[mySel].p[expectResize].x = mx/zoom;
+            boxes[mySel].p[expectResize].y = my/zoom;
 
-            boxes[mySel].p[expectResize].x = mx;
-            boxes[mySel].p[expectResize].y = my;
-
-            selectionHandles[expectResize]={x:boxes[mySel].p[expectResize].x-half, y:boxes[mySel].p[expectResize].y-half};
-            clear(ctx);
+            selectionHandles[expectResize]={x:boxes[mySel].p[expectResize].x*zoom-half, y:boxes[mySel].p[expectResize].y*zoom-half};
             ctx.strokeStyle = "black";
             ctx.lineWidth = mySelWidth;
-            drawPolygon(ctx, updatePoly.p, false);
             
             // draw the boxes
+            let zoomedPoints = [];
             for (let index = 0; index < updatePoints.length; index ++){
-                let cur = {x:updatePoints[index].x-half, y:updatePoints[index].y-half};
+                let cur = {x:updatePoints[index].x*zoom-half, y:updatePoints[index].y*zoom-half};
                 selectionHandles.push(cur);
                 ctx.fillStyle = mySelBoxColor;
                 ctx.fillRect(cur.x, cur.y, mySelBoxSize, mySelBoxSize);
-            }
 
+                zoomedPoints.push({x:updatePoints[index].x*zoom, y:updatePoints[index].y*zoom})
+            }
+            clear(ctx);
+            drawPolygon(ctx, zoomedPoints, false);
             invalidate();
         }
 
@@ -219,6 +223,13 @@ function modifyPolygon(index) {
         expectResize = -1;
         clear(ctx);
         list_to_json(boxes);
+
+        canvas.style.cursor='auto';
+            
+        // Remove previous listeners
+        canvas.removeEventListener("mousedown",myDown);
+        canvas.removeEventListener("mousemove",myMove);
+        canvas.removeEventListener("mouseup",myUp);
     }
 
     function getMouse(e) {

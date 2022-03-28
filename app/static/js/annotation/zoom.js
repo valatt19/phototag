@@ -53,8 +53,8 @@ function download_image(){
     var img = document.getElementById("image");
 
     // Set size of the canvas (= size of image) and draw the image on
-    dl_ctx.canvas.width = img.width;
-    dl_ctx.canvas.height = img.height;
+    dl_ctx.canvas.width = img.width/zoom;
+    dl_ctx.canvas.height = img.height/zoom;
     dl_ctx.drawImage(img,0,0);
         
     // Draw all boxes on download canvas

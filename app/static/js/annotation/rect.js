@@ -113,14 +113,15 @@ function modifyRect(index) {
     let mySelBoxSize = 8;
 
     // get correct rec
-    let updateRect = boxes[index];
+    let ur = boxes[index];
+    let updateRect = {x:ur.x*zoom, y:ur.y*zoom, w:ur.w*zoom, h:ur.h*zoom};
 
     ctx.strokeStyle = "black";
     ctx.lineWidth = mySelWidth;
     ctx.strokeRect(updateRect.x,updateRect.y,updateRect.w,updateRect.h);
     
     // draw the boxes
-    let half = 2.5;
+    let half = mySelBoxSize/2;
 
     selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
         {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
@@ -154,41 +155,42 @@ function modifyRect(index) {
             // 5  6  7
             switch (expectResize) {
             case 0:
-                boxes[mySel].x = mx;
-                boxes[mySel].y = my;
-                boxes[mySel].w += oldx - mx;
-                boxes[mySel].h += oldy - my;
+                boxes[mySel].x = mx/zoom;
+                boxes[mySel].y = my/zoom;
+                boxes[mySel].w += oldx - mx/zoom;
+                boxes[mySel].h += oldy - my/zoom;
                 break;
             case 1:
-                boxes[mySel].y = my;
-                boxes[mySel].h += oldy - my;
+                boxes[mySel].y = my/zoom;
+                boxes[mySel].h += oldy - my/zoom;
                 break;
             case 2:
-                boxes[mySel].y = my;
-                boxes[mySel].w = mx - oldx;
-                boxes[mySel].h += oldy - my;
+                boxes[mySel].y = my/zoom;
+                boxes[mySel].w = mx/zoom - oldx;
+                boxes[mySel].h += oldy - my/zoom;
                 break;
             case 3:
-                boxes[mySel].x = mx;
-                boxes[mySel].w += oldx - mx;
+                boxes[mySel].x = mx/zoom;
+                boxes[mySel].w += oldx - mx/zoom;
                 break;
             case 4:
-                boxes[mySel].w = mx - oldx;
+                boxes[mySel].w = mx/zoom - oldx;
                 break;
             case 5:
-                boxes[mySel].x = mx;
-                boxes[mySel].w += oldx - mx;
-                boxes[mySel].h = my - oldy;
+                boxes[mySel].x = mx/zoom;
+                boxes[mySel].w += oldx - mx/zoom;
+                boxes[mySel].h = my/zoom - oldy;
                 break;
             case 6:
-                boxes[mySel].h = my - oldy;
+                boxes[mySel].h = my/zoom - oldy;
                 break;
             case 7:
-                boxes[mySel].w = mx - oldx;
-                boxes[mySel].h = my - oldy;
+                boxes[mySel].w = mx/zoom - oldx;
+                boxes[mySel].h = my/zoom - oldy;
                 break;
             }
-            let b = boxes[mySel];
+            let ur = boxes[mySel];
+            let b = {x:ur.x*zoom, y:ur.y*zoom, w:ur.w*zoom, h:ur.h*zoom};
             selectionHandles = [{x:b.x-half, y:b.y-half}, 
                 {x:b.x+b.w/2-half, y:b.y-half},
                 {x:b.x+b.w-half, y:b.y-half},
@@ -307,6 +309,12 @@ function modifyRect(index) {
         expectResize = -1;
         clear(ctx);
         list_to_json(boxes);
+        canvas.style.cursor='auto';
+            
+        // Remove previous listeners
+        canvas.removeEventListener("mousedown",myDown);
+        canvas.removeEventListener("mousemove",myMove);
+        canvas.removeEventListener("mouseup",myUp);
     }
 
 
@@ -319,19 +327,20 @@ function modifyRect(index) {
         clear(ctx);
         ctx.strokeStyle = "black";
         ctx.lineWidth = mySelWidth;
+
+        let ur = boxes[index];
+        let updateRect = {x:ur.x*zoom, y:ur.y*zoom, w:ur.w*zoom, h:ur.h*zoom};
+
         ctx.strokeRect(updateRect.x,updateRect.y,updateRect.w,updateRect.h);
-        
-        // draw the boxes
-        
-        let half = 2.5;
-        let selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
-                                {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
-                                {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
-                                {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
-                                {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h/2-half},
-                                {x:updateRect.x-half, y:updateRect.y+updateRect.h-half},
-                                {x:updateRect.x+updateRect.w/2-half, y:updateRect.y+updateRect.h-half},
-                                {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h-half}];
+    
+        selectionHandles = [{x:updateRect.x-half, y:updateRect.y-half}, 
+            {x:updateRect.x+updateRect.w/2-half, y:updateRect.y-half},
+            {x:updateRect.x+updateRect.w-half, y:updateRect.y-half},
+            {x:updateRect.x-half, y:updateRect.y+updateRect.h/2-half},
+            {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h/2-half},
+            {x:updateRect.x-half, y:updateRect.y+updateRect.h-half},
+            {x:updateRect.x+updateRect.w/2-half, y:updateRect.y+updateRect.h-half},
+            {x:updateRect.x+updateRect.w-half, y:updateRect.y+updateRect.h-half}];
         // 0  1  2
         // 3     4
         // 5  6  7

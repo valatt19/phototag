@@ -114,6 +114,10 @@ def project(user_id = current_user):
 @app.route("/project/new/", methods=["GET", "POST"])
 def project_create():
     if request.method == 'POST':
+        # check that name does not exist
+        if Project.query.filter(Project.name==request.form["pname"]).count() != 0:
+            return redirect(request.url)
+
         # check if the post request has the file part
         print(request.form.getlist('mytext[]'))
         if 'files[]' not in request.files:
@@ -129,7 +133,21 @@ def project_create():
         if not os.path.isdir(new_dir):
             os.mkdir(new_dir)
 
+        # Check if project is public or not
+        if request.form["ptype"] == "1":
+            ptype = True
+        else:
+            ptype = False 
+        
+        # Add project in DB
+        pr = Project(creator = current_user, name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
+        pr.addMember(current_user)
+
+        db.session.add(pr)
+        db.session.commit()
+        
         # loop on each file on the folder imported
+        ps = 0
         for i in range(len(uploaded_files)):
             # save the file in the server
             file = uploaded_files[i]
@@ -141,23 +159,12 @@ def project_create():
             size = int(os.stat(path).st_size / 1000)
 
             # create Image object
-            img = Image(name = filename, path = path[3:], size=size, last_time=datetime.now(),last_person=current_user.id,annotations=[],nb_annotations=0)
+            img = Image(name = filename, path = path[3:], size=size, last_time=datetime.now(),last_person=current_user,annotations=[],nb_annotations=0, project=pr, project_pos=ps)
             db.session.add(img)
             db.session.commit()
 
-        # Check if project is public or not
-        if request.form["ptype"] == "1":
-            ptype = True
-        else:
-            ptype = False 
+            ps += 1
 
-        # Add project in DB
-        pr = Project(creator = current_user, name = request.form["pname"], privacy=ptype, classes=request.form.getlist('mytext[]'), nb_membre=0)
-        pr.addMember(current_user)
-
-        db.session.add(pr)
-        db.session.commit()
-        #changer project_id pour créer plusieurs projets
         return redirect(url_for('dataset_overview', project_id=pr.id))
 
     return render_template("project/create.html")
@@ -191,38 +198,40 @@ def project_joined(project_id):
 # Dataset overview of a project (list img and vid)
 @app.route("/project/<int:project_id>/dataset/")
 def dataset_overview(project_id):
-    dataset = Image.query.all()
-    project = Project.query.all()[project_id]
+    dataset = Image.query.filter((Image.project_id==project_id))
+    project = Project.query.get(project_id)
     project_name = project.name
     return render_template("project/dataset.html", dataset=dataset, id=project_id, name= project_name,project=project,user =current_user.username)
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 def annotate_image(project_id, img_id):
-    ds_images = Image.query.all()
+    project = Project.query.get(project_id)
+    ds_images = Image.query.filter((Image.project_id==project_id))
     image = ds_images[img_id]
-    project = Project.query.all()[project_id]
+
+    # Compute id of previous and next images
+    len_images = ds_images.count()
+    prev = (img_id+len_images-1)%len_images
+    next = (img_id+1)%len_images
     
     if image.nb_annotations == 0:
         boxes = "[]"
     else:
         boxes = json.dumps(image.annotations)
 
-    # Compute id of previous and next images
-    len_images = len(ds_images)
-    prev = (img_id+len_images-1)%len_images
-    next = (img_id+1)%len_images
-
-    return render_template("project/annotate.html", image=image, img_id=img_id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project)
+    return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project)
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
 def save_json(project_id, img_id):
-    image = Image.query.all()[img_id]
-
+    image = Image.query.get(img_id)
+    if image.project_id != project_id :
+        return jsonify({"impossible": True, "response": "can't save this file"}), 200  
+    
     # Get the annotations data and update it for image
     data = request.get_json()
-    image.update_annotations(data['html_data'])
+    image.update_annotations(data['html_data'], datetime.now(), current_user)
 
     resp = {"success": True, "response": "file saved!"}
     return jsonify(resp), 200    

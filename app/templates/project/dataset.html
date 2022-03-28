@@ -54,12 +54,13 @@ img:hover {
             {% for file in dataset %}
             <div class="content_img">
 
-              <a href="../annotate/{{loop.index-1}}">
+              <a href="../annotate/{{file.project_pos}}">
 
                   <img id="image" class='img' src="{{url_for('static', filename='datasets/'+user+'/'+name+'/'+file.name)}}" alt="" />
                   <div>
-                <p> last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
-                <p>number of annotations : {{file.nb_annotations}}</p>
+                <p>Last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
+                <p>{{file.last_person.username}}</p>
+                <p># annotations : {{file.nb_annotations}}</p>
               </div>
               </a>
 
