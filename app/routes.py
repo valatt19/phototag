@@ -54,7 +54,7 @@ def login():
             return redirect(url_for("project"))
 
     # GET
-    return render_template("project/login.html",form=form)
+    return render_template("login.html",form=form)
 
 
 # Register
@@ -80,11 +80,12 @@ def register():
 
         # add new project dir
         new_dir = app.config['UPLOAD_FOLDER'] +"/"+ form.username.data
-        os.mkdir(new_dir)
+        if not os.path.isdir(new_dir):
+            os.mkdir(new_dir)
 
         return redirect(url_for("login"))
 
-    return render_template("project/register.html", form=form)
+    return render_template("register.html", form=form)
 
 
 # Logout
@@ -160,9 +161,8 @@ def project_create():
 
         db.session.add(pr)
         db.session.commit()
-
-
-        return redirect(url_for('project'))
+        #changer project_id pour créer plusieurs projets
+        return redirect(url_for('dataset_overview', project_id=pr.id))
 
     return render_template("project/create.html")
 
@@ -170,10 +170,25 @@ def project_create():
 
 # Join a project
 @app.route("/project/join/")
-@login_required
 def project_join():
-    return "hello world!"
+    public_projects = Project.query.filter(Project.privacy==1)
+    final_public_projects = []
+    for p in public_projects:
+        if not p in current_user.getMyProjects():
+            final_public_projects.append(p)
 
+    return render_template("project/project_join.html", projects=final_public_projects)
+
+# User click on join a project
+@app.route("/project/joined/<int:project_id>")
+def project_joined(project_id):
+    project_joined = Project.query.get(project_id)
+    if project_joined.privacy == 1:
+        project_joined.addMember(current_user)
+        db.session.commit()
+        return redirect(url_for('dataset_overview', project_id=project_joined.id))
+
+    return redirect(url_for('project_join'))
 
 ######################
 # In a project pages #
