@@ -79,39 +79,43 @@ $("input[type='text']").fadeToggle();
 </script>
 
         <form action="" method="POST" enctype="multipart/form-data">
-            <label for="pname">Project name: </label><br>
+            <h2>Set project parameters</h2>
+            <label for="pname"><b>Project name: </b></label><br>
             <input type="text" name="pname" id="pname"><br><br>
 
-            <label for="ptype">Privacy: </label><br>
+            <label for="ptype"><b>Privacy: </b></label><br>
             <input type="radio" id="public" name="ptype" value="1"checked>Public<br>
             <input type="radio" id="private" name="ptype" value="0">Private<br><br>
+
             <h2>Set configuration</h2>
             <div>
+                <label for="importConfig"><b>Import configuration file: </b></label><br>
+                <button type="button" class="btn btn-outline-primary"><input type="file" id="importConfig" accept=".xml"></button><br><br>
 
-                <button type="button" class="btn btn-outline-primary"><input type="file" id="importConfig" accept=".xml"></button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create</button>
-                    <div id="popup" name="popup" class="modal">
-                    <div class="modal-dialog modal-dialog-centered">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <p> Ajout de classe </p>
+                <label for="importConfig"><b>OR create new configuration: </b></label><br>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create</button><br><br>
+                <div id="popup" name="popup" class="modal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <p> Ajout de classe </p>
+                    </div>
+                        <div id="container1" class="modal-body">
+                        <button class="add_form_field">Add New Field &nbsp;
+                        <span style="font-size:16px; font-weight:bold;">+ </span>
+                    </button>
+                    <div><input type="text" name="mytext[]"></div>
+                    </div>
+                        <div class="modal-footer">
+                        <button type="button" class="confirm">Confirm</button>
                         </div>
-                          <div id="container1" class="modal-body">
-                           <button class="add_form_field">Add New Field &nbsp;
-                          <span style="font-size:16px; font-weight:bold;">+ </span>
-                        </button>
-                        <div><input type="text" name="mytext[]"></div>
-                        </div>
-                          <div class="modal-footer">
-                            <button type="button" class="confirm">Confirm</button>
-                          </div>
-          </div>
-        </div>
-      </div>
-
+                    </div>
+                </div>
+                </div>
             </div>
 
-            <label for="file">Upload folder: </label><br>
+            <h2>Set dataset</h2>
+            <label for="file"><b>Upload folder: </b></label><br>
             <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory=""><br><br>
 
             <input type="submit" value="Create">
