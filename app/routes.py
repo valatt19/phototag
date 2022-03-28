@@ -91,7 +91,9 @@ def register():
 # Logout
 @app.route("/logout/")
 def logout():
+    logout_user()
     return redirect(url_for("login"))
+
 
 
 ##################
@@ -100,6 +102,7 @@ def logout():
 
 # All projects of the user (created and joined by him)
 @app.route("/project/")
+@login_required
 def project(user_id = current_user):
     """project_query = "SELECT * FROM Project WHERE members"
     query = Project.query(project_query)
@@ -112,6 +115,7 @@ def project(user_id = current_user):
 # S1
 # Create a new project (Sprint 1 : only load a dataset)
 @app.route("/project/new/", methods=["GET", "POST"])
+@login_required
 def project_create():
     if request.method == 'POST':
         # check that name does not exist
@@ -169,6 +173,8 @@ def project_create():
 
     return render_template("project/create.html")
 
+
+
 # Join a project
 @app.route("/project/join/")
 def project_join():
@@ -197,6 +203,7 @@ def project_joined(project_id):
 
 # Dataset overview of a project (list img and vid)
 @app.route("/project/<int:project_id>/dataset/")
+@login_required
 def dataset_overview(project_id):
     dataset = Image.query.filter((Image.project_id==project_id))
     project = Project.query.get(project_id)
@@ -205,6 +212,7 @@ def dataset_overview(project_id):
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
+@login_required
 def annotate_image(project_id, img_id):
     project = Project.query.get(project_id)
     ds_images = Image.query.filter((Image.project_id==project_id))
@@ -224,6 +232,7 @@ def annotate_image(project_id, img_id):
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
+@login_required
 def save_json(project_id, img_id):
     image = Image.query.get(img_id)
     if image.project_id != project_id :
