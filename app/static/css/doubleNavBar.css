@@ -33,8 +33,6 @@
   font-family: "Mountains of Christmas", cursive;
 }
 
-
-
 .top_nav .right ul{
   display: flex;
 }
@@ -42,7 +40,6 @@
 .top_nav .right ul li{
   margin: 0 12px;
 }
-
 
 .bottom_nav{
   width: 100%;
