@@ -78,3 +78,23 @@ function download_image(){
     link.href = image;
     link.click();
 }
+
+///////////////////////////////
+// DOWNLOAD ANNOTATIONS JSON //
+///////////////////////////////
+function download_json(){
+    var obj = $('#my_data').data("boxes");
+    var new_obj = [];
+    for (let i = 0; i < obj.length; i++) {
+        var box = obj[i];
+        box.type = document.getElementById("classes").getElementsByTagName("li")[obj[i].type].innerHTML;
+        new_obj.push(box);
+    }
+    var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+
+    var link = document.createElement('a');
+    var img_name = $('#my_data').data("name").split(".")[0];
+    link.download = img_name+".json";
+    link.href = 'data:' + data;
+    link.click();
+}
