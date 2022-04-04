@@ -1,7 +1,7 @@
 {% extends "parent2.html" %}
 {% block content %}
     <style>
-img {
+.img_dataset {
   border: 1px solid #ddd; /* Gray border */
   border-radius: 4px;  /* Rounded border */
   padding: 5px; /* Some padding */
@@ -9,7 +9,7 @@ img {
 }
 
 /* Add a hover effect (blue shadow) */
-img:hover {
+.img_dataset:hover {
   box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
 }
 
@@ -56,7 +56,7 @@ img:hover {
 
               <a href="../annotate/{{file.project_pos}}">
 
-                  <img id="image" class='img' src="{{url_for('static', filename='../../'+file.path)}}" alt="" />
+                  <img id="image_dataset" class='img_dataset' src="{{url_for('static', filename='../../'+file.path)}}" alt="" />
                   <div>
                 <p>Last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
                 <p>{{file.last_person.username}}</p>
