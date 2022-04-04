@@ -11,38 +11,24 @@
 </head>
 
     <script>
+    function disableCreate(){
+        let create_config = document.getElementById('btn_create');
+        create_config.disabled = true;
+    }
+    function disableImport() {
+        let import_config = document.getElementById('importConfig');
+        import_config.disabled = true;
+    }
+    /*function reset() {
+        let import_config = document.getElementById('importConfig');
+        let create_config = document.getElementById('btn_create');
 
-    /*$(document).ready(function(){
+        import_config.disabled = false;
+        create_config.disabled = false;
 
-$("ul").on("click", "li", function(){
-$(this).toggleClass("completed");
-});
+        import_config.file[0].value = "";
 
-
-$("ul").on("click", "span", function(event){
-$(this).parent().fadeOut(500,function(){
-$(this).remove();
-});
-event.stopPropagation();
-});
-
-$("input[type='text']").keypress(function(event){
-if(event.which === 13){
-var classText = $(this).val();
-$(this).val("");
-mylist.push(classText)
-$("ul").append("<li><span><i class='fa fa-trash'></i></span> " + classText + "</li>")
-    console.log(mylist);
-
-}
-});
-
-$(".fa-plus").click(function(){
-$("input[type='text']").fadeToggle();
-});
-
-
-});*/
+    }*/
     $(document).ready(function() {
 
 
@@ -53,11 +39,40 @@ $("input[type='text']").fadeToggle();
     var wrapper = $(".modal-body");
     var add_button = $(".add_form_field");
     var confirm_button = $(".confirm");
+    var reset_config = document.getElementById('reset_config');
+    /*var create_config = document.getElementById('btn_create');
+    var import_config = document.getElementById('importConfig');
+    var input = document.querySelector('input[id=importConfig]')
 
+
+
+    $(create_config).click(function (e){
+        e.preventDefault();
+        import_config.disabled = true;
+    });
+
+    $(input).click(function (e){
+        e.preventDefault();
+
+        create_config.disabled = true;
+    });
+
+   ;*/
+    $(reset_config).click(function (e){
+        e.preventDefault();
+        let import_config = document.getElementById('importConfig');
+        let create_config = document.getElementById('btn_create');
+
+        import_config.disabled = false;
+        create_config.disabled = false;
+
+        //import_config.file[0].value = "";
+    })
     var x = 1;
     $(add_button).click(function(e) {
         e.preventDefault();
         if (x < max_fields) {
+
             x++;
             $(wrapper).append('<div><input type="text" name="mytext[]"/><a href="#" class="delete">Delete</a></div>'); //add input box
         } else {
@@ -90,10 +105,10 @@ $("input[type='text']").fadeToggle();
             <h2>Set configuration</h2>
             <div>
                 <label for="importConfig"><b>Import configuration file: </b></label><br>
-                <button type="button" class="btn btn-outline-primary"><input type="file" id="importConfig" accept=".xml"></button><br><br>
+                <button type="button" class="btn btn-outline-primary"><input type="file" onclick="disableCreate()" id="importConfig" accept=".xml"></button><br><br>
+                <label for="btn_create"><b>OR create new configuration: </b></label><br>
+                <button type="button" id="btn_create" onclick="disableImport()" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create</button><br><br>
 
-                <label for="importConfig"><b>OR create new configuration: </b></label><br>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create</button><br><br>
                 <div id="popup" name="popup" class="modal">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
@@ -112,6 +127,7 @@ $("input[type='text']").fadeToggle();
                     </div>
                 </div>
                 </div>
+                <button onclick="reset()" id="reset_config">Reset config</button>
             </div>
 
             <h2>Set dataset</h2>
