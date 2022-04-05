@@ -136,7 +136,7 @@ function setAnnotationsList(boxes) {
 // Send POST request to server to save the annotations list
 function list_to_json(l) {
     // Get image id
-    var img_id = $('#my_data').data("img");
+    img_id = $('#my_data').data("img");
 
     // Send request
     $.ajax({
@@ -149,4 +149,17 @@ function list_to_json(l) {
             console.log(response);
         },
     });
+}
+
+///////////////////////////////////////
+// DELETE A BOX : same for all tools //
+///////////////////////////////////////
+function update(b,i) {
+    if (img_id == i) {
+        boxes = b;
+        // Redraw new canvas and update annotations list
+        invalidate();
+        setInterval(mainDraw, INTERVAL);
+        setAnnotationsList(boxes);
+    }
 }

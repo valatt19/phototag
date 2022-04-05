@@ -1,5 +1,3 @@
-var isNearZone = 5;
-
 function addPolygon(){
     // updateRect flag is true when the user is dragging the mouse
     let isDrawing = false;

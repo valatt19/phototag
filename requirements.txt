@@ -4,3 +4,4 @@ flask_wtf
 wtforms
 flask_sqlalchemy
 werkzeug
+flask-socketio

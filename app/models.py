@@ -70,7 +70,7 @@ class Project(db.Model):
 
         # add classes
         node_classes = SubElement(node_config,"classes")
-        classes = ["first", "second"]  
+        classes = self.classes 
         for cl in classes:
             node_cl = SubElement(node_classes, "classe")
             node_cl.text = cl
@@ -134,7 +134,7 @@ class Group(db.Model):
     def __repr__(self):
         return "< Group >" + self.name
 
-db.drop_all()
+#db.drop_all()
 db.create_all()
 
 # Create two groups
@@ -142,12 +142,12 @@ gr1 = Group(name="mod")
 gr2 = Group(name="normal")
 
 # Create the admin user
-admin = User(username="admin",firstname="Admin",surname="Admin",group=gr1)
-admin.set_password("admin")
-db.session.add(admin)
+#admin = User(username="admin",firstname="Admin",surname="Admin",group=gr1)
+#admin.set_password("admin")
+#db.session.add(admin)
 
-pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
-pr.addMember(admin)
+#pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
+#pr.addMember(admin)
 
 db.session.commit()
 
