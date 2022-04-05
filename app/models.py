@@ -70,7 +70,7 @@ class Project(db.Model):
 
         # add classes
         node_classes = SubElement(node_config,"classes")
-        classes = ["first", "second"]  
+        classes = self.classes 
         for cl in classes:
             node_cl = SubElement(node_classes, "classe")
             node_cl.text = cl

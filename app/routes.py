@@ -11,6 +11,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 from datetime import datetime
 import json
+from xml.etree.cElementTree import dump
 
 from app.models import Image, ds_images, User,  Group, gr1, gr2, users, Project
 from app import db
