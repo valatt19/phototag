@@ -1,5 +1,5 @@
 from __future__ import annotations
-from app import app
+from app import app, socketio
 
 from flask import render_template, redirect
 from flask import url_for, request, flash, jsonify
@@ -231,18 +231,33 @@ def annotate_image(project_id, img_id):
 
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project)
 
+@socketio.on("refresh")
+def refresh(img_id):
+    '''On connecting, update the client with the current state.'''
+    boxes = Image.query.get(img_id).annotations
+    socketio.emit("update", (boxes, img_id))
+
+
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
 @login_required
 def save_json(project_id, img_id):
     image = Image.query.get(img_id)
     if image.project_id != project_id :
-        return jsonify({"impossible": True, "response": "can't save this file"}), 200  
+        return jsonify({"impossible": True, "response": "can't modify this file"}), 200  
     
     # Get the annotations data and update it for image
     data = request.get_json()
     image.update_annotations(data['html_data'], datetime.now(), current_user)
 
+    refresh(img_id)
+
     resp = {"success": True, "response": "file saved!"}
     return jsonify(resp), 200    
 
+########
+# MAIN #
+########
+
+if __name__ == '__main__':
+    socketio.run(app)
