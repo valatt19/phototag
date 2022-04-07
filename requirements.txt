@@ -1,7 +1,9 @@
-flask
+flask~=2.0.3
 flask_login
 flask_wtf
-wtforms
+wtforms~=3.0.1
 flask_sqlalchemy
-werkzeug
+werkzeug~=2.0.3
 flask-socketio
+SQLAlchemy~=1.4.31
+config~=0.5.1

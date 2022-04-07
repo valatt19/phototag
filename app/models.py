@@ -6,7 +6,6 @@ from copy import deepcopy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from xml.etree.cElementTree import Element, ElementTree, SubElement, dump
-
 from sqlalchemy.ext.mutable import MutableList
 
 #-------------------------Image---------------------------------------------
