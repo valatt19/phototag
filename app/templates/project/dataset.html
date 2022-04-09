@@ -58,9 +58,9 @@
 
                   <img id="image_dataset" class='img_dataset' src="{{url_for('static', filename='../../'+file.path)}}" alt="" />
                   <div>
-                <p>Last edit : {{file.last_time.strftime('%Y-%m-%d %H:%M')}}</p>
-                <p>{{file.last_person.username}}</p>
-                <p># annotations : {{file.nb_annotations}}</p>
+                <p>Last: {{file.last_time.strftime('%Y-%m-%d %H:%M')}} by {{file.last_person.username}}</p>
+                <p>Live: {% for user in working[loop.index-1] %}{{user.username}}, {% endfor %}</p>
+                <p>{{file.nb_annotations}} annotations</p>
               </div>
               </a>
 

@@ -242,8 +242,14 @@ def dataset_overview(project_id):
     dataset = Image.query.filter((Image.project_id == project_id))
     project = Project.query.get(project_id)
     project_name = project.name
+
+    # Create working list for each image
+    working = []
+    for img in dataset:
+        working.append(User.query.filter(User.image_id == img.id))
+
     return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project,
-                           user=current_user.username)
+                           user=current_user.username, working = working)
 
 
 # Annotate an image of a project
@@ -264,15 +270,29 @@ def annotate_image(project_id, img_id):
     else:
         boxes = json.dumps(image.annotations)
 
+    # Add user in working list
+    current_user.setImage(image)
+    db.session.commit()
+    working = User.query.filter(User.image_id == image.id)
+
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
-                           classes=project.classes, boxes=boxes, project=project)
+                           classes=project.classes, boxes=boxes, project=project, working=working)
 
 
 @socketio.on("refresh")
 def refresh(img_id):
     '''On connecting, update the client with the current state.'''
-    boxes = Image.query.get(img_id).annotations
+    img = Image.query.get(img_id)
+    boxes = img.annotations
     socketio.emit("update", (boxes, img_id))
+
+@socketio.on('disconnect')
+def test_disconnect():
+    # Remove user in working list
+    print("disconnected "+current_user.username)
+    current_user.setImage(None)
+    db.session.commit()
+
 
 
 # Receive the json file from an image

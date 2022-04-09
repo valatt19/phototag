@@ -8,34 +8,6 @@ from datetime import datetime
 from xml.etree.cElementTree import Element, ElementTree, SubElement, dump
 from sqlalchemy.ext.mutable import MutableList
 
-#-------------------------Image---------------------------------------------
-ds_images = []
-
-class Image(db.Model):
-    __tablename__ = "image"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(80),unique = False, nullable=False)
-    path = db.Column(db.String(80),unique=False,nullable=False)
-    size = db.Column(db.Integer)
-    last_time = db.Column(db.DateTime, unique=False, nullable=False)
-    project_pos = db.Column(db.Integer, nullable=False)
-    nb_annotations = db.Column(db.Integer)
-    annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
-
-    last_person_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    last_person = db.relationship("User", backref=db.backref('posts1', lazy=True))
-
-    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
-    project = db.relationship("Project", backref=db.backref('posts2', lazy=True))
-
-    def update_annotations(self,json_list, date, user):
-        self.annotations = json_list
-        self.nb_annotations = len(json_list)
-        self.last_time = date
-        self.last_person = user
-        db.session.commit()
-
 #-----------------------------Projets/User---------------------------------
 
 class ProjectUser(db.Model):
@@ -91,9 +63,15 @@ class User(UserMixin, db.Model):
     projects = db.relationship("Project", secondary=ProjectUser.__table__, backref="User")
     group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
     group = db.relationship("Group", backref=db.backref('posts', lazy=True))
+    
+    image_id = db.Column(db.Integer, db.ForeignKey('image.id'))
+    image = db.relationship("Image", backref=db.backref('posts2', lazy=True),foreign_keys=[image_id])
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
+
+    def setImage(self, img):
+        self.image = img
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -116,6 +94,12 @@ class User(UserMixin, db.Model):
     def getMyProjects(self):
         return self.projects
 
+    def getImageId(self):
+        return self.image_id
+
+    def getImage(self):
+        return self.image
+
     def checkIsAdmin(self):
         return self.group.name == "mod"
 
@@ -132,6 +116,44 @@ class Group(db.Model):
 
     def __repr__(self):
         return "< Group >" + self.name
+
+#-------------------------Image---------------------------------------------
+ds_images = []
+
+class Image(db.Model):
+    __tablename__ = "image"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(80),unique = False, nullable=False)
+    path = db.Column(db.String(80),unique=False,nullable=False)
+    size = db.Column(db.Integer)
+    last_time = db.Column(db.DateTime, unique=False, nullable=False)
+    project_pos = db.Column(db.Integer, nullable=False)
+    nb_annotations = db.Column(db.Integer)
+    annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
+
+    last_person_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    last_person = db.relationship("User", backref=db.backref('posts1', lazy=True), foreign_keys=[last_person_id])
+
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
+    project = db.relationship("Project", backref=db.backref('posts2', lazy=True))
+
+    working = db.Column(MutableList.as_mutable(PickleType),default=[])
+
+    def add_working(self, username):
+        self.working.append(username)
+        db.session.commit()
+
+    def delete_working(self, username):
+        self.working.remove(username)
+        db.session.commit()
+
+    def update_annotations(self,json_list, date, user):
+        self.annotations = json_list
+        self.nb_annotations = len(json_list)
+        self.last_time = date
+        self.last_person = user
+        db.session.commit()
 
 db.drop_all()
 db.create_all()
