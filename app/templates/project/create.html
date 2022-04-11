@@ -19,16 +19,6 @@
         let import_config = document.getElementById('importConfig');
         import_config.disabled = true;
     }
-    /*function reset() {
-        let import_config = document.getElementById('importConfig');
-        let create_config = document.getElementById('btn_create');
-
-        import_config.disabled = false;
-        create_config.disabled = false;
-
-        import_config.file[0].value = "";
-
-    }*/
     $(document).ready(function() {
 
 
@@ -40,24 +30,7 @@ $("input[type='text']").fadeToggle();
     var add_button = $(".add_form_field");
     var confirm_button = $(".confirm");
     var reset_config = document.getElementById('reset_config');
-    /*var create_config = document.getElementById('btn_create');
-    var import_config = document.getElementById('importConfig');
-    var input = document.querySelector('input[id=importConfig]')
 
-
-
-    $(create_config).click(function (e){
-        e.preventDefault();
-        import_config.disabled = true;
-    });
-
-    $(input).click(function (e){
-        e.preventDefault();
-
-        create_config.disabled = true;
-    });
-
-   ;*/
     $(reset_config).click(function (e){
         e.preventDefault();
         let import_config = document.getElementById('importConfig');

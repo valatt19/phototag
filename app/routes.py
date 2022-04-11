@@ -249,7 +249,7 @@ def dataset_overview(project_id):
         working.append(User.query.filter(User.image_id == img.id))
 
     return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project,
-                           user=current_user.username, working = working)
+                           user=current_user.username, working = working, configExport=project.exportConfig())
 
 
 # Annotate an image of a project

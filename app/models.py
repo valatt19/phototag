@@ -1,11 +1,12 @@
 from email.policy import default
+
 from flask_login import UserMixin
 from sqlalchemy import null, PickleType
 from app import db,login_manager
 from copy import deepcopy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-from xml.etree.cElementTree import Element, ElementTree, SubElement, dump
+from xml.etree.cElementTree import Element, ElementTree, SubElement, dump, tostring
 from sqlalchemy.ext.mutable import MutableList
 
 #-----------------------------Projets/User---------------------------------
@@ -47,8 +48,9 @@ class Project(db.Model):
             node_cl.text = cl
         
         # add config to doc and return it
-        doc = ElementTree(node_config)
-        return doc
+        #doc = ElementTree(node_config)
+        xmlstr = tostring(node_config, encoding='utf8',method="xml")
+        return xmlstr
 
 #----------------------------User-----------------------------------------------
 class User(UserMixin, db.Model):
