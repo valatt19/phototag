@@ -242,6 +242,7 @@ def dataset_overview(project_id):
     dataset = Image.query.filter((Image.project_id == project_id))
     project = Project.query.get(project_id)
     project_name = project.name
+    config = project.exportConfig()
 
     # Create working list for each image
     working = []
@@ -249,7 +250,7 @@ def dataset_overview(project_id):
         working.append(User.query.filter(User.image_id == img.id))
 
     return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project,
-                           user=current_user.username, working = working, configExport=project.exportConfig())
+                           user=current_user.username, working = working, configExport=config)
 
 
 # Annotate an image of a project
@@ -257,6 +258,7 @@ def dataset_overview(project_id):
 @login_required
 def annotate_image(project_id, img_id):
     project = Project.query.get(project_id)
+    config = project.exportConfig()
     ds_images = Image.query.filter((Image.project_id == project_id))
     image = ds_images[img_id]
 
@@ -276,7 +278,7 @@ def annotate_image(project_id, img_id):
     working = User.query.filter(User.image_id == image.id)
 
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
-                           classes=project.classes, boxes=boxes, project=project, working=working)
+                           classes=project.classes, boxes=boxes, project=project, working=working, configExport=config)
 
 
 @socketio.on("refresh")
@@ -292,8 +294,6 @@ def test_disconnect():
     print("disconnected "+current_user.username)
     current_user.setImage(None)
     db.session.commit()
-
-
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])

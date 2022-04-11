@@ -91,16 +91,16 @@
         </ul>
     </div>
 </nav>
-<meta id="my_data" data-config="{{project.exportConfig()}}" data-name="{{ project.name }}">
+<meta id="my_config" data-config="{{project.exportConfig()}}" data-name="{{ project.name }}">
 <script>
 
         function saveConfig() {
             $(document).ready(function () {
-            let xmltext = $('#my_data').data("config");
+            let xmltext = $('#my_config').data("config");
             xmltext = xmltext.slice(2, xmltext.length - 1);
             xmltext = xmltext.replace(/\\n/g, '')
 
-            let name = $('#my_data').data("name");
+            let name = $('#my_config').data("name");
             let filename =name+".xml";
 
             let pom = document.createElement('a');
