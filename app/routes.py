@@ -277,16 +277,25 @@ def annotate_image(project_id, img_id):
     db.session.commit()
     working = User.query.filter(User.image_id == image.id)
 
+    refresh(img_id)
+
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
                            classes=project.classes, boxes=boxes, project=project, working=working, configExport=config)
-
 
 @socketio.on("refresh")
 def refresh(img_id):
     '''On connecting, update the client with the current state.'''
     img = Image.query.get(img_id)
     boxes = img.annotations
-    socketio.emit("update", (boxes, img_id))
+
+    working = User.query.filter(User.image_id == img.id)
+    users_live = []
+    for user in working:
+        users_live.append(user.username)
+
+    print(users_live)
+
+    socketio.emit("update", (boxes, img_id, users_live))
 
 @socketio.on('disconnect')
 def test_disconnect():

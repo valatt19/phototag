@@ -151,15 +151,36 @@ function list_to_json(l) {
     });
 }
 
-///////////////////////////////////////
-// DELETE A BOX : same for all tools //
-///////////////////////////////////////
-function update(b,i) {
+////////////////////////////////////////
+// UPDATE when other user made update //
+////////////////////////////////////////
+function update(b,i,users) {
     if (img_id == i) {
+        // Update live users first
+        updateLive(users,i)
         boxes = b;
         // Redraw new canvas and update annotations list
         invalidate();
         setInterval(mainDraw, INTERVAL);
         setAnnotationsList(boxes);
+    }
+}
+
+/////////////////////////////////
+// UPDATE live users connected //
+/////////////////////////////////
+function updateLive(users,i) {
+    if (img_id == i) {
+        // Delete all precedents usernames
+        const myNode = document.getElementById("username");
+        while (myNode.firstChild) {
+            myNode.removeChild(myNode.lastChild);
+        }
+        // Add new usernames
+        for (let j=0; j < users.length; j++) {
+            let a = document.createElement("a");
+            a.innerHTML = " " + users[j] + " -"
+            myNode.appendChild(a)
+        }
     }
 }

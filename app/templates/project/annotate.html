@@ -21,10 +21,12 @@
             <button onclick="download_image()">Download Img</button>
             <button onclick="download_json()">Download Json</button>
 
-            <a>Live users:</a>
+            <div id="username" style="float:right">
             {% for user in working %}
             <a> {{user.username}} -</a>
             {% endfor %}
+            </div>
+            <a style="float:right"><b>Live users</b></a>
 
         </div>
 
