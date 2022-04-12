@@ -280,7 +280,7 @@ def annotate_image(project_id, img_id):
     db.session.commit()
     working = User.query.filter(User.image_id == image.id)
 
-    refresh(img_id)
+    refresh(image.id)
 
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
                            classes=project.classes, boxes=boxes, project=project, working=working, configExport=config, log=log)
