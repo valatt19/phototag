@@ -26,8 +26,9 @@ let offsetY = canvasOffset.top;
 let scrollX = $canvas.scrollLeft();
 let scrollY = $canvas.scrollTop();
 
-let annotations = document.getElementById("annotations")
-let boxes = []
+let annotations = document.getElementById("annotations");
+let boxes = [];
+let log = "";
 
 let isNearZone = 4; // For polygon tool, distance within magic join is done
 
@@ -54,6 +55,7 @@ $(document).ready(function() {
     setInterval(mainDraw, INTERVAL);
 
     setAnnotationsList(boxes);
+    log = $('#my_data').data("log");
 
     img_id = $('#my_data').data("img");
     socket.on("update", update);

@@ -34,7 +34,7 @@ function addPolygon(){
             canvas.removeEventListener("mousedown",handleMouseDown);
             canvas.removeEventListener("mousemove",handleMouseMove);
 
-            list_to_json(boxes);
+            list_to_json(boxes,"add","polygon",document.getElementById("classes").getElementsByTagName("li")[current].innerHTML);
 
         } else {
             // Add mouse position 
@@ -220,7 +220,7 @@ function modifyPolygon(index) {
         isResizeDrag = false;
         expectResize = -1;
         clear(ctx);
-        list_to_json(boxes);
+        list_to_json(boxes,"modify","polygon",document.getElementById("classes").getElementsByTagName("li")[boxes[index].type].innerHTML);
 
         canvas.style.cursor='auto';
             

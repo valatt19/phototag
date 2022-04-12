@@ -272,6 +272,9 @@ def annotate_image(project_id, img_id):
     else:
         boxes = json.dumps(image.annotations)
 
+    # Generate txt log file
+    log = image.generate_log()
+
     # Add user in working list
     current_user.setImage(image)
     db.session.commit()
@@ -280,7 +283,7 @@ def annotate_image(project_id, img_id):
     refresh(img_id)
 
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
-                           classes=project.classes, boxes=boxes, project=project, working=working, configExport=config)
+                           classes=project.classes, boxes=boxes, project=project, working=working, configExport=config, log=log)
 
 @socketio.on("refresh")
 def refresh(img_id):
@@ -295,7 +298,9 @@ def refresh(img_id):
 
     print(users_live)
 
-    socketio.emit("update", (boxes, img_id, users_live))
+    log = img.generate_log()
+
+    socketio.emit("update", (boxes, img_id, users_live, log))
 
 @socketio.on('disconnect')
 def test_disconnect():
@@ -314,7 +319,11 @@ def save_json(project_id, img_id):
 
         # Get the annotations data and update it for image
     data = request.get_json()
-    image.update_annotations(data['html_data'], datetime.now(), current_user)
+    user = current_user
+    date = datetime.now()
+    image.update_annotations(data['html_data'][0], date, user)
+    print(data['html_data'])
+    image.add_log(username=user.username, modif=data['html_data'][1], type=data['html_data'][3], tool=data['html_data'][2] , date=date)
 
     refresh(img_id)
 

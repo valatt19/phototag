@@ -30,6 +30,8 @@ function modifyBoxe(tool, index) {
 ///////////////////////////////////////
 function deleteBoxe(index) {
     // Delete boxe in the list
+    let tool = boxes[index].tool;
+    let type = boxes[index].type
     boxes.splice(index,1);
     
     // Redraw new canvas and update annotations list
@@ -37,7 +39,7 @@ function deleteBoxe(index) {
     setInterval(mainDraw, INTERVAL);
     setAnnotationsList(boxes);
 
-    list_to_json(boxes);
+    list_to_json(boxes, "delete", tool, document.getElementById("classes").getElementsByTagName("li")[type].innerHTML);
 }
 
 //////////////////////////
@@ -134,7 +136,7 @@ function setAnnotationsList(boxes) {
 }
 
 // Send POST request to server to save the annotations list
-function list_to_json(l) {
+function list_to_json(l,modif,tool,type) {
     // Get image id
     img_id = $('#my_data').data("img");
 
@@ -144,7 +146,7 @@ function list_to_json(l) {
         type: "POST",
         contentType: "application/json;charset=UTF-8",
         dataType: "json",
-        data: JSON.stringify({html_data: l}),
+        data: JSON.stringify({html_data: [l,modif,tool,type]}),
         success: function(response) {
             console.log(response);
         },
@@ -154,7 +156,7 @@ function list_to_json(l) {
 ////////////////////////////////////////
 // UPDATE when other user made update //
 ////////////////////////////////////////
-function update(b,i,users) {
+function update(b,i,users,l) {
     if (img_id == i) {
         // Update live users first
         updateLive(users,i)
@@ -163,6 +165,7 @@ function update(b,i,users) {
         invalidate();
         setInterval(mainDraw, INTERVAL);
         setAnnotationsList(boxes);
+        log=l;
     }
 }
 

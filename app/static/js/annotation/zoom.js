@@ -98,3 +98,15 @@ function download_json(){
     link.href = 'data:' + data;
     link.click();
 }
+
+//////////////////////
+// DOWNLOAD LOG TXT //
+//////////////////////
+function download_log(){
+    var data = "text/txt;charset=utf-8," + encodeURIComponent(log);
+    var link = document.createElement('a');
+    var img_name = $('#my_data').data("name").split(".")[0];
+    link.download = img_name+"-LOG.txt";
+    link.href = 'data:' + data;
+    link.click();
+}

@@ -20,13 +20,14 @@
             <button onclick="addPolygon()">Polygon</button>
             <button onclick="download_image()">Download Img</button>
             <button onclick="download_json()">Download Json</button>
+            <button onclick="download_log()">Download Log</button>
 
             <div id="username" style="float:right">
             {% for user in working %}
             <a> {{user.username}} -</a>
             {% endfor %}
             </div>
-            <a style="float:right"><b>Live users</b></a>
+            <a style="float:right ; padding-right: 3px;"><b>Live users</b></a>
 
         </div>
 
@@ -57,7 +58,7 @@
             </div>
 
         </div>
-        <meta id="my_data" data-img="{{img_id}}" data-boxes="{{boxes}}" data-name="{{image.name}}">
+        <meta id="my_data" data-img="{{img_id}}" data-boxes="{{boxes}}" data-name="{{image.name}}" data-log="{{log}}">
         <script src="{{url_for('static', filename='js/annotation/main.js')}}"></script>
 
         <script src="{{url_for('static', filename='js/annotation/zoom.js')}}"></script>

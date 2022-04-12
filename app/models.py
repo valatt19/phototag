@@ -131,8 +131,11 @@ class Image(db.Model):
     size = db.Column(db.Integer)
     last_time = db.Column(db.DateTime, unique=False, nullable=False)
     project_pos = db.Column(db.Integer, nullable=False)
+
     nb_annotations = db.Column(db.Integer)
     annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
+
+    log_annotations = db.Column(MutableList.as_mutable(PickleType),default=[])
 
     last_person_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     last_person = db.relationship("User", backref=db.backref('posts1', lazy=True), foreign_keys=[last_person_id])
@@ -150,12 +153,23 @@ class Image(db.Model):
         self.working.remove(username)
         db.session.commit()
 
-    def update_annotations(self,json_list, date, user):
+    def update_annotations(self, json_list, date, user):
         self.annotations = json_list
         self.nb_annotations = len(json_list)
         self.last_time = date
         self.last_person = user
         db.session.commit()
+
+    def add_log(self, username, modif, type, tool, date):
+        self.log_annotations.append({"user":username, "modification":modif, "type":type, "tool":tool, "date":date})
+        print(self.log_annotations)
+        db.session.commit()
+
+    def generate_log(self):
+        txt = "Log modifications:\n------------------\n"
+        for line in self.log_annotations:
+            txt = txt + "\n" + line["modification"].upper() + " " + line["tool"].upper() + " (Class = " + line["type"] + ")\n\tUser: " + line["user"] + "\n\tDate: " + line["date"].strftime('%Y-%m-%d %H:%M') + "\n"
+        return txt
 
 db.drop_all()
 db.create_all()
@@ -169,8 +183,8 @@ admin = User(username="admin",firstname="Admin",surname="Admin",group=gr1)
 admin.set_password("admin")
 db.session.add(admin)
 
-pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
-pr.addMember(admin)
+#pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
+#pr.addMember(admin)
 
 db.session.commit()
 
