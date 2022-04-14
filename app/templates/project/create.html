@@ -19,17 +19,40 @@
         let import_config = document.getElementById('importConfig');
         import_config.disabled = true;
     }
+    function checkForm() {
+        let check_import_config = document.getElementById("importConfig").value;
+        let check_create_config = document.getElementById("createClass[]").value;
+        let check_import_files = document.getElementById("files").value;
+        let check_name = document.getElementById("pname").value;
+
+        if (!check_create_config && !check_import_config){
+            alert("Create or import a configuration please")
+            return false
+        }
+        if (!check_import_files){
+            alert("No file(s) imported ")
+            return false
+        }
+        if (!check_name ){
+            alert("Give a name to this project")
+            return false
+        }
+        return true
+
+
+    }
     $(document).ready(function() {
 
 
-$(".fa-plus").click(function(){
-$("input[type='text']").fadeToggle();
-});
+    $(".fa-plus").click(function(){
+    $("input[type='text']").fadeToggle();
+    });
     var max_fields = 10;
     var wrapper = $(".modal-body");
     var add_button = $(".add_form_field");
     var confirm_button = $(".confirm");
     var reset_config = document.getElementById('reset_config');
+
 
     $(reset_config).click(function (e){
         e.preventDefault();
@@ -59,17 +82,18 @@ $("input[type='text']").fadeToggle();
         x--;
     })
 
-        $(confirm_button).click(function(e){
-            e.preventDefault();
-            $(".modal").modal('hide');
-        });
+    $(confirm_button).click(function(e){
+        e.preventDefault();
+        $(".modal").modal('hide');
+    });
+
 });
 </script>
 
         <form action="" method="POST" enctype="multipart/form-data">
             <h2>Set project parameters</h2>
             <label for="pname"><b>Project name: </b></label><br>
-            <input type="text" name="pname" id="pname"><br><br>
+            <input type="text" name="pname" id="pname" required><br><br>
 
             <label for="ptype"><b>Privacy: </b></label><br>
             <input type="radio" id="public" name="ptype" value="1"checked>Public<br>
@@ -92,7 +116,7 @@ $("input[type='text']").fadeToggle();
                         <button class="add_form_field">Add New Field &nbsp;
                         <span style="font-size:16px; font-weight:bold;">+ </span>
                     </button>
-                    <div><input type="text" name="mytext[]"></div>
+                    <div><input type="text" id="createClass[]" name="mytext[]"></div>
                     </div>
                         <div class="modal-footer">
                         <button type="button" class="confirm">Confirm</button>
@@ -100,14 +124,15 @@ $("input[type='text']").fadeToggle();
                     </div>
                 </div>
                 </div>
-                <button onclick="reset()" id="reset_config">Reset config</button>
+
             </div>
 
             <h2>Set dataset</h2>
             <label for="file"><b>Upload folder: </b></label><br>
-            <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory=""><br><br>
+            <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory="" ><br><br>
 
-            <input type="submit" value="Create">
+            <button onclick="reset()" id="reset_config">Reset config</button>
+            <input onclick="return checkForm()" id="createButton" type="submit" value="Create">
         </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
