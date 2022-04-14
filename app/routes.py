@@ -4,7 +4,7 @@ from app import app, socketio
 from flask import render_template, redirect
 from flask import url_for, request, flash, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
-from app.forms import LoginForm, RegisterForm
+from app.forms import LoginForm, RegisterForm, EditUserForm
 
 import os
 from werkzeug.utils import secure_filename
@@ -13,7 +13,7 @@ from datetime import datetime
 import json
 from xml.etree.cElementTree import dump
 from xml.dom import minidom
-from app.models import Image, ds_images, User, Group, gr1, gr2, users, Project
+from app.models import Image, ds_images, User, users, Project
 from app import db
 
 
@@ -70,9 +70,7 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         # Add the user in the dict of users
-        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data,
-                    password=form.password.data, group=gr2)
-
+        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data)
         user.set_password(form.password.data)
 
         db.session.add(user)
@@ -80,7 +78,7 @@ def register():
         users.append(form.username.data)
         flash("Congratulations, you are now a registered user!", "info")
 
-        # add new project dir
+        # add new user  dir
         new_dir = app.config['UPLOAD_FOLDER'] + "/" + form.username.data
         if not os.path.isdir(new_dir):
             os.mkdir(new_dir)
@@ -96,6 +94,23 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+# Profile
+@app.route("/profile/", methods=['GET', 'POST']) #view function to update a task
+@login_required
+def update_user_info():
+        form = EditUserForm()
+        if form.validate_on_submit():
+                current_user.firstname = form.firstname.data
+                current_user.surname = form.surname.data
+                db.session.commit()
+                flash("Your changes have been saved.", "info")
+                return redirect(url_for('project'))
+
+        elif request.method == 'GET':
+                form.firstname.data = current_user.firstname
+                form.surname.data = current_user.surname     
+   
+        return render_template ('profile.html', form = form)
 
 ##################
 # Projects pages #
