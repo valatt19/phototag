@@ -267,6 +267,19 @@ def dataset_overview(project_id):
     return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project,
                            user=current_user.username, working = working, configExport=config)
 
+# Users overview of a project (list of members)
+@app.route("/project/<int:project_id>/users/")
+@login_required
+def project_users(project_id):
+    project = Project.query.get(project_id)
+    project_name = project.name
+    config = project.exportConfig()
+
+    members = project.getMembers()
+
+    return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project,
+                           user=current_user.username, can_remove = True, configExport=config)
+
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")

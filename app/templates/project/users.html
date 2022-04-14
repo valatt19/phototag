@@ -1,0 +1,27 @@
+{% extends "parent.html" %}
+{% block content %}
+<body>
+    <h3 class="text-center text-info">Members of {{project.creator.username}}/{{project.name}}</h3>
+    <table>
+        <tr>
+          <th>Username</th>
+          <th>First Name</th>
+          <th>Surname</th>
+          {% if can_remove %}
+          <th>Remove</th>
+          {% endif %}
+
+        </tr>
+        {% for m in members %}
+        <tr>
+          <td>{{m.username}}</td>
+          <td>{{m.firstname}}</td>
+          <td>{{m.surname}}</td>
+          {% if can_remove %}
+          <td><a href="/project/{{project.id}}/remove/{{m.id}}">Remove</a></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+  </table>
+</body>
+{% endblock %}

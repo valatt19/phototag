@@ -10,7 +10,7 @@
         </tr>
         {% for project in projects %}
         <tr>
-          <td><a href="../project/{{project.id}}/dataset">{{project.name}}</a></td>
+          <td><a href="../project/{{project.id}}/dataset">{{project.creator.username}}/{{project.name}}</a></td>
           <td>{{project.members}}</td>
           <td>{{project.privacy}}</td>
         </tr>
