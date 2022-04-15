@@ -114,7 +114,7 @@ def update_user_info():
 # All projects of the user (created and joined by him)
 @app.route("/project/")
 @login_required
-def project(user_id=current_user):
+def project():
     projects = current_user.getMyProjects()
     return render_template("project/project.html", projects=projects)
 
@@ -243,6 +243,10 @@ def dataset_overview(project_id):
     project = Project.query.get(project_id)
     project_name = project.name
 
+    # Check that user can access this project
+    if not project.isMember(current_user):
+        return redirect(url_for('project'))
+
     config = project.exportConfig()
 
     # Create working on users list for each image
@@ -260,6 +264,10 @@ def project_users(project_id):
     project_name = project.name
     config = project.exportConfig()
 
+    # Check that user can access this project
+    if not project.isMember(current_user):
+        return redirect(url_for('project'))
+
     members = project.getMembers()
 
     return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), configExport=config)
@@ -268,7 +276,7 @@ def project_users(project_id):
 @app.route("/project/<int:project_id>/remove/<int:user_id>")
 def project_users_remove(project_id, user_id):
     project = Project.query.get(project_id)
-    user = User.query.get(user_id) 
+    user = User.query.get(user_id)
 
     # Check that current user is creator of project and not triying to remove creator
     if current_user.id == project.creator.id and project.creator.id != user_id :
@@ -282,6 +290,11 @@ def project_users_remove(project_id, user_id):
 @login_required
 def annotate_image(project_id, img_id):
     project = Project.query.get(project_id)
+
+    # Check that user can access this project
+    if not project.isMember(current_user):
+        return redirect(url_for('project'))
+
     config = project.exportConfig()
     ds_images = Image.query.filter((Image.project_id == project_id))
     image = ds_images[img_id]
@@ -337,9 +350,10 @@ def test_disconnect():
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
 @login_required
 def save_json(project_id, img_id):
+    project = Project.query.get(project_id)
     image = Image.query.get(img_id)
-    if image.project_id != project_id:
-        return jsonify({"impossible": True, "response": "can't modify this file"}), 200
+    if image.project_id != project_id or project.isMember(current_user):
+        return jsonify({"impossible": True, "response": "Can't modify this file"}), 200
 
         # Get the annotations data and update it for image
     data = request.get_json()
@@ -351,7 +365,7 @@ def save_json(project_id, img_id):
 
     refresh(img_id)
 
-    resp = {"success": True, "response": "file saved!"}
+    resp = {"success": True, "response": "File saved"}
     return jsonify(resp), 200
 
 

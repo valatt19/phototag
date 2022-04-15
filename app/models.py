@@ -41,6 +41,9 @@ class Project(db.Model):
     def getMembers(self):
         return self.members
 
+    def isMember(self,user):
+        return (user in self.members)
+
     def exportConfig(self):
         node_config = Element("configuration")
 
