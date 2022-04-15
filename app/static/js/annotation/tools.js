@@ -111,17 +111,15 @@ function setAnnotationsList(boxes) {
       tr.appendChild(td2);
       td2.style.background = `hsla(${colors[boxes[i].type]},75%,50%,0.6)`;
       
-      // Cell 3
-      let tool = boxes[i].tool;
-      let td3 = document.createElement("td");
-      if (tool != "lasso" ) { 
+      //let td3 = document.createElement("td");
+      //if (tool != "lasso" ) { 
           // Because lasso cant be modified
-          let button_modify = document.createElement("button");
-          button_modify.innerHTML = "Modify";
-          button_modify.onclick = function() {modifyBoxe(tool,i);};
-          td3.appendChild(button_modify);
-      }
-      tr.appendChild(td3); 
+          //let button_modify = document.createElement("button");
+          //button_modify.innerHTML = "Modify";
+          //button_modify.onclick = function() {modifyBoxe(tool,i);};
+          //td3.appendChild(button_modify);
+      //}
+      //tr.appendChild(td3); 
 
       // Cell 4
       let td4 = document.createElement("td");
@@ -130,6 +128,10 @@ function setAnnotationsList(boxes) {
       button_delete.innerHTML = "Delete";
       td4.appendChild(button_delete);
       tr.appendChild(td4);
+      
+      // Make row clickable to modify box
+      let tool = boxes[i].tool;
+      tr.onclick = function() {modifyBoxe(tool,i);};
 
       annotations.appendChild(tr);
     }
@@ -181,9 +183,16 @@ function updateLive(users,i) {
         }
         // Add new usernames
         for (let j=0; j < users.length; j++) {
-            let a = document.createElement("a");
-            a.innerHTML = " " + users[j] + " -"
-            myNode.appendChild(a)
+            let div = document.createElement("div");
+            div.className = "avatar-circle";
+
+            let span = document.createElement("span");
+            span.className = "initials";
+            span.title = users[j];
+            span.innerHTML = users[j].slice(0,2);
+
+            div.appendChild(span);
+            myNode.appendChild(div);
         }
     }
 }

@@ -352,7 +352,7 @@ def test_disconnect():
 def save_json(project_id, img_id):
     project = Project.query.get(project_id)
     image = Image.query.get(img_id)
-    if image.project_id != project_id or project.isMember(current_user):
+    if image.project_id != project_id or not project.isMember(current_user):
         return jsonify({"impossible": True, "response": "Can't modify this file"}), 200
 
         # Get the annotations data and update it for image

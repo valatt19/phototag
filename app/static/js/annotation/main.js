@@ -28,6 +28,7 @@ let scrollY = $canvas.scrollTop();
 
 let annotations = document.getElementById("annotations");
 let boxes = [];
+let previous_boxes = [];
 let log = "";
 
 let isNearZone = 4; // For polygon tool, distance within magic join is done
@@ -52,6 +53,8 @@ $(document).ready(function() {
     ctxo.lineWidth = 3;
 
     boxes = $('#my_data').data("boxes"); //Load from backend list
+    previous_boxes.push(boxes); //Load 1st version of boces
+    
     setInterval(mainDraw, INTERVAL);
 
     setAnnotationsList(boxes);
