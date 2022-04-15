@@ -34,6 +34,10 @@ class Project(db.Model):
         self.members.append(user)
         self.nb_membre+=1
 
+    def removeMember(self, user):
+        self.members.remove(user)
+        self.nb_membre-=1
+
     def getMembers(self):
         return self.members
 
@@ -153,7 +157,7 @@ class Image(db.Model):
             txt = txt + "\n" + line["modification"].upper() + " " + line["tool"].upper() + " (Class = " + line["type"] + ")\n\tUser: " + line["user"] + "\n\tDate: " + line["date"].strftime('%Y-%m-%d %H:%M') + "\n"
         return txt
 
-# db.drop_all()
+#db.drop_all()
 db.create_all()
 
 # Create the admin user

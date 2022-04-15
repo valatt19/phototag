@@ -8,10 +8,8 @@ from app.forms import LoginForm, RegisterForm, EditUserForm
 
 import os
 from werkzeug.utils import secure_filename
-from werkzeug.datastructures import FileStorage
 from datetime import datetime
 import json
-from xml.etree.cElementTree import dump
 from xml.dom import minidom
 from app.models import Image, ds_images, User, users, Project
 from app import db
@@ -25,7 +23,6 @@ from app import db
 @app.route('/')
 def home():
     return redirect(url_for("login"))
-
 
 # Login
 @app.route("/login/", methods=["GET", "POST"])
@@ -58,7 +55,6 @@ def login():
     # GET
     return render_template("login.html", form=form)
 
-
 # Register
 @app.route("/register/", methods=["GET", "POST"])
 def register():
@@ -86,7 +82,6 @@ def register():
         return redirect(url_for("login"))
 
     return render_template("register.html", form=form)
-
 
 # Logout
 @app.route("/logout/")
@@ -120,16 +115,9 @@ def update_user_info():
 @app.route("/project/")
 @login_required
 def project(user_id=current_user):
-    """project_query = "SELECT * FROM Project WHERE members"
-    query = Project.query(project_query)
-
-    projects = query.all()
-    print(projects)"""
     projects = current_user.getMyProjects()
     return render_template("project/project.html", projects=projects)
 
-
-# S1
 # Create a new project (Sprint 1 : only load a dataset)
 @app.route("/project/new/", methods=["GET", "POST"])
 @login_required
@@ -139,6 +127,7 @@ def project_create():
         if Project.query.filter(Project.name == request.form["pname"]).count() != 0:
             return redirect(request.url)
 
+        # check that there is files
         if 'files[]' not in request.files:
             return redirect(request.url)
         uploaded_files = request.files.getlist('files[]')
@@ -168,12 +157,12 @@ def project_create():
 
         if request.form.getlist('mytext[]') != ['']:
 
-            #manual configuration
+            # manual configuration
             final_classes = request.form.getlist('mytext[]')
 
         else:
 
-            #xml configuration
+            # xml configuration
             uploaded_importConfig = request.files['importConfig']
 
             filename = secure_filename(uploaded_importConfig.filename)
@@ -184,21 +173,17 @@ def project_create():
             classes = data.getElementsByTagName('classe')
 
             for elem in classes:
-                #print(elem.firstChild.data)
                 final_classes.append(elem.firstChild.data)
-        print(final_classes)
-
 
         # Add project in DB
-        pr = Project(creator=current_user, name=request.form["pname"], privacy=ptype,
-                     classes=final_classes, nb_membre=0)
+        pr = Project(creator=current_user, name=request.form["pname"], privacy=ptype, classes=final_classes, nb_membre=0)
         pr.addMember(current_user)
 
         db.session.add(pr)
         db.session.commit()
 
         # loop on each file on the folder imported
-        ps = 0
+        ps = 0 # variable used to indicate position of image in dataset
         for i in range(len(uploaded_files)):
             # save the file in the server
             file = uploaded_files[i]
@@ -210,8 +195,7 @@ def project_create():
             size = int(os.stat(path).st_size / 1000)
 
             # create Image object
-            img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user,
-                        annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+            img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
             db.session.add(img)
             db.session.commit()
 
@@ -225,6 +209,7 @@ def project_create():
 # Join a project
 @app.route("/project/join/")
 def project_join():
+    # Get all public projects (that can be joined) but remove the ones where the user is already in
     public_projects = Project.query.filter(Project.privacy == 1)
     final_public_projects = []
     for p in public_projects:
@@ -233,11 +218,11 @@ def project_join():
 
     return render_template("project/project_join.html", projects=final_public_projects)
 
-
 # User click on join a project
 @app.route("/project/joined/<int:project_id>")
 def project_joined(project_id):
     project_joined = Project.query.get(project_id)
+    # Check that user is joining a public project
     if project_joined.privacy == 1:
         project_joined.addMember(current_user)
         db.session.commit()
@@ -254,18 +239,18 @@ def project_joined(project_id):
 @app.route("/project/<int:project_id>/dataset/")
 @login_required
 def dataset_overview(project_id):
-    dataset = Image.query.filter((Image.project_id == project_id))
+    dataset = Image.query.filter((Image.project_id == project_id)) # Get all images of the dataset
     project = Project.query.get(project_id)
     project_name = project.name
+
     config = project.exportConfig()
 
-    # Create working list for each image
+    # Create working on users list for each image
     working = []
     for img in dataset:
         working.append(User.query.filter(User.image_id == img.id))
 
-    return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project,
-                           user=current_user.username, working = working, configExport=config)
+    return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project, user=current_user.username, working = working, configExport=config)
 
 # Users overview of a project (list of members)
 @app.route("/project/<int:project_id>/users/")
@@ -277,9 +262,20 @@ def project_users(project_id):
 
     members = project.getMembers()
 
-    return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project,
-                           user=current_user.username, can_remove = True, configExport=config)
+    return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = True, configExport=config)
 
+# User click on join a project
+@app.route("/project/<int:project_id>/remove/<int:user_id>")
+def project_users_remove(project_id, user_id):
+    project = Project.query.get(project_id)
+    user = User.query.get(user_id) 
+
+    # Check that current user is creator of project and not triying to remove creator
+    if current_user == project.creator and project.creator.id != user_id :
+        project.removeMember(user)
+        db.session.commit()
+
+    return redirect(url_for('project_users', project_id=project_id))
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
