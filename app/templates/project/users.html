@@ -17,7 +17,7 @@
           <td>{{m.username}}</td>
           <td>{{m.firstname}}</td>
           <td>{{m.surname}}</td>
-          {% if can_remove %}
+          {% if can_remove and m.id != project.creator.id %}
           <td><a href="/project/{{project.id}}/remove/{{m.id}}">Remove</a></td>
           {% endif %}
         </tr>

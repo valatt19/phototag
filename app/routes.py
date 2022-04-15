@@ -262,7 +262,7 @@ def project_users(project_id):
 
     members = project.getMembers()
 
-    return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = True, configExport=config)
+    return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), configExport=config)
 
 # User click on join a project
 @app.route("/project/<int:project_id>/remove/<int:user_id>")
@@ -271,7 +271,7 @@ def project_users_remove(project_id, user_id):
     user = User.query.get(user_id) 
 
     # Check that current user is creator of project and not triying to remove creator
-    if current_user == project.creator and project.creator.id != user_id :
+    if current_user.id == project.creator.id and project.creator.id != user_id :
         project.removeMember(user)
         db.session.commit()
 
