@@ -247,19 +247,33 @@ def dataset_overview(project_id):
     if not project.isMember(current_user):
         return redirect(url_for('project'))
 
-    config = project.exportConfig()
-
     # Create working on users list for each image
     working = []
     for img in dataset:
         working.append(User.query.filter(User.image_id == img.id))
 
-    return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project, user=current_user.username, working = working, configExport=config)
+    return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project, user=current_user.username, working = working)
 
 # Users overview of a project (list of members)
-@app.route("/project/<int:project_id>/users/")
+@app.route("/project/<int:project_id>/settings/", methods=["GET", "POST"])
 @login_required
-def project_users(project_id):
+def project_settings(project_id):
+    project = Project.query.get(project_id)
+    project_name = project.name
+    config = project.exportConfig()
+
+    # Check that user can access this project
+    if not project.isMember(current_user):
+        return redirect(url_for('project'))
+
+    # User want to add a new class
+    if request.method == 'POST':
+        if len(request.form["newclass"]) >= 1 and current_user.id == project.creator.id:
+           project.addClass(request.form["newclass"])
+           db.session.commit()
+        
+        return redirect(url_for('project_settings', project_id=project_id))
+
     project = Project.query.get(project_id)
     project_name = project.name
     config = project.exportConfig()
@@ -270,9 +284,9 @@ def project_users(project_id):
 
     members = project.getMembers()
 
-    return render_template("project/users.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), configExport=config)
+    return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), classes=project.classes, exportConfig = config)
 
-# User click on join a project
+# User removed by creator of project
 @app.route("/project/<int:project_id>/remove/<int:user_id>")
 def project_users_remove(project_id, user_id):
     project = Project.query.get(project_id)
@@ -283,7 +297,19 @@ def project_users_remove(project_id, user_id):
         project.removeMember(user)
         db.session.commit()
 
-    return redirect(url_for('project_users', project_id=project_id))
+    return redirect(url_for('project_settings', project_id=project_id))
+
+# Privacy of project changed
+@app.route("/project/<int:project_id>/switch/")
+def project_privacy_switch(project_id):
+    project = Project.query.get(project_id)
+
+    # Check that current user is creator
+    if current_user.id == project.creator.id :
+        project.changePrivacy()
+        db.session.commit()
+
+    return redirect(url_for('project_settings', project_id=project_id))
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
@@ -295,7 +321,6 @@ def annotate_image(project_id, img_id):
     if not project.isMember(current_user):
         return redirect(url_for('project'))
 
-    config = project.exportConfig()
     ds_images = Image.query.filter((Image.project_id == project_id))
     image = ds_images[img_id]
 
@@ -319,8 +344,7 @@ def annotate_image(project_id, img_id):
 
     refresh(image.id)
 
-    return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
-                           classes=project.classes, boxes=boxes, project=project, working=working, configExport=config, log=log)
+    return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project, working=working, log=log)
 
 @socketio.on("refresh")
 def refresh(img_id):

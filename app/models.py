@@ -44,6 +44,12 @@ class Project(db.Model):
     def isMember(self,user):
         return (user in self.members)
 
+    def changePrivacy(self):
+        self.privacy = not self.privacy
+
+    def addClass(self, new):
+        self.classes.append(new)
+
     def exportConfig(self):
         node_config = Element("configuration")
 
