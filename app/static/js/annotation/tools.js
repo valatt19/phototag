@@ -5,6 +5,8 @@
 // ADD A BOX WITH : rect, lasso, polygon //
 ///////////////////////////////////////////
 function addBoxe(tool) {
+    clear(ctx);
+
     if (tool == "rect") {
         addRect();
     } else if (tool == "lasso") {
@@ -18,8 +20,12 @@ function addBoxe(tool) {
 // MODIFY A BOX : rect, polygon //
 //////////////////////////////////
 function modifyBoxe(tool, index) {
+    clear(ctx);
+    
     if (tool == "rect") {
         modifyRect(index);
+    } else if (tool == "lasso") {
+        modifyLasso(index);
     } else if (tool == "polygon") {
         modifyPolygon(index);
     }
@@ -29,6 +35,8 @@ function modifyBoxe(tool, index) {
 // DELETE A BOX : same for all tools //
 ///////////////////////////////////////
 function deleteBoxe(index) {
+    clear(ctx);
+
     // Delete boxe in the list
     let tool = boxes[index].tool;
     let type = boxes[index].type
@@ -110,16 +118,11 @@ function setAnnotationsList(boxes) {
       td2.innerHTML = message;
       tr.appendChild(td2);
       td2.style.background = `hsla(${colors[boxes[i].type]},75%,50%,0.6)`;
-      
-      //let td3 = document.createElement("td");
-      //if (tool != "lasso" ) { 
-          // Because lasso cant be modified
-          //let button_modify = document.createElement("button");
-          //button_modify.innerHTML = "Modify";
-          //button_modify.onclick = function() {modifyBoxe(tool,i);};
-          //td3.appendChild(button_modify);
-      //}
-      //tr.appendChild(td3); 
+
+      // Cell 3
+      let td3 = document.createElement("td");
+      td3.innerHTML = boxes[i].tool;
+      tr.appendChild(td3);
 
       // Cell 4
       let td4 = document.createElement("td");
@@ -132,6 +135,7 @@ function setAnnotationsList(boxes) {
       // Make row clickable to modify box
       let tool = boxes[i].tool;
       tr.onclick = function() {modifyBoxe(tool,i);};
+      tr.style.cursor = "pointer";
 
       annotations.appendChild(tr);
     }
