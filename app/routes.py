@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 import json
 from xml.dom import minidom
-from app.models import Image, ds_images, User, users, Project
+from app.models import Image, User, users, Project
 from app import db
 
 

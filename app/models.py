@@ -115,8 +115,6 @@ class User(UserMixin, db.Model):
         return self.username
 
 #-------------------------Image---------------------------------------------
-ds_images = []
-
 class Image(db.Model):
     __tablename__ = "image"
 
@@ -166,13 +164,13 @@ class Image(db.Model):
             txt = txt + "\n" + line["modification"].upper() + " " + line["tool"].upper() + " (Class = " + line["type"] + ")\n\tUser: " + line["user"] + "\n\tDate: " + line["date"].strftime('%Y-%m-%d %H:%M') + "\n"
         return txt
 
-#db.drop_all()
+db.drop_all()
 db.create_all()
 
 # Create the admin user
-#admin = User(username="admin",firstname="Admin",surname="Admin")
-#admin.set_password("admin")
-#db.session.add(admin)
+admin = User(username="admin",firstname="Admin",surname="Admin")
+admin.set_password("admin")
+db.session.add(admin)
 
 #pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
 #pr.addMember(admin)
