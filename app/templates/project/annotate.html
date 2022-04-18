@@ -11,23 +11,28 @@
 
     <body>
         <div id="pannel">
-            {{image.name}}
             <a href="{{prev}}" class="next">&#8249;</a>
-            <a href="{{next}}" class="next">&#8250;</a>
+            <b>{{image.name}}</b>
+            <a href="{{next}}" class="next" style="margin-right: 20px;">&#8250;</a>
 
+            <a><b>Tools:</b></a>
             <button onclick="addRect()">Rect</button>
             <button onclick="addLasso()">Lasso</button>
-            <button onclick="addPolygon()">Polygon</button>
-            <button onclick="download_image()">Download Img</button>
-            <button onclick="download_json()">Download Json</button>
-            <button onclick="download_log()">Download Log</button>
+            <button onclick="addPolygon()" style="margin-right: 20px;">Polygon</button>
+
+            <a><b>Download:</b></a>
+            <button onclick="download_image()">Image</button>
+            <button onclick="download_json()">Json</button>
+            <button onclick="download_log()">Log</button>
 
             <div id="username" style="float:right">
             {% for user in working %}
-            <a> {{user.username}} -</a>
+            <div class="avatar-circle">
+                <span class="initials" title="{{user.username}}">{{user.username[0:2]}}</span>
+            </div>
             {% endfor %}
             </div>
-            <a style="float:right ; padding-right: 3px;"><b>Live users</b></a>
+            <a style="float:right ; margin-right: 3px;"><b>Live users:</b></a>
 
         </div>
 
@@ -44,7 +49,7 @@
                     <h3>Current object</h3>
                     <ul id="classes">
                         {% for c in classes %}
-                            <li id="c{{loop.index-1}}" style="cursor: pointer;" onclick="set_current('{{loop.index-1}}')">{{c}}</li>
+                            <li id="c{{loop.index-1}}" style="cursor: pointer; padding: 5px; text-align: center; font-size: 14px;" onclick="set_current('{{loop.index-1}}')">{{c}}</li>
                         {% endfor %}
                     </ul>
                 </div>

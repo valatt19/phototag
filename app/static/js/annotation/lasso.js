@@ -133,3 +133,25 @@ function addLasso(){
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
 }
+
+function modifyLasso(index){
+    let box = boxes[index];
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    for (let i = 0; i < box.p.length; i ++){
+
+        let point = box.p[i];
+        // draw in ctxo
+        if (i == 0){
+            ctx.moveTo(point.x*zoom, point.y*zoom);
+        } else {
+            ctx.lineTo(point.x*zoom, point.y*zoom);
+        }
+    }
+
+    // Save free form in drawing layer 
+    ctx.lineTo(box.p[0].x*zoom, box.p[0].y*zoom);
+    ctx.stroke();
+    ctx.closePath();
+}
