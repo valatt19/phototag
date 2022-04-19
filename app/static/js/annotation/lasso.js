@@ -125,7 +125,7 @@ function addLasso(){
         canvas.removeEventListener("mousedown",handleMouseDown);
         canvas.removeEventListener("mousemove",handleMouseMove);
         canvas.removeEventListener("mouseup",handleMouseUp);
-        list_to_json(boxes,"add","lasso",document.getElementById("classes").getElementsByTagName("li")[current].innerHTML);
+        save_modifications(boxes,"add","lasso",document.getElementById("classes").getElementsByTagName("li")[current].innerHTML);
     }
 
     // Add listeners

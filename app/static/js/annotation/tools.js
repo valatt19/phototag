@@ -21,6 +21,7 @@ function addBoxe(tool) {
 //////////////////////////////////
 function modifyBoxe(tool, index) {
     clear(ctx);
+    setBorder(index);
     
     if (tool == "rect") {
         modifyRect(index);
@@ -47,7 +48,7 @@ function deleteBoxe(index) {
     setInterval(mainDraw, INTERVAL);
     setAnnotationsList(boxes);
 
-    list_to_json(boxes, "delete", tool, document.getElementById("classes").getElementsByTagName("li")[type].innerHTML);
+    save_modifications(boxes, "delete", tool, document.getElementById("classes").getElementsByTagName("li")[type].innerHTML);
 }
 
 //////////////////////////
@@ -142,11 +143,14 @@ function setAnnotationsList(boxes) {
 }
 
 // Send POST request to server to save the annotations list
-function list_to_json(l,modif,tool,type) {
+function save_modifications(l,modif,tool,type) {
+    // Set border to of annotations to normal when modification finished
+    setBorder(-1);
+
     // Get image id
     img_id = $('#my_data').data("img");
 
-    // Send request
+    // Send request to save the modifications to server
     $.ajax({
         url: img_id+"/save_json",
         type: "POST",
@@ -199,4 +203,16 @@ function updateLive(users,i) {
             myNode.appendChild(div);
         }
     }
+}
+
+function setBorder(index) {
+    let lines = document.getElementById("annotations").getElementsByTagName("tr");
+    for (let i = 0 ; i < lines.length ; i++) {
+        lines[i].style.border = "1px solid #ddd";
+    }
+    // One line is selectionned and it is thicked
+    if (index > -1) {
+        lines[index].style.border = "thick solid black";
+    }
+
 }

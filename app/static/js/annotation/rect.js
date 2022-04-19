@@ -42,7 +42,7 @@ function addRect(){
         canvas.removeEventListener("mousedown",handleMouseDown);
         canvas.removeEventListener("mousemove",handleMouseMove);
         canvas.removeEventListener("mouseup",handleMouseUp);
-        list_to_json(boxes,"add","rect",document.getElementById("classes").getElementsByTagName("li")[current].innerHTML);
+        save_modifications(boxes,"add","rect",document.getElementById("classes").getElementsByTagName("li")[current].innerHTML);
     }
     
     //FUNCTION
@@ -308,7 +308,7 @@ function modifyRect(index) {
         isResizeDrag = false;
         expectResize = -1;
         clear(ctx);
-        list_to_json(boxes,"modify","rect",document.getElementById("classes").getElementsByTagName("li")[boxes[index].type].innerHTML);
+        save_modifications(boxes,"modify","rect",document.getElementById("classes").getElementsByTagName("li")[boxes[index].type].innerHTML);
         canvas.style.cursor='auto';
             
         // Remove previous listeners
