@@ -68,7 +68,19 @@
                                 </div>
                             </div>
                         </div>
-
+                        <div class="form-group">
+                            <label for="email" class="cols-sm-2 control-label">Email</label>
+                            <div class="cols-sm-10">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                                    {{ form.email (class="form-control bg-white text-primary", placeholder="Your email") }}
+                                    <small class="form-text text-danger">
+                                        {% if form.email.errors %} {% for message in form.email.errors %}{{ message }}
+                                        {% endfor %}{% endif %}
+                                            </small><br>
+                                </div>
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="password" class="cols-sm-2 control-label">Password</label>
                             <div class="cols-sm-10">
