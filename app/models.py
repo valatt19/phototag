@@ -192,7 +192,7 @@ gr1 = Group(name="mod")
 gr2 = Group(name="normal")
 
 # Create the admin user
-admin = User(username="admin",firstname="Admin",surname="Admin",email="innoye@gmail.com",group=gr1)
+admin = User(username="admin",firstname="Admin",surname="Admin",email="innoye2000@gmail.com",group=gr1)
 admin.set_password("admin")
 db.session.add(admin)
 

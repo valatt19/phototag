@@ -144,7 +144,7 @@ def pwresetrq_post():
         contents = ['Please go to this URL to reset your password:', "http://127.0.0.1:5000" + url_for("pwreset_get",  id = (str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
         #yag.send('innoye2000@gmail.com', 'Reset your password', contents)
-        flash("Hello "+user.username + ", check your email for a link to reset your password.  It expires in a <amount of time here>!", "success")
+        flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
 
 
         return redirect(url_for("home"))
