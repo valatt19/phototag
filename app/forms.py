@@ -2,7 +2,7 @@ from app import app
 from flask_wtf import FlaskForm 
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField
 from wtforms.widgets import TextArea
-from wtforms.validators import InputRequired, DataRequired, Length, NoneOf, EqualTo
+from wtforms.validators import InputRequired, DataRequired, Length, NoneOf, EqualTo, Email
 from app.models import users
 
 # Form for enter a login
@@ -16,6 +16,7 @@ class RegisterForm(FlaskForm):
     firstname = StringField("First name:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters")])
     surname = StringField("Surname:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters")])
     username = StringField("Username:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters"),NoneOf(values=users,message="This username is already used")])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(min=6, max=50)])
     password = PasswordField("New Password:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters"),EqualTo("checkpassword", message="Passwords must match")])
     checkpassword = PasswordField("Repeat Password:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50),])
     submit = SubmitField('Submit')
@@ -25,3 +26,6 @@ class EditUserForm(FlaskForm):
     firstname = StringField("First name:", validators=[InputRequired(), Length(min=2, max=50,message="Between 2 and 50 characters")])
     surname = StringField("Surname:", validators=[InputRequired(), Length(min=2, max=50,message="Between 2 and 50 characters")])
     submit = SubmitField('Submit')
+
+
+

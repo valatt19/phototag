@@ -1,5 +1,13 @@
 from __future__ import annotations
-from app import app, socketio
+
+import uuid
+import pytz
+import yagmail
+from sqlalchemy import exists
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
+
+from app import app, socketio, keygenerator
 
 from flask import render_template, redirect
 from flask import url_for, request, flash, jsonify
@@ -8,10 +16,11 @@ from app.forms import LoginForm, RegisterForm, EditUserForm
 
 import os
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from xml.dom import minidom
-from app.models import Image, User, users, Project
+
+from app.models import Image, User, users, Project, PWReset
 from app import db
 
 
@@ -66,7 +75,7 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         # Add the user in the dict of users
-        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data)
+        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data, email=form.email.data)
         user.set_password(form.password.data)
 
         db.session.add(user)
@@ -89,6 +98,106 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+@app.route("/pwresetrq", methods=["GET"])
+def pwresetrq_get():
+    return render_template('forgotPage.html')
+
+@app.route("/pwresetrq", methods=["POST"])
+def pwresetrq_post():
+    if db.session.query(User).filter_by(email=request.form["email"]).first():
+        print("ok1")
+        user = db.session.query(User).filter_by(email=request.form["email"]).one()
+        # check if user already has reset their password, so they will update
+        # the current key instead of generating a separate entry in the table.
+        if db.session.query(PWReset).filter_by(user_id=user.id).first():
+            print("ok2")
+            pwalready = db.session.query(PWReset).filter_by(user_id=user.id).first()
+            # if the key hasn't been used yet, just send the same key.
+            if pwalready.has_activated == False:
+                print("ok3")
+                pwalready.datetime = datetime.now()
+                key = pwalready.reset_key
+            else:
+                print("ok5")
+                key = keygenerator.make_key()
+                pwalready.reset_key = key
+                pwalready.datetime = datetime.now()
+                pwalready.has_activated = False
+        else:
+            key = keygenerator.make_key()
+            print(type(key))
+            user_reset = PWReset(reset_key=str(key), user_id=user.id)
+            db.session.add(user_reset)
+        db.session.commit()
+        ##Add Yagmail code here
+        # Here is mine:
+        #email : pphototag@gmail.com
+        #password : Phototag2022
+
+        yag = yagmail.SMTP('pphototag')
+        contents = ['Please go to this URL to reset your password:', "http://127.0.0.1:5000" + url_for("pwreset_get",  id = (str(key)))]
+        yag.send(request.form["email"], 'Reset your password', contents)
+        #yag.send('innoye2000@gmail.com', 'Reset your password', contents)
+        flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
+
+
+        return redirect(url_for("home"))
+    else:
+
+        flash("Your email was never registered.", "danger")
+        return redirect(url_for("pwresetrq_get"))
+
+@app.route("/pwreset/<id>", methods=["POST"])
+def pwreset_post(id):
+    if request.form["password"] != request.form["password2"]:
+        flash("Your password and password verification didn't match.", "danger")
+        print("Your password and password verification didn't match.", "danger")
+        return redirect(url_for("pwreset_get", id=id))
+    if len(request.form["password"]) < 1:
+        flash("Your password needs to be at least 1 characters", "danger")
+        print("Your password needs to be at least 1 characters", "danger")
+        return redirect(url_for("pwreset_get", id=id))
+
+    user_reset = db.session.query(PWReset).filter_by(reset_key=id).one()
+    try:
+        exists(db.session.query(User).filter_by(id = user_reset.user_id)
+               .update({'password':request.form["password"],'password_hash':generate_password_hash(request.form["password"])}))
+        db.session.commit()
+
+        print('mdp update ok')
+    except IntegrityError:
+        flash("Something went wrong", "danger")
+        print("Something went wrong", "danger")
+        db.session.rollback()
+        return redirect(url_for("home"))
+    user_reset.has_activated = True
+    db.session.commit()
+    flash("Your new password is saved.", "success")
+    print("Your new password is saved.", "success")
+    return redirect(url_for("home"))
+
+
+@app.route("/pwreset/<id>", methods=["GET"])
+def pwreset_get(id):
+    key = id
+    pwresetkey = db.session.query(PWReset).filter_by(reset_key=id).one()
+    generated_by = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(hours=24)
+    if pwresetkey.has_activated is True:
+        flash("You already reset your password with the URL you are using." +
+              "If you need to reset your password again, please make a" +
+              " new request here.", "danger")
+        print("You already reset your password with the URL you are using." +
+              "If you need to reset your password again, please make a" +
+              " new request here.", "danger")
+        return redirect(url_for("pwresetrq_get"))
+    if pwresetkey.datetime.replace(tzinfo=pytz.utc) < generated_by:
+        flash("Your password reset link expired.  Please generate a new one" +
+              " here.", "danger")
+        print("Your password reset link expired.  Please generate a new one" +
+              " here.", "danger")
+        return redirect(url_for("pwresetrq_get"))
+    return render_template('resetPassword.html', id=key)
+
 # Profile
 @app.route("/profile/", methods=['GET', 'POST']) #view function to update a task
 @login_required
@@ -106,6 +215,7 @@ def update_user_info():
                 form.surname.data = current_user.surname     
    
         return render_template ('profile.html', form = form)
+
 
 ##################
 # Projects pages #
@@ -147,7 +257,6 @@ def project_create():
             ptype = True
         else:
             ptype = False
-
 
         # configuration----------------------------------------
         if 'importConfig' not in request.files:
@@ -363,12 +472,14 @@ def refresh(img_id):
 
     socketio.emit("update", (boxes, img_id, users_live, log))
 
+
 @socketio.on('disconnect')
 def test_disconnect():
     # Remove user in working list
-    print("disconnected "+current_user.username)
+    print("disconnected " + current_user.username)
     current_user.setImage(None)
     db.session.commit()
+
 
 # Receive the json file from an image
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
@@ -385,7 +496,8 @@ def save_json(project_id, img_id):
     date = datetime.now()
     image.update_annotations(data['html_data'][0], date, user)
     print(data['html_data'])
-    image.add_log(username=user.username, modif=data['html_data'][1], type=data['html_data'][3], tool=data['html_data'][2] , date=date)
+    image.add_log(username=user.username, modif=data['html_data'][1], type=data['html_data'][3],
+                  tool=data['html_data'][2], date=date)
 
     refresh(img_id)
 

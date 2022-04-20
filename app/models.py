@@ -69,8 +69,9 @@ class User(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    firstname = db.Column(db.String(80))
-    surname = db.Column(db.String(80))
+    firstname = db.Column(db.String(80), nullable=False)
+    surname = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(80),unique=True, nullable=False)
     password = db.Column(db.String(16))
     password_hash = db.Column(db.String(16))
     projects = db.relationship("Project", secondary=ProjectUser.__table__, backref="User")
@@ -79,6 +80,7 @@ class User(UserMixin, db.Model):
     image = db.relationship("Image", backref=db.backref('posts2', lazy=True),foreign_keys=[image_id])
 
     def set_password(self, password):
+        self.password = password
         self.password_hash = generate_password_hash(password)
 
     def setImage(self, img):
@@ -113,6 +115,15 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return self.username
+
+class PWReset(db.Model):
+    __tablename__ = "pwreset"
+    id = db.Column(db.Integer, primary_key=True)
+    reset_key = db.Column(db.String(128), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    datetime = db.Column(db.DateTime(timezone=True), default=datetime.now)
+    user = db.relationship(User, lazy='joined')
+    has_activated = db.Column(db.Boolean, default=False)
 
 #-------------------------Image---------------------------------------------
 class Image(db.Model):
@@ -168,7 +179,8 @@ db.drop_all()
 db.create_all()
 
 # Create the admin user
-admin = User(username="admin",firstname="Admin",surname="Admin")
+
+admin = User(username="admin",firstname="Admin",surname="Admin",email="innoye2000@gmail.com")
 admin.set_password("admin")
 db.session.add(admin)
 

@@ -17,8 +17,18 @@
         </a>
     </div>
 </div>
+
 <div id="login">
     <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for category, message in messages %}
+      <li class="{{ category }}">{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
         <div id="login-row" class="row justify-content-center align-items-center">
             <div id="login-column" class="col-md-6">
                 <div id="login-box" class="col-md-12">
@@ -44,6 +54,7 @@
                         <div id="register-link" class="text-right">
                             <a href="/register" class="text-info">Register here</a>
                         </div>
+                        <span id="passwordForgot" class="text-right"><a href="{{ url_for('.pwresetrq_post') }}">Forgot password?</a></span>
                     </form>
                 </div>
             </div>
