@@ -5,6 +5,8 @@
 // ADD A BOX WITH : rect, lasso, polygon //
 ///////////////////////////////////////////
 function addBoxe(tool) {
+    clear(ctx);
+
     if (tool == "rect") {
         addRect();
     } else if (tool == "lasso") {
@@ -18,8 +20,13 @@ function addBoxe(tool) {
 // MODIFY A BOX : rect, polygon //
 //////////////////////////////////
 function modifyBoxe(tool, index) {
+    clear(ctx);
+    setBorder(index);
+    
     if (tool == "rect") {
         modifyRect(index);
+    } else if (tool == "lasso") {
+        modifyLasso(index);
     } else if (tool == "polygon") {
         modifyPolygon(index);
     }
@@ -29,6 +36,8 @@ function modifyBoxe(tool, index) {
 // DELETE A BOX : same for all tools //
 ///////////////////////////////////////
 function deleteBoxe(index) {
+    clear(ctx);
+
     // Delete boxe in the list
     let tool = boxes[index].tool;
     let type = boxes[index].type
@@ -39,7 +48,7 @@ function deleteBoxe(index) {
     setInterval(mainDraw, INTERVAL);
     setAnnotationsList(boxes);
 
-    list_to_json(boxes, "delete", tool, document.getElementById("classes").getElementsByTagName("li")[type].innerHTML);
+    save_modifications(boxes, "delete", tool, document.getElementById("classes").getElementsByTagName("li")[type].innerHTML);
 }
 
 //////////////////////////
@@ -110,18 +119,11 @@ function setAnnotationsList(boxes) {
       td2.innerHTML = message;
       tr.appendChild(td2);
       td2.style.background = `hsla(${colors[boxes[i].type]},75%,50%,0.6)`;
-      
+
       // Cell 3
-      let tool = boxes[i].tool;
       let td3 = document.createElement("td");
-      if (tool != "lasso" ) { 
-          // Because lasso cant be modified
-          let button_modify = document.createElement("button");
-          button_modify.innerHTML = "Modify";
-          button_modify.onclick = function() {modifyBoxe(tool,i);};
-          td3.appendChild(button_modify);
-      }
-      tr.appendChild(td3); 
+      td3.innerHTML = boxes[i].tool;
+      tr.appendChild(td3);
 
       // Cell 4
       let td4 = document.createElement("td");
@@ -130,17 +132,25 @@ function setAnnotationsList(boxes) {
       button_delete.innerHTML = "Delete";
       td4.appendChild(button_delete);
       tr.appendChild(td4);
+      
+      // Make row clickable to modify box
+      let tool = boxes[i].tool;
+      tr.onclick = function() {modifyBoxe(tool,i);};
+      tr.style.cursor = "pointer";
 
       annotations.appendChild(tr);
     }
 }
 
 // Send POST request to server to save the annotations list
-function list_to_json(l,modif,tool,type) {
+function save_modifications(l,modif,tool,type) {
+    // Set border to of annotations to normal when modification finished
+    setBorder(-1);
+
     // Get image id
     img_id = $('#my_data').data("img");
 
-    // Send request
+    // Send request to save the modifications to server
     $.ajax({
         url: img_id+"/save_json",
         type: "POST",
@@ -181,9 +191,28 @@ function updateLive(users,i) {
         }
         // Add new usernames
         for (let j=0; j < users.length; j++) {
-            let a = document.createElement("a");
-            a.innerHTML = " " + users[j] + " -"
-            myNode.appendChild(a)
+            let div = document.createElement("div");
+            div.className = "avatar-circle";
+
+            let span = document.createElement("span");
+            span.className = "initials";
+            span.title = users[j];
+            span.innerHTML = users[j].slice(0,2);
+
+            div.appendChild(span);
+            myNode.appendChild(div);
         }
     }
+}
+
+function setBorder(index) {
+    let lines = document.getElementById("annotations").getElementsByTagName("tr");
+    for (let i = 0 ; i < lines.length ; i++) {
+        lines[i].style.border = "1px solid #ddd";
+    }
+    // One line is selectionned and it is thicked
+    if (index > -1) {
+        lines[index].style.border = "thick solid black";
+    }
+
 }

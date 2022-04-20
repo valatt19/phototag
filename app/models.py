@@ -34,8 +34,21 @@ class Project(db.Model):
         self.members.append(user)
         self.nb_membre+=1
 
+    def removeMember(self, user):
+        self.members.remove(user)
+        self.nb_membre-=1
+
     def getMembers(self):
         return self.members
+
+    def isMember(self,user):
+        return (user in self.members)
+
+    def changePrivacy(self):
+        self.privacy = not self.privacy
+
+    def addClass(self, new):
+        self.classes.append(new)
 
     def exportConfig(self):
         node_config = Element("configuration")
@@ -47,8 +60,6 @@ class Project(db.Model):
             node_cl = SubElement(node_classes, "classe")
             node_cl.text = cl
         
-        # add config to doc and return it
-        #doc = ElementTree(node_config)
         xmlstr = tostring(node_config, encoding='utf8',method="xml")
         return xmlstr
 
@@ -64,8 +75,6 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(16))
     password_hash = db.Column(db.String(16))
     projects = db.relationship("Project", secondary=ProjectUser.__table__, backref="User")
-    group_id = db.Column(db.Integer, db.ForeignKey("groups.id"), nullable=False)
-    group = db.relationship("Group", backref=db.backref('posts', lazy=True))
     
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'))
     image = db.relationship("Image", backref=db.backref('posts2', lazy=True),foreign_keys=[image_id])
@@ -104,13 +113,9 @@ class User(UserMixin, db.Model):
     def getImage(self):
         return self.image
 
-    def checkIsAdmin(self):
-        return self.group.name == "mod"
-
     def __repr__(self):
         return self.username
 
-#Reset
 class PWReset(db.Model):
     __tablename__ = "pwreset"
     id = db.Column(db.Integer, primary_key=True)
@@ -120,21 +125,7 @@ class PWReset(db.Model):
     user = db.relationship(User, lazy='joined')
     has_activated = db.Column(db.Boolean, default=False)
 
-
-# GROUPS
-class Group(db.Model):
-
-    __tablename__ = "groups"
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(200), nullable=False)
-
-    def __repr__(self):
-        return "< Group >" + self.name
-
 #-------------------------Image---------------------------------------------
-ds_images = []
-
 class Image(db.Model):
     __tablename__ = "image"
 
@@ -187,12 +178,9 @@ class Image(db.Model):
 db.drop_all()
 db.create_all()
 
-# Create two groups
-gr1 = Group(name="mod")
-gr2 = Group(name="normal")
-
 # Create the admin user
-admin = User(username="admin",firstname="Admin",surname="Admin",email="innoye2000@gmail.com",group=gr1)
+
+admin = User(username="admin",firstname="Admin",surname="Admin",email="innoye2000@gmail.com")
 admin.set_password("admin")
 db.session.add(admin)
 
