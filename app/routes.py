@@ -216,6 +216,17 @@ def update_user_info():
    
         return render_template ('profile.html', form = form)
 
+# Delete user
+@app.route("/delete_user/", methods=['POST'])
+@login_required
+def delete_user():
+    user = current_user
+    users.remove(user.username)
+    db.session.delete(user)
+    db.session.commit()
+
+    logout_user()
+    return redirect(url_for('home'))
 
 ##################
 # Projects pages #
