@@ -21,7 +21,7 @@ import json
 from xml.dom import minidom
 
 from app.models import Image, User, users, Project, PWReset
-from app import db
+from app import db, domain
 
 
 ##############
@@ -135,7 +135,8 @@ def pwresetrq_post():
         #password : Phototag2022
 
         yag = yagmail.SMTP('pphototag')
-        contents = ['Please go to this URL to reset your password:', "http://127.0.0.1:5000" + url_for("pwreset_get",  id = (str(key)))]
+        print(domain)
+        contents = ['Please go to this URL to reset your password:', request.host + url_for("pwreset_get",  id = (str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
         #yag.send('innoye2000@gmail.com', 'Reset your password', contents)
         flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
