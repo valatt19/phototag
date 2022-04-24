@@ -20,11 +20,13 @@ from datetime import datetime, timedelta
 import json
 from xml.dom import minidom
 
+
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 
 from app.models import Image, User, users, Project, PWReset,Invitation
-from app import db
+from app import db,domain
+
 
 
 #For google login
@@ -215,7 +217,8 @@ def pwresetrq_post():
         #password : Phototag2022
 
         yag = yagmail.SMTP('pphototag')
-        contents = ['Please go to this URL to reset your password:', "http://127.0.0.1:5000" + url_for("pwreset_get",  id = (str(key)))]
+        print(domain)
+        contents = ['Please go to this URL to reset your password:', request.host + url_for("pwreset_get",  id = (str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
         #yag.send('innoye2000@gmail.com', 'Reset your password', contents)
         flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
@@ -296,6 +299,17 @@ def update_user_info():
    
         return render_template ('profile.html', form = form)
 
+# Delete user
+@app.route("/delete_user/", methods=['POST'])
+@login_required
+def delete_user():
+    user = current_user
+    users.remove(user.username)
+    db.session.delete(user)
+    db.session.commit()
+
+    logout_user()
+    return redirect(url_for('home'))
 
 ##################
 # Projects pages #

@@ -9,6 +9,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config.from_object(Config)
 
+domain = app.config.get('SERVER_NAME', 'some.sensible.default.domain')
+
 # Import and init flask login
 from flask_login import LoginManager
 
