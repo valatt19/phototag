@@ -1,0 +1,33 @@
+{% extends "parent.html" %}
+
+
+<!-- Script for searching in table -->
+<link rel="stylesheet" href="{{url_for('static', filename='css/search.css')}}">
+
+{% block content scoped %}
+
+<script src="{{url_for('static', filename='js/searchbar.js')}}"></script>
+
+<h2> All Users</h2>
+<input onblur="this.focus()" autofocus type = "text" id="searchInput" onkeyup="search('searchInput', 'users-table',0)" placeholder="Search for usernames... &#128270;" title="Type in a username">
+
+<table id="users-table">
+    <tr>
+        <th>Username</th>
+        <th> Action</th>
+    </tr>
+    
+    {% for user in users %} 
+    <tr>
+        <td>
+            {{user.username}}
+        </td>
+    
+        <td class="align-middle">
+            <a class="btn btn-success" href="/added/{{project.id}}/{{user.id}}/">Add</a>  
+        </td>   
+    </tr>
+    {% endfor %} 
+</table>
+
+{% endblock %}
