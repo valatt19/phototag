@@ -119,13 +119,12 @@ def callback():
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     # check is current user already authenticated
-    print(current_user.is_authenticated)
     if current_user.is_authenticated:
         return redirect(url_for("project_create"))
 
     # Form data
     form = LoginForm()
-    # print(form)
+
     if request.method == 'POST':
         if form.validate_on_submit():
 
@@ -180,39 +179,40 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+# display the forgot password page
 @app.route("/pwresetrq", methods=["GET"])
 def pwresetrq_get():
     return render_template('forgotPage.html')
 
+#send a request to change password
 @app.route("/pwresetrq", methods=["POST"])
 def pwresetrq_post():
     if db.session.query(User).filter_by(email=request.form["email"]).first():
-        print("ok1")
+
         user = db.session.query(User).filter_by(email=request.form["email"]).one()
         # check if user already has reset their password, so they will update
         # the current key instead of generating a separate entry in the table.
         if db.session.query(PWReset).filter_by(user_id=user.id).first():
-            print("ok2")
+
             pwalready = db.session.query(PWReset).filter_by(user_id=user.id).first()
             # if the key hasn't been used yet, just send the same key.
             if pwalready.has_activated == False:
-                print("ok3")
+
                 pwalready.datetime = datetime.now()
                 key = pwalready.reset_key
             else:
-                print("ok5")
+
                 key = keygenerator.make_key()
                 pwalready.reset_key = key
                 pwalready.datetime = datetime.now()
                 pwalready.has_activated = False
         else:
             key = keygenerator.make_key()
-            print(type(key))
+
             user_reset = PWReset(reset_key=str(key), user_id=user.id)
             db.session.add(user_reset)
         db.session.commit()
-        ##Add Yagmail code here
-        # Here is mine:
+
         #email : pphototag@gmail.com
         #password : Phototag2022
 
@@ -220,7 +220,6 @@ def pwresetrq_post():
         print(domain)
         contents = ['Please go to this URL to reset your password:', request.host + url_for("pwreset_get",  id = (str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
-        #yag.send('innoye2000@gmail.com', 'Reset your password', contents)
         flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
 
 
@@ -230,15 +229,14 @@ def pwresetrq_post():
         flash("Your email was never registered.", "danger")
         return redirect(url_for("pwresetrq_get"))
 
+# send the new password
 @app.route("/pwreset/<id>", methods=["POST"])
 def pwreset_post(id):
     if request.form["password"] != request.form["password2"]:
         flash("Your password and password verification didn't match.", "danger")
-        print("Your password and password verification didn't match.", "danger")
         return redirect(url_for("pwreset_get", id=id))
     if len(request.form["password"]) < 1:
         flash("Your password needs to be at least 1 characters", "danger")
-        print("Your password needs to be at least 1 characters", "danger")
         return redirect(url_for("pwreset_get", id=id))
 
     user_reset = db.session.query(PWReset).filter_by(reset_key=id).one()
@@ -250,16 +248,14 @@ def pwreset_post(id):
         print('mdp update ok')
     except IntegrityError:
         flash("Something went wrong", "danger")
-        print("Something went wrong", "danger")
         db.session.rollback()
         return redirect(url_for("home"))
     user_reset.has_activated = True
     db.session.commit()
     flash("Your new password is saved.", "success")
-    print("Your new password is saved.", "success")
     return redirect(url_for("home"))
 
-
+#display the reset password page
 @app.route("/pwreset/<id>", methods=["GET"])
 def pwreset_get(id):
     key = id
@@ -269,15 +265,12 @@ def pwreset_get(id):
         flash("You already reset your password with the URL you are using." +
               "If you need to reset your password again, please make a" +
               " new request here.", "danger")
-        print("You already reset your password with the URL you are using." +
-              "If you need to reset your password again, please make a" +
-              " new request here.", "danger")
+
         return redirect(url_for("pwresetrq_get"))
     if pwresetkey.datetime.replace(tzinfo=pytz.utc) < generated_by:
         flash("Your password reset link expired.  Please generate a new one" +
               " here.", "danger")
-        print("Your password reset link expired.  Please generate a new one" +
-              " here.", "danger")
+
         return redirect(url_for("pwresetrq_get"))
     return render_template('resetPassword.html', id=key)
 
