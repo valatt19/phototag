@@ -10,11 +10,27 @@
         </tr>
         {% for project in projects %}
         <tr>
-          <td>{{project.creator.username}}/{{project.name}}</a></td>
+          <td>{{project.creator.username}}/{{project.name}}</td>
           <td>{{project.members}}</td>
           <td><a href="../joined/{{project.id}}">Join</a></td>
         </tr>
         {% endfor %}
   </table>
+  <h3 class="text-center text-info">Invitation(s)</h3>
+    <table>
+        <tr>
+          <th>Name</th>
+          <th>Project</th>
+          <th>Join</th>
+        </tr>
+        {% for invitation in invitations %}
+        <tr>
+          <td>{{invitation.invited_by.creator}}</a></td>
+          <td>{{invitation.invited_to.name}}</td>
+          <td><a href="../joined/{{invitation.id}}">accept</a></td>
+        </tr>
+        {% endfor %}
+  </table>
+
 </body>
 {% endblock %}

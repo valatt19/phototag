@@ -20,8 +20,23 @@ from datetime import datetime, timedelta
 import json
 from xml.dom import minidom
 
-from app.models import Image, User, users, Project, PWReset
-from app import db, domain
+
+from oauthlib.oauth2 import WebApplicationClient
+import requests
+
+from app.models import Image, User, users, Project, PWReset,Invitation
+from app import db,domain
+
+
+
+#For google login
+GOOGLE_CLIENT_ID ="790952338581-eo6eir5djsu1cn1j2butat647t7kp0lc.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_DISCOVERY_URL = (
+    "https://accounts.google.com/.well-known/openid-configuration"
+)
+
+client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 
 ##############
@@ -32,6 +47,73 @@ from app import db, domain
 @app.route('/')
 def home():
     return redirect(url_for("login"))
+
+def get_google_provider_cfg():
+    return requests.get(GOOGLE_DISCOVERY_URL).json()
+# Login with Google
+@app.route("/login/google/login/", methods=["GET", "POST"])
+def login2():
+
+    google_provider_cfg = get_google_provider_cfg()
+    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+    request_uri=client.prepare_request_uri(
+        authorization_endpoint,
+        redirect_uri=request.base_url + "callback",
+        scope=["openid","email","profile"],
+    )
+    return redirect(request_uri)
+
+@app.route("/login/google/login/callback")
+def callback():
+    code = request.args.get("code")
+    google_provider_cfg = get_google_provider_cfg()
+    token_endpoint=google_provider_cfg["token_endpoint"]
+    token_url,headers,body=client.prepare_token_request(
+        token_endpoint,
+        authorization_response=request.url,
+        redirect_url=request.base_url,
+        code=code,
+    )
+    token_response=requests.post(
+        token_url,
+        headers=headers,
+        data=body,
+        auth=(GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET),
+    )
+
+    client.parse_request_body_response(json.dumps(token_response.json()))
+
+    userinfo_endpoint=google_provider_cfg["userinfo_endpoint"]
+    uri,headers,body=client.add_token(userinfo_endpoint)
+    userinfo_response=requests.get(uri,headers=headers, data=body)
+
+    if userinfo_response.json().get("email_verified"):
+        id=userinfo_response.json()["sub"]
+        second = userinfo_response.json()["family_name"]
+        users_email = userinfo_response.json()["email"]
+        name = userinfo_response.json()["given_name"]
+        username = userinfo_response.json()["name"]+ second
+        pswd="google"+str(int(userinfo_response.json()["sub"])/1000)
+    else:
+        return "User email not available or not verified by Google.", 400
+
+    new_dir = app.config['UPLOAD_FOLDER'] + "/" + username
+    if not os.path.isdir(new_dir):
+        os.mkdir(new_dir)
+
+    user= User.query.filter_by(username=username).first()
+    if not user:
+        user = User(
+        username=username,firstname=name,surname=second,email=users_email,password=pswd
+        )
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+    else:
+        login_user(user)
+    return redirect(url_for("project"))
+
+
 
 # Login
 @app.route("/login/", methods=["GET", "POST"])
@@ -330,26 +412,51 @@ def project_create():
 # Join a project
 @app.route("/project/join/")
 def project_join():
-    # Get all public projects (that can be joined) but remove the ones where the user is already in
-    public_projects = Project.query.filter(Project.privacy == 1)
+    public_projects = Project.query.filter(Project.privacy==1)
     final_public_projects = []
     for p in public_projects:
         if not p in current_user.getMyProjects():
             final_public_projects.append(p)
 
-    return render_template("project/project_join.html", projects=final_public_projects)
+    private_projects = Invitation.query.all()
+    private = []
+    for p2 in private_projects:
+        if not p2 in current_user.getInvitation():
+            private.append(p2)
+
+    return render_template("project/project_join.html", projects=final_public_projects, invitations=private)
 
 # User click on join a project
 @app.route("/project/joined/<int:project_id>")
 def project_joined(project_id):
     project_joined = Project.query.get(project_id)
-    # Check that user is joining a public project
-    if project_joined.privacy == 1:
+    if project_joined.privacy == 1 or project_joined.privacy == 0:
         project_joined.addMember(current_user)
         db.session.commit()
         return redirect(url_for('dataset_overview', project_id=project_joined.id))
 
+
     return redirect(url_for('project_join'))
+
+@app.route("/added/<int:project_id>/<int:user_id>/")
+def add_user_private(project_id,user_id):
+    project_added = Project.query.get(project_id)
+    get_user = User.query.get(user_id)
+    if project_added.privacy == 0:
+        project_added.invit(get_user)
+        db.session.commit()
+        return redirect(url_for('project'))
+    return redirect(url_for('add'))
+
+@app.route("/project/<int:project_id>/add/") 
+def add(project_id):
+    all_users = User.query.all()
+    userTo_add = []
+    project = Project.query.get(project_id)
+    for u in all_users:
+        if u.id != project.creator_id :
+            userTo_add.append(u)
+    return render_template("project/users_add.html",project=project, users=userTo_add)
 
 
 ######################

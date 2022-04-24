@@ -9,6 +9,7 @@ from datetime import datetime
 from xml.etree.cElementTree import Element, ElementTree, SubElement, dump, tostring
 from sqlalchemy.ext.mutable import MutableList
 
+
 #-----------------------------Projets/User---------------------------------
 
 class ProjectUser(db.Model):
@@ -16,6 +17,17 @@ class ProjectUser(db.Model):
     id = db.Column(db.Integer, primary_key=True, index=True)
     projectId = db.Column(db.Integer, db.ForeignKey('project.id'))
     userId = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+#-------------------------------------Invitation------------------------------------------
+
+class Invitation(db.Model):
+    __tablename__ = "invits"
+    id = db.Column(db.Integer, primary_key=True , index = True)
+    invited_by = db.relationship("Project",backref=db.backref('by',lazy=True))
+    invited_byid=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    invited_to = db.relationship("Project",backref=db.backref('to',lazy=True))
+    invited=db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
 
 #-------------------------------Projets------------------------------------
 
@@ -29,6 +41,13 @@ class Project(db.Model):
     classes = db.Column(MutableList.as_mutable(PickleType),default=[])
     members = db.relationship("User", secondary=ProjectUser.__table__, backref="Project")
     nb_membre = db.Column(db.Integer)
+
+    invitations=db.relationship("User", secondary=Invitation.__table__, backref="users")
+    nb_invitation = db.Column(db.Integer,default=0)                                                                                                                         
+    
+    def invit(self,invit):
+        self.invitations.append(invit)
+        self.nb_invitation += 1
 
     def addMember(self, user):
         self.members.append(user)
@@ -79,6 +98,11 @@ class User(UserMixin, db.Model):
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'))
     image = db.relationship("Image", backref=db.backref('posts2', lazy=True),foreign_keys=[image_id])
 
+    invitations = db.relationship("Invitation",secondary=Project.__table__,backref="users")
+
+    def getInvitation(self):
+        return self.invitations
+        
     def set_password(self, password):
         self.password = password
         self.password_hash = generate_password_hash(password)
@@ -115,6 +139,8 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return self.username
+
+    
 
 class PWReset(db.Model):
     __tablename__ = "pwreset"
