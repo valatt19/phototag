@@ -108,7 +108,7 @@ def callback():
 
 @app.route("/set_pswd", methods=["GET"])
 def set_pswd_get():
-    return render_template('project/choose_pswd.html')
+    return render_template('choose_pswd.html')
 
 
 @app.route("/set_pswd", methods=["POST"])
