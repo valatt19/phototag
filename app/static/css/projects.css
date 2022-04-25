@@ -31,3 +31,18 @@ td a {
     color: inherit;
     text-decoration: inherit;
 }
+
+.cellbutton a {
+    background-color: #17a2b8;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+/* Change the color of links on hover */
+.cellbutton a:hover {
+    background-color: #ddd;
+    color: black;
+  }

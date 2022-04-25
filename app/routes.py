@@ -100,16 +100,15 @@ def callback():
     if not os.path.isdir(new_dir):
         os.mkdir(new_dir)
 
-    user= User.query.filter_by(username=username).first()
-    if not user:
+    user= User.query.filter_by(email=userinfo_response.json()["email"]).first()
+    if user is None:
         user = User(
-        username=username,firstname=name,surname=second,email=users_email,password=pswd
+            username=username,firstname =userinfo_response.json()["given_name"], surname=second, email=userinfo_response.json()["email"]
         )
-        db.session.add(user)
-        db.session.commit()
-        login_user(user)
-    else:
-        login_user(user)
+    db.session.add(user)
+    db.session.commit()
+    login_user(user)
+    
     return redirect(url_for("project"))
 
 
