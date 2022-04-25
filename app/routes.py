@@ -108,7 +108,7 @@ def callback():
     db.session.add(user)
     db.session.commit()
     login_user(user)
-    
+
     return redirect(url_for("project"))
 
 
@@ -465,8 +465,6 @@ def add(project_id):
             userTo_add.append(u)
     return render_template("project/users_add.html",project=project, users=userTo_add)
 
-
-
 ######################
 # In a project pages #
 ######################
@@ -630,6 +628,28 @@ def save_json(project_id, img_id):
 
     resp = {"success": True, "response": "File saved"}
     return jsonify(resp), 200
+
+
+##################
+# Error handling #
+##################
+
+# Show custom error pages
+@app.errorhandler(404)
+def handler404(error):
+    return render_template("error/errorpage.html",code=404)
+
+@app.errorhandler(403)
+def handler403(error):
+    return render_template("error/errorpage.html",code=403)
+
+@app.errorhandler(400)
+def handler400(error):
+    return render_template("error/errorpage.html",code=400)
+
+@app.errorhandler(500)
+def handler404(error):
+    return render_template("error/errorpage.html",code=500)
 
 
 ########
