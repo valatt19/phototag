@@ -42,8 +42,10 @@ let img_id;
 ///////////////////////////////
 
 $(document).ready(function() {
-    // Set zoom value
-    setZoom();
+
+    // Set zoom value and image depending on zoom value
+    // The waiting of 100 ms is useful to prevent loading problems on Firefox
+    setTimeout(function(){setZoom();}, 100);
 
     // Set colors values
     set_colors();

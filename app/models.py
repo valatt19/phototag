@@ -201,22 +201,12 @@ class Image(db.Model):
             txt = txt + "\n" + line["modification"].upper() + " " + line["tool"].upper() + " (Class = " + line["type"] + ")\n\tUser: " + line["user"] + "\n\tDate: " + line["date"].strftime('%Y-%m-%d %H:%M') + "\n"
         return txt
 
-db.drop_all()
+# Launch DB
 db.create_all()
-
-# Create the admin user
-
-admin = User(username="admin",firstname="Admin",surname="Admin",email="innoye2000@gmail.com")
-admin.set_password("admin")
-db.session.add(admin)
-
-#pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
-#pr.addMember(admin)
-
 db.session.commit()
+users = []
 
-users = ["admin"]
-
+# Init login manager
 @login_manager.user_loader
 def user_loader(userid):
     return User.query.get(int(userid))
