@@ -87,12 +87,8 @@ def callback():
     userinfo_response=requests.get(uri,headers=headers, data=body)
 
     if userinfo_response.json().get("email_verified"):
-        id=userinfo_response.json()["sub"]
         second = userinfo_response.json()["family_name"]
-        users_email = userinfo_response.json()["email"]
-        name = userinfo_response.json()["given_name"]
-        username = userinfo_response.json()["name"]+ second
-        pswd="google"+str(int(userinfo_response.json()["sub"])/1000)
+        username = userinfo_response.json()["given_name"]+ second
     else:
         return "User email not available or not verified by Google.", 400
 
@@ -100,7 +96,7 @@ def callback():
     if not os.path.isdir(new_dir):
         os.mkdir(new_dir)
 
-    user= User.query.filter_by(email=userinfo_response.json()["email"]).first()
+    user= User.query.filter_by(username=username).first()
     if user is None:
         user = User(
             username=username,firstname =userinfo_response.json()["given_name"], surname=second, email=userinfo_response.json()["email"]
@@ -108,8 +104,26 @@ def callback():
     db.session.add(user)
     db.session.commit()
     login_user(user)
+    return redirect((url_for('set_pswd_get')))
 
-    return redirect(url_for("project"))
+@app.route("/set_pswd", methods=["GET"])
+def set_pswd_get():
+    return render_template('project/choose_pswd.html')
+
+
+@app.route("/set_pswd", methods=["POST"])
+def set_pswd():
+    user = current_user
+    if request.form["password"] != request.form["password2"]:
+        flash("Your password and password verification didn't match.", "danger")
+        return redirect(url_for("set_pswd_get"))
+    if len(request.form["password"]) < 1:
+        flash("Your password needs to be at least 1 characters", "danger")
+        return redirect(url_for("set_pswd_get"))
+    user.set_password(request.form["password"])
+    db.session.commit()
+    return redirect(url_for('project'))
+
 
 
 
