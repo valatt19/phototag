@@ -400,6 +400,22 @@ def project_create():
 
     return render_template("project/create.html")
 
+# Join a project
+@app.route("/project/join/")
+def project_join():
+    public_projects = Project.query.filter(Project.privacy==1)
+    final_public_projects = []
+    for p in public_projects:
+        if not p in current_user.getMyProjects():
+            final_public_projects.append(p)
+
+    private_projects = Invitation.query.all()
+    private = []
+    for p2 in private_projects:
+        if not p2 in current_user.getInvitation():
+            private.append(p2)
+
+    return render_template("project/project_join.html", projects=final_public_projects, invitations=private)
 
 # Join a project
 @app.route("/project/join/")
@@ -426,8 +442,6 @@ def project_joined(project_id):
         project_joined.addMember(current_user)
         db.session.commit()
         return redirect(url_for('dataset_overview', project_id=project_joined.id))
-
-
     return redirect(url_for('project_join'))
 
 @app.route("/added/<int:project_id>/<int:user_id>/")
@@ -449,6 +463,7 @@ def add(project_id):
         if u.id != project.creator_id :
             userTo_add.append(u)
     return render_template("project/users_add.html",project=project, users=userTo_add)
+
 
 
 ######################
