@@ -1,0 +1,45 @@
+<head>
+    <link href="/static/css/style_navbar.css" rel="stylesheet">
+</head>
+<body>
+<div class="topnav" id="nav1">
+    <div class="logo">
+        <a class="active" href="/">
+            <img alt="Photo-Tag" src="/static/img/photo-tag-white.png" width="25" height="25">
+        </a>
+    </div>
+</div>
+
+{% if code == 404%}
+
+<div class="errorMessage">
+    <h1>Page not found</h1>
+</div>
+
+{%endif%}
+
+{% if code == 403%}
+
+<div class="errorMessage">
+    <h1>Acces refused</h1>
+</div>
+
+{%endif%}
+
+{% if code == 400%}
+
+<div class="errorMessage">
+    <h1>Bad request</h1>
+</div>
+
+{%endif%}
+
+{% if code == 500%}
+
+<div class="errorMessage">
+    <h1>Internal server error</h1>
+</div>
+
+{%endif%}
+
+</body>
