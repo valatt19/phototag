@@ -28,13 +28,14 @@ from app.models import Image, User, users, Project, PWReset,Invitation
 from app import db,domain
 from . import smtpConfig
 
-#For google login
+#For google login configuration
+#store the Google Client ID and Client Secret
 GOOGLE_CLIENT_ID ="790952338581-eo6eir5djsu1cn1j2butat647t7kp0lc.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
 )
-
+# OAuth 2 client setup
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
 
@@ -47,14 +48,21 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 def home():
     return redirect(url_for("login"))
 
+#This function retrieves Google’s provider configuration
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
+
+
 # Login with Google
 @app.route("/login/google/login/", methods=["GET", "POST"])
 def login2():
 
+    # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
+   
+    # Use library to construct the request for Google login and provide
+    # scopes that let you retrieve user's profile from Google
     request_uri=client.prepare_request_uri(
         authorization_endpoint,
         redirect_uri=request.base_url + "callback",
@@ -62,11 +70,20 @@ def login2():
     )
     return redirect(request_uri)
 
+# When Google sends back that unique code, it will be sending
+# it to this login callback endpoint on your application
 @app.route("/login/google/login/callback")
 def callback():
+
+    # Get authorization code Google sent back to you
     code = request.args.get("code")
+
+    # Find out what URL to hit to get tokens that allow you to ask for
+    # things on behalf of a user
     google_provider_cfg = get_google_provider_cfg()
     token_endpoint=google_provider_cfg["token_endpoint"]
+
+    # Prepare and send a request to get tokens
     token_url,headers,body=client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,
@@ -79,13 +96,17 @@ def callback():
         data=body,
         auth=(GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET),
     )
-
+    # Parse the tokens
     client.parse_request_body_response(json.dumps(token_response.json()))
 
+    # find and hit the URL from Google that gives the user's profile information
     userinfo_endpoint=google_provider_cfg["userinfo_endpoint"]
     uri,headers,body=client.add_token(userinfo_endpoint)
     userinfo_response=requests.get(uri,headers=headers, data=body)
 
+    #verify if the email is verified
+    # The user authenticated with Google authorized
+    # we've verified their email through Google!
     if userinfo_response.json().get("email_verified"):
         second = userinfo_response.json()["family_name"]
         username = userinfo_response.json()["given_name"]+ second
@@ -97,6 +118,8 @@ def callback():
         os.mkdir(new_dir)
 
     user= User.query.filter_by(username=username).first()
+
+    # Doesn't exist? Add it to the database.
     if user is None:
         user = User(
             username=username,firstname =userinfo_response.json()["given_name"], surname=second, email=userinfo_response.json()["email"]
@@ -104,13 +127,16 @@ def callback():
     db.session.add(user)
     db.session.commit()
     login_user(user)
+
+    # Go ask a password to the user 
     return redirect((url_for('set_pswd_get')))
 
+#page to ask a password for the user that used Google login
 @app.route("/set_pswd", methods=["GET"])
 def set_pswd_get():
-    return render_template('project/choose_pswd.html')
+    return render_template('choose_pswd.html')
 
-
+#[Post] for the password ask
 @app.route("/set_pswd", methods=["POST"])
 def set_pswd():
     user = current_user
@@ -123,9 +149,6 @@ def set_pswd():
     user.set_password(request.form["password"])
     db.session.commit()
     return redirect(url_for('project'))
-
-
-
 
 # Login
 @app.route("/login/", methods=["GET", "POST"])
@@ -475,7 +498,7 @@ def add(project_id):
     userTo_add = []
     project = Project.query.get(project_id)
     for u in all_users:
-        if u.id != project.creator_id :
+        if u.id != project.creator_id and u not in project.getMembers():
             userTo_add.append(u)
     return render_template("project/users_add.html",project=project, users=userTo_add)
 
