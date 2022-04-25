@@ -89,9 +89,10 @@
 
 });
 </script>
-
+<body style="text-align: center">
+<div class="container" style="border: 1px solid #000000;">
         <form action="" method="POST" enctype="multipart/form-data">
-            <h2>Set project parameters</h2>
+            <h2 style="color: #1c7430">Set project parameters</h2>
             <label for="pname"><b>Project name: </b></label><br>
             <input type="text" name="pname" id="pname" required><br><br>
 
@@ -99,12 +100,12 @@
             <input type="radio" id="public" name="ptype" value="1"checked>Public<br>
             <input type="radio" id="private" name="ptype" value="0">Private<br><br>
 
-            <h2>Set configuration</h2>
+            <h2 style="color: #1c7430">Set configuration</h2>
             <div>
                 <label for="importConfiguration"><b>Import configuration file: </b></label><br>
                 <button type="button" class="btn btn-outline-primary"><input type="file" onclick="disableCreate()" name="importConfig" id="importConfig" accept=".xml"></button><br><br>
                 <label for="btn_create"><b>OR create new configuration: </b></label><br>
-                <button type="button" id="btn_create" onclick="disableImport()" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create</button><br><br>
+                <button type="button" id="btn_create" onclick="disableImport()" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#popup">Create Config</button><br><br>
 
                 <div id="popup" name="popup" class="modal">
                 <div class="modal-dialog modal-dialog-centered">
@@ -127,15 +128,18 @@
 
             </div>
 
-            <h2>Set dataset</h2>
+            <h2 style="color: #1c7430">Set dataset</h2>
             <label for="file"><b>Upload folder: </b></label><br>
-            <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory="" ><br><br>
-
-            <button onclick="reset()" id="reset_config">Reset config</button>
-            <input onclick="return checkForm()" id="createButton" type="submit" value="Create">
+            <button type="button" class="btn btn-outline-info">
+                <input type="file" name="files[]" id="files" multiple directory="" webkitdirectory="" mozdirectory="" >
+            </button>
+            <br><br>
+            <button onclick="reset()" id="reset_config" class="btn btn-secondary">Reset</button>
+            <input onclick="return checkForm()" class="btn btn-success" id="createButton" type="submit" value="Create Project">
         </form>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-
+</div>
+</body>
 
 {% endblock %}
