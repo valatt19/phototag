@@ -28,7 +28,9 @@ from app.models import Image, User, users, Project, PWReset,Invitation
 from app import db,domain
 from . import smtpConfig
 
-#For google login configuration
+####################
+# For GOOGLE Login #
+####################
 #store the Google Client ID and Client Secret
 GOOGLE_CLIENT_ID ="790952338581-eo6eir5djsu1cn1j2butat647t7kp0lc.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
@@ -43,7 +45,7 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 # Home pages #
 ##############
 
-# Homepage (redirect to login page) - (sprint 1 : redirect to load dataset page)
+# Homepage
 @app.route('/')
 def home():
     return redirect(url_for("login"))
@@ -113,10 +115,12 @@ def callback():
     else:
         return "User email not available or not verified by Google.", 400
 
+    # Create new folder for user
     new_dir = app.config['UPLOAD_FOLDER'] + "/" + username
     if not os.path.isdir(new_dir):
         os.mkdir(new_dir)
 
+    # Check if user with same email is not already registred
     user= User.query.filter_by(username=username).first()
 
     # Doesn't exist? Add it to the database.
@@ -128,10 +132,10 @@ def callback():
     db.session.commit()
     login_user(user)
 
-    # Go ask a password to the user 
+   # Redirection to create a password
     return redirect((url_for('set_pswd_get')))
 
-#page to ask a password for the user that used Google login
+## Page for choosing a password for the user that used Google login
 @app.route("/set_pswd", methods=["GET"])
 def set_pswd_get():
     return render_template('choose_pswd.html')
@@ -140,6 +144,8 @@ def set_pswd_get():
 @app.route("/set_pswd", methods=["POST"])
 def set_pswd():
     user = current_user
+
+    # Password checks
     if request.form["password"] != request.form["password2"]:
         flash("Your password and password verification didn't match.", "danger")
         return redirect(url_for("set_pswd_get"))
@@ -150,7 +156,8 @@ def set_pswd():
     db.session.commit()
     return redirect(url_for('project'))
 
-# Login
+
+# Normal Login
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     # check is current user already authenticated
@@ -180,6 +187,7 @@ def login():
     # GET
     return render_template("login.html", form=form)
 
+
 # Register
 @app.route("/register/", methods=["GET", "POST"])
 def register():
@@ -196,7 +204,6 @@ def register():
 
         db.session.add(user)
         db.session.commit()
-        users.append(form.username.data)
         flash("Congratulations, you are now a registered user!", "info")
 
         # add new user  dir
@@ -208,18 +215,21 @@ def register():
 
     return render_template("register.html", form=form)
 
+
 # Logout
 @app.route("/logout/")
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
-# display the forgot password page
+
+# Display  forgot password page
 @app.route("/pwresetrq", methods=["GET"])
 def pwresetrq_get():
     return render_template('forgotPage.html')
 
-#send a request to change password
+
+# Send a request to change password
 @app.route("/pwresetrq", methods=["POST"])
 def pwresetrq_post():
     if db.session.query(User).filter_by(email=request.form["email"]).first():
@@ -264,7 +274,8 @@ def pwresetrq_post():
         flash("Your email was never registered.", "danger")
         return redirect(url_for("pwresetrq_get"))
 
-# send the new password
+
+# Send the new password
 @app.route("/pwreset/<id>", methods=["POST"])
 def pwreset_post(id):
     if request.form["password"] != request.form["password2"]:
@@ -290,7 +301,8 @@ def pwreset_post(id):
     flash("Your new password is saved.", "success")
     return redirect(url_for("home"))
 
-#display the reset password page
+
+# Display the reset password page
 @app.route("/pwreset/<id>", methods=["GET"])
 def pwreset_get(id):
     key = id
@@ -309,7 +321,8 @@ def pwreset_get(id):
         return redirect(url_for("pwresetrq_get"))
     return render_template('resetPassword.html', id=key)
 
-# Profile
+
+# Profile page to update personal infos or to delete profile
 @app.route("/profile/", methods=['GET', 'POST']) #view function to update a task
 @login_required
 def update_user_info():
@@ -327,17 +340,18 @@ def update_user_info():
    
         return render_template ('profile.html', form = form)
 
-# Delete user
+
+# Delete current user (asked by him)
 @app.route("/delete_user/", methods=['POST'])
 @login_required
 def delete_user():
-    user = current_user
-    users.remove(user.username)
-    db.session.delete(user)
+    User.query.filter(User.id == current_user.id).delete()
     db.session.commit()
 
     logout_user()
     return redirect(url_for('home'))
+
+
 
 ##################
 # Projects pages #
@@ -350,7 +364,8 @@ def project():
     projects = current_user.getMyProjects()
     return render_template("project/project.html", projects=projects)
 
-# Create a new project (Sprint 1 : only load a dataset)
+
+# Create a new project
 @app.route("/project/new/", methods=["GET", "POST"])
 @login_required
 def project_create():
@@ -359,7 +374,7 @@ def project_create():
         if Project.query.filter(Project.name == request.form["pname"]).count() != 0:
             return redirect(request.url)
 
-        # check that there is files
+        # check that there are files
         if 'files[]' not in request.files:
             return redirect(request.url)
         uploaded_files = request.files.getlist('files[]')
@@ -368,7 +383,7 @@ def project_create():
         if len(uploaded_files) < 1:
             return redirect(request.url)
 
-        # add new project dir
+        # Add new project dir
         new_dir = app.config['UPLOAD_FOLDER'] + "/" + current_user.username + "/" + request.form["pname"]
         if not os.path.isdir(new_dir):
             os.mkdir(new_dir)
@@ -436,7 +451,8 @@ def project_create():
 
     return render_template("project/create.html")
 
-# Join a project
+
+# Join a public project or a private project (with invitation)
 @app.route("/project/join/")
 def project_join():
     public_projects = Project.query.filter(Project.privacy==1)
@@ -453,11 +469,13 @@ def project_join():
 
     return render_template("project/project_join.html", projects=final_public_projects, invitations=private)
 
+
 # User click on join a project
 @app.route("/project/joined/<int:project_id>")
 def project_joined(project_id):
     project_joined = Project.query.get(project_id)
 
+    # Check that project is public
     if project_joined.privacy == 1:
         project_joined.addMember(current_user)
         db.session.commit()
@@ -466,13 +484,14 @@ def project_joined(project_id):
 
     return redirect(url_for('project_join'))
 
-# User click on join a project
+
+# User click on accept an invitation
 @app.route("/project/acceptinvit/<int:invit_id>/<int:project_id>")
 def project_accept_invit(invit_id, project_id):
     project_joined = Project.query.get(project_id)
     invit = Invitation.query.get(invit_id)
 
-    # Verification project is private and the invit correspond to correct project
+    # Check project is private and the invit correspond to correct project
     if project_joined.privacy == 0 and invit.invited == project_id:
         project_joined.addMember(current_user)
         Invitation.query.filter(Invitation.id == invit_id).delete()
@@ -482,6 +501,8 @@ def project_accept_invit(invit_id, project_id):
 
     return redirect(url_for('project_join'))
 
+
+# [POST] invitation sent to user
 @app.route("/added/<int:project_id>/<int:user_id>/")
 def add_user_private(project_id,user_id):
     project_added = Project.query.get(project_id)
@@ -492,6 +513,8 @@ def add_user_private(project_id,user_id):
         return redirect(url_for('project'))
     return redirect(url_for('add'))
 
+
+# Page to list users (not already member of a project) and send them invitation to join the project
 @app.route("/project/<int:project_id>/add/") 
 def add(project_id):
     all_users = User.query.all()
@@ -501,6 +524,8 @@ def add(project_id):
         if u.id != project.creator_id and u not in project.getMembers():
             userTo_add.append(u)
     return render_template("project/users_add.html",project=project, users=userTo_add)
+
+
 
 ######################
 # In a project pages #
@@ -524,6 +549,7 @@ def dataset_overview(project_id):
         working.append(User.query.filter(User.image_id == img.id))
 
     return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project, user=current_user.username, working = working)
+
 
 # Users overview of a project (list of members)
 @app.route("/project/<int:project_id>/settings/", methods=["GET", "POST"])
@@ -557,6 +583,7 @@ def project_settings(project_id):
 
     return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), classes=project.classes, exportConfig = config)
 
+
 # User removed by creator of project
 @app.route("/project/<int:project_id>/remove/<int:user_id>")
 def project_users_remove(project_id, user_id):
@@ -570,6 +597,7 @@ def project_users_remove(project_id, user_id):
 
     return redirect(url_for('project_settings', project_id=project_id))
 
+
 # Privacy of project changed
 @app.route("/project/<int:project_id>/switch/")
 def project_privacy_switch(project_id):
@@ -581,6 +609,7 @@ def project_privacy_switch(project_id):
         db.session.commit()
 
     return redirect(url_for('project_settings', project_id=project_id))
+
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
@@ -617,24 +646,27 @@ def annotate_image(project_id, img_id):
 
     return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project, working=working, log=log)
 
+
+# SOCKET used to refresh annotation page when modifications are made by other user
+# It updates also the Users live working on the same image
 @socketio.on("refresh")
 def refresh(img_id):
-    '''On connecting, update the client with the current state.'''
     img = Image.query.get(img_id)
     boxes = img.annotations
 
+    # Find all users working on this image
     working = User.query.filter(User.image_id == img.id)
     users_live = []
     for user in working:
         users_live.append(user.username)
 
-    print(users_live)
-
+    #Generate new log with latest updates
     log = img.generate_log()
 
     socketio.emit("update", (boxes, img_id, users_live, log))
 
 
+# SOCKET used to update current image where the user is working to None
 @socketio.on('disconnect')
 def test_disconnect():
     # Remove user in working list
@@ -652,7 +684,7 @@ def save_json(project_id, img_id):
     if image.project_id != project_id or not project.isMember(current_user):
         return jsonify({"impossible": True, "response": "Can't modify this file"}), 200
 
-        # Get the annotations data and update it for image
+    # Get the annotations data and update it for image
     data = request.get_json()
     user = current_user
     date = datetime.now()
@@ -665,6 +697,7 @@ def save_json(project_id, img_id):
 
     resp = {"success": True, "response": "File saved"}
     return jsonify(resp), 200
+
 
 
 ##################
@@ -687,6 +720,7 @@ def handler400(error):
 @app.errorhandler(500)
 def handler404(error):
     return render_template("error/errorpage.html",code=500)
+
 
 
 ########

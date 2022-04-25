@@ -1,5 +1,4 @@
 from email.policy import default
-
 from flask_login import UserMixin
 from sqlalchemy import null, PickleType
 from app import db,login_manager
@@ -11,7 +10,7 @@ from sqlalchemy.ext.mutable import MutableList
 
 
 #-----------------------------Projets/User---------------------------------
-
+""" Junction table between Project and User because N-to-N relation """
 class ProjectUser(db.Model):
     __tablename__ = 'projectuser'
     id = db.Column(db.Integer, primary_key=True, index=True)
@@ -20,7 +19,7 @@ class ProjectUser(db.Model):
 
 
 #-------------------------------------Invitation------------------------------------------
-
+""" Table representing invitations from a Project to an User """
 class Invitation(db.Model):
     __tablename__ = "invits"
     id = db.Column(db.Integer, primary_key=True , index = True)
@@ -29,8 +28,9 @@ class Invitation(db.Model):
     invited_to = db.relationship("Project",backref=db.backref('to',lazy=True))
     invited=db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
 
-#-------------------------------Projets------------------------------------
 
+#-------------------------------Projets------------------------------------
+""" Table representing a project of annotations : it contains a dataset (Images), a creator (User), members (Users), classes created by an user (List) """
 class Project(db.Model):
     __tablename__ = "project"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -82,7 +82,10 @@ class Project(db.Model):
         xmlstr = tostring(node_config, encoding='utf8',method="xml")
         return xmlstr
 
+
 #----------------------------User-----------------------------------------------
+""" Table representing an User, it uses the UserMixin layout (for logins, lougout, ...). 
+    An User has personnal informations, works on Projects, and is currently working on an Image (image = None if user not working on an image) """
 class User(UserMixin, db.Model):
     __tablename__ = "users"
 
@@ -140,8 +143,9 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return self.username
 
-    
 
+#-------------------------PWReset---------------------------------------------   
+""" Table used to handle Password Reset asked by an User. The user receives an email with a link to change his PW """
 class PWReset(db.Model):
     __tablename__ = "pwreset"
     id = db.Column(db.Integer, primary_key=True)
@@ -151,7 +155,10 @@ class PWReset(db.Model):
     user = db.relationship(User, lazy='joined')
     has_activated = db.Column(db.Boolean, default=False)
 
+
 #-------------------------Image---------------------------------------------
+""" Table representing an Image. An image has some informations related to it. It has also a parent Project, some Annotations and a Log (in JSON format).
+    The ID is used to identify the Image between ALL images saved. The PROJECT_POS is used to identify the image IN the dataset """
 class Image(db.Model):
     __tablename__ = "image"
 
@@ -201,12 +208,14 @@ class Image(db.Model):
             txt = txt + "\n" + line["modification"].upper() + " " + line["tool"].upper() + " (Class = " + line["type"] + ")\n\tUser: " + line["user"] + "\n\tDate: " + line["date"].strftime('%Y-%m-%d %H:%M') + "\n"
         return txt
 
-# Launch DB
+
+#-------------------------Launch DB-------------------------------------------
 db.create_all()
 db.session.commit()
 users = []
 
-# Init login manager
+
+#-----------------------Init Login Manager------------------------------------
 @login_manager.user_loader
 def user_loader(userid):
     return User.query.get(int(userid))
