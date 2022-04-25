@@ -5,18 +5,18 @@
 </head>
 
 <body>
-    <h3 class="text-center text-info">Project(s)</h3>
+    <h3 class="text-center text-info">My Project(s)</h3>
     <table id="projects">
         <tr>
           <th>Name</th>
+          <th>Privacy</th>
           <th>Members</th>
-          <th>Public</th>
         </tr>
         {% for project in projects %}
         <tr>
-          <td><a href="../project/{{project.id}}/dataset">{{project.creator.username}}/{{project.name}}</a></td>
-          <td>{{project.members}}</td>
-          <td>{{project.privacy}}</td>
+          <td><a href="../project/{{project.id}}/dataset"><b>{{project.creator.username}}/{{project.name}}</b></a></td>
+          <td><a href="../project/{{project.id}}/dataset">{% if project.privacy %}Public{% else %}Private{%endif%}</a></td>
+          <td><a href="../project/{{project.id}}/dataset">{{project.members}}</a></td>
         </tr>
         {% endfor %}
   </table>
