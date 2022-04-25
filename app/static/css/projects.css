@@ -1,0 +1,23 @@
+#projects {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 90%;
+    margin: auto;
+  }
+  
+#projects td, #projects th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+  
+#projects tr:nth-child(even){background-color: #f2f2f2;}
+  
+#projects tr:hover {background-color: #ddd;}
+  
+#projects th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #04AA6D;
+    color: white;
+}

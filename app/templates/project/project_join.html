@@ -1,8 +1,29 @@
 {% extends "parent.html" %}
 {% block content %}
+<head>
+  <link href="/static/css/projects.css" rel="stylesheet">
+</head>
+
 <body>
-    <h3 class="text-center text-info">Project(s)</h3>
-    <table>
+  <h3 class="text-center text-info">Invitation(s) received</h3>
+  <table id="projects">
+        <tr>
+          <th>Name</th>
+          <th>Project</th>
+          <th>Join</th>
+        </tr>
+        {% for invitation in invitations %}
+        <tr>
+          <td>{{invitation.invited_by.creator}}</a></td>
+          <td>{{invitation.invited_to.name}}</td>
+          <td><a href="../acceptinvit/{{invitation.id}}/{{invitation.invited}}">accept</a></td>
+        </tr>
+        {% endfor %}
+  </table>
+  <br><br>
+
+  <h3 class="text-center text-info">Public Project(s)</h3>
+    <table id="projects">
         <tr>
           <th>Name</th>
           <th>Members</th>
@@ -13,21 +34,6 @@
           <td>{{project.creator.username}}/{{project.name}}</td>
           <td>{{project.members}}</td>
           <td><a href="../joined/{{project.id}}">Join</a></td>
-        </tr>
-        {% endfor %}
-  </table>
-  <h3 class="text-center text-info">Invitation(s)</h3>
-    <table>
-        <tr>
-          <th>Name</th>
-          <th>Project</th>
-          <th>Join</th>
-        </tr>
-        {% for invitation in invitations %}
-        <tr>
-          <td>{{invitation.invited_by.creator}}</a></td>
-          <td>{{invitation.invited_to.name}}</td>
-          <td><a href="../joined/{{invitation.id}}">accept</a></td>
         </tr>
         {% endfor %}
   </table>

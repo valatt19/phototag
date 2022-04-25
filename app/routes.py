@@ -417,31 +417,33 @@ def project_join():
 
     return render_template("project/project_join.html", projects=final_public_projects, invitations=private)
 
-# Join a project
-@app.route("/project/join/")
-def project_join():
-    public_projects = Project.query.filter(Project.privacy==1)
-    final_public_projects = []
-    for p in public_projects:
-        if not p in current_user.getMyProjects():
-            final_public_projects.append(p)
-
-    private_projects = Invitation.query.all()
-    private = []
-    for p2 in private_projects:
-        if not p2 in current_user.getInvitation():
-            private.append(p2)
-
-    return render_template("project/project_join.html", projects=final_public_projects, invitations=private)
-
 # User click on join a project
 @app.route("/project/joined/<int:project_id>")
 def project_joined(project_id):
     project_joined = Project.query.get(project_id)
-    if project_joined.privacy == 1 or project_joined.privacy == 0:
+
+    if project_joined.privacy == 1:
         project_joined.addMember(current_user)
         db.session.commit()
+
         return redirect(url_for('dataset_overview', project_id=project_joined.id))
+
+    return redirect(url_for('project_join'))
+
+# User click on join a project
+@app.route("/project/acceptinvit/<int:invit_id>/<int:project_id>")
+def project_accept_invit(invit_id, project_id):
+    project_joined = Project.query.get(project_id)
+    invit = Invitation.query.get(invit_id)
+
+    # Verification project is private and the invit correspond to correct project
+    if project_joined.privacy == 0 and invit.invited == project_id:
+        project_joined.addMember(current_user)
+        Invitation.query.filter(Invitation.id == invit_id).delete()
+        db.session.commit()
+
+        return redirect(url_for('dataset_overview', project_id=project_joined.id))
+
     return redirect(url_for('project_join'))
 
 @app.route("/added/<int:project_id>/<int:user_id>/")
