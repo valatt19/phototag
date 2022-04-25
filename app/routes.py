@@ -26,8 +26,7 @@ import requests
 
 from app.models import Image, User, users, Project, PWReset,Invitation
 from app import db,domain
-
-
+from . import smtpConfig
 
 #For google login
 GOOGLE_CLIENT_ID ="790952338581-eo6eir5djsu1cn1j2butat647t7kp0lc.apps.googleusercontent.com"
@@ -213,10 +212,11 @@ def pwresetrq_post():
             db.session.add(user_reset)
         db.session.commit()
 
-        #email : pphototag@gmail.com
-        #password : Phototag2022
 
-        yag = yagmail.SMTP('pphototag')
+        email = smtpConfig.EMAIL
+        pwd = smtpConfig.PASSWORD
+
+        yag = yagmail.SMTP(user=email,password=pwd)
         print(domain)
         contents = ['Please go to this URL to reset your password:', request.host + url_for("pwreset_get",  id = (str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
