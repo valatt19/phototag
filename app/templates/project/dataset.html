@@ -4,8 +4,9 @@
 .img_dataset {
   border: 1px solid #ddd; /* Gray border */
   border-radius: 4px;  /* Rounded border */
-  padding: 5px; /* Some padding */
-  width: 100px; /* Set a small width */
+  padding: 10px; /* Some padding */
+  width: 170px; /* Set a small width */
+  height: 200px;
 }
 
 /* Add a hover effect (blue shadow) */
@@ -16,8 +17,8 @@
 /* Parent Container */
 .content_img{
  position: relative;
- width: 150px;
- height: 150px;
+ width: 200px;
+ height: 210px;
  float: left;
  margin-right: 8px;
 }
@@ -27,6 +28,7 @@
  position: absolute;
  bottom: 0;
  right: 0;
+    float: left;
  background: black;
  color: white;
  margin-bottom: 5px;
@@ -36,6 +38,7 @@
  -webkit-transition: visibility 0s, opacity 0.5s linear;
  transition: visibility 0s, opacity 0.5s linear;
 }
+
 
 /* Hover on Parent Container */
 .content_img:hover{
@@ -47,6 +50,7 @@
  padding: 8px 15px;
  visibility: visible;
  opacity: 0.7;
+    float: left;
 }
 </style>
     <body>
