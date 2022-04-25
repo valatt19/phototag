@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, DateField, SelectField
 from wtforms.widgets import TextArea
 from wtforms.validators import InputRequired, DataRequired, Length, NoneOf, EqualTo, Email
-from app.models import users
+from app.models import User
 
 # Form for enter a login
 class LoginForm(FlaskForm):
@@ -13,6 +13,7 @@ class LoginForm(FlaskForm):
 
 # Form for register
 class RegisterForm(FlaskForm):
+    users = [u.username for u in User.query.all()]
     firstname = StringField("First name:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters")])
     surname = StringField("Surname:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters")])
     username = StringField("Username:", validators=[InputRequired(), DataRequired(), Length(min=2, max=50,message="Between 2 and 50 characters"),NoneOf(values=users,message="This username is already used")])

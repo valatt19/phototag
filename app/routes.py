@@ -188,7 +188,6 @@ def register():
 
         db.session.add(user)
         db.session.commit()
-        users.append(form.username.data)
         flash("Congratulations, you are now a registered user!", "info")
 
         # add new user  dir
@@ -330,9 +329,7 @@ def update_user_info():
 @app.route("/delete_user/", methods=['POST'])
 @login_required
 def delete_user():
-    user = current_user
-    users.remove(user.username)
-    db.session.delete(user)
+    User.query.filter(User.id == current_user.id).delete()
     db.session.commit()
 
     logout_user()
@@ -511,6 +508,8 @@ def add(project_id):
         if u.id != project.creator_id and u not in project.getMembers():
             userTo_add.append(u)
     return render_template("project/users_add.html",project=project, users=userTo_add)
+
+
 
 ######################
 # In a project pages #
