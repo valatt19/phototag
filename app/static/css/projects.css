@@ -21,3 +21,13 @@
     background-color: #04AA6D;
     color: white;
 }
+
+tr:hover {
+    background: grey;
+}
+
+td a {
+    display: block;
+    color: inherit;
+    text-decoration: inherit;
+}

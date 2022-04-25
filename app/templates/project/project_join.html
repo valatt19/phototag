@@ -16,7 +16,11 @@
         <tr>
           <td>{{invitation.invited_by.creator}}</a></td>
           <td>{{invitation.invited_to.name}}</td>
-          <td><a href="../acceptinvit/{{invitation.id}}/{{invitation.invited}}">accept</a></td>
+          <td>
+            <div class="cellbutton">
+              <a href="../acceptinvit/{{invitation.id}}/{{invitation.invited}}">Accept</a>
+            </div>
+          </td>
         </tr>
         {% endfor %}
   </table>
@@ -33,7 +37,10 @@
         <tr>
           <td>{{project.creator.username}}/{{project.name}}</td>
           <td>{{project.members}}</td>
-          <td><a href="../joined/{{project.id}}">Join</a></td>
+          <td>
+            <div class="cellbutton">
+              <a href="../joined/{{project.id}}">Join</a>
+            </div></td>
         </tr>
         {% endfor %}
   </table>
