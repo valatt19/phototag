@@ -23,9 +23,8 @@ class ProjectUser(db.Model):
 class Invitation(db.Model):
     __tablename__ = "invits"
     id = db.Column(db.Integer, primary_key=True , index = True)
-    invited_by = db.relationship("Project",backref=db.backref('by',lazy=True))
-    invited_byid=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
-    invited_to = db.relationship("Project",backref=db.backref('to',lazy=True))
+    userId=db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    invited_to = db.relationship("Project")
     invited=db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
 
 
@@ -39,10 +38,10 @@ class Project(db.Model):
     name = db.Column(db.String(80),unique = True, nullable=False)
     privacy = db.Column(db.Boolean,default = True)
     classes = db.Column(MutableList.as_mutable(PickleType),default=[])
-    members = db.relationship("User", secondary=ProjectUser.__table__, backref="Project")
+    members = db.relationship("User", secondary=ProjectUser.__table__, backref=db.backref("Project"),overlaps="project,members")
     nb_membre = db.Column(db.Integer)
 
-    invitations=db.relationship("User", secondary=Invitation.__table__, backref="users")
+    invitations=db.relationship("User", secondary=Invitation.__table__,overlaps="invited_to")
     nb_invitation = db.Column(db.Integer,default=0)                                                                                                                         
     
     def invit(self,invit):
@@ -96,12 +95,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(80),unique=True, nullable=False)
     password = db.Column(db.String(16))
     password_hash = db.Column(db.String(16))
-    projects = db.relationship("Project", secondary=ProjectUser.__table__, backref="User")
+    projects = db.relationship("Project", secondary=ProjectUser.__table__,overlaps="Project,members")
+    invited= db.Column(db.Boolean,default=False)
     
     image_id = db.Column(db.Integer, db.ForeignKey('image.id'))
     image = db.relationship("Image", backref=db.backref('posts2', lazy=True),foreign_keys=[image_id])
 
-    invitations = db.relationship("Invitation",secondary=Project.__table__,backref="users")
+    invitations = db.relationship("Invitation",secondary=Project.__table__,overlaps="creator,posts",viewonly=True)
 
     def getInvitation(self):
         return self.invitations

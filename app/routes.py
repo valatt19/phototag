@@ -181,7 +181,6 @@ def login():
 
             # Ok for log in
             login_user(user)
-            flash("Logged in successfully.", "info")
             return redirect(url_for("project"))
 
     # GET
@@ -495,12 +494,21 @@ def project_accept_invit(invit_id, project_id):
     if project_joined.privacy == 0 and invit.invited == project_id:
         project_joined.addMember(current_user)
         Invitation.query.filter(Invitation.id == invit_id).delete()
+        current_user.invited=False
         db.session.commit()
 
         return redirect(url_for('dataset_overview', project_id=project_joined.id))
 
     return redirect(url_for('project_join'))
 
+
+# User click on decline an invitation
+@app.route("/project/declineinvit/<int:invit_id>")
+def project_decline_invit(invit_id):
+    Invitation.query.filter(Invitation.id == invit_id).delete()
+    current_user.invited=False
+    db.session.commit()
+    return redirect(url_for('project'))
 
 # [POST] invitation sent to user
 @app.route("/added/<int:project_id>/<int:user_id>/")
@@ -509,6 +517,7 @@ def add_user_private(project_id,user_id):
     get_user = User.query.get(user_id)
     if project_added.privacy == 0:
         project_added.invit(get_user)
+        get_user.invited = True
         db.session.commit()
         return redirect(url_for('project'))
     return redirect(url_for('add'))
