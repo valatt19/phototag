@@ -84,3 +84,14 @@ body{background: #f2f6f8;}
     background-color: #04AA6D;
     color: white;
 }
+
+#edit_controls li
+{
+    list-style-type:none;
+    display:inline-block;
+    color: black;
+}
+
+#value_box{
+    width: 150px;
+} 

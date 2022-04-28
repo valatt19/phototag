@@ -4,7 +4,23 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.4.0/fabric.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+        script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function()
+            {
+                $(".range").change(add_filter).mousemove(add_filter);
+            });
 
+            function add_filter()
+            {
+                var exposure_val=$("#exposure").val();
+                var contrast_val=$("#contrast").val();
+                var invert_val=$("#invert").val();
+                var saturate_val=$("#saturate").val();
+
+                $("#image").css("-webkit-filter","saturate("+saturate_val+"%) brightness("+exposure_val+"%) contrast("+contrast_val+"%) invert("+invert_val+"%)");
+            }
+        </script>
 
         <link href="/static/css/annotate.css" rel="stylesheet">
     </head>
@@ -59,6 +75,32 @@
                 </div>
                 <div id="imagetools">
                     <h3>Image</h3>
+                    <div id="edit_controls">
+                        <li>Saturate<br>
+                            <form>
+                                <input id="saturate" class="range" type="range" min="0" max="200" value="100" oninput="this.form.amountInput.value=this.value" />
+                                <input id="value_box" type="number" name="amountInput" min="0" max="200" value="100" oninput="this.form.amountRange.value=this.value" />
+                            </form>
+                        </li>
+                        <li>Exposure<br>
+                            <form>
+                                <input id="exposure" class="range" type="range" min="0" max="200" value="100" oninput="this.form.amountInput.value=this.value" />
+                                <input id="value_box" type="number" name="amountInput" min="0" max="200" value="100" oninput="this.form.amountRange.value=this.value" />
+                            </form>
+                        </li>
+                        <li>Contrast<br>
+                            <form>
+                                <input id="contrast" class="range" type="range" min="0" max="200" value="100" oninput="this.form.amountInput.value=this.value" />
+                                <input id="value_box" type="number" name="amountInput" min="0" max="200" value="100" oninput="this.form.amountRange.value=this.value" />
+                            </form>
+                        </li>
+                        <li>Invert<br>
+                            <form>
+                                <input id="invert" class="range" type="range" min="0" max="100" value="0" oninput="this.form.amountInput.value=this.value" />
+                                <input id="value_box" type="number" name="amountInput" min="0" max="100" value="0" oninput="this.form.amountRange.value=this.value" />
+                            </form>
+                        </li>
+                    </div>
                 </div>
             </div>
 

@@ -10,15 +10,20 @@
         <tr>
           <th>Name</th>
           <th>Project</th>
-          <th>Join</th>
+          <th colspan="2">Decision</th>
         </tr>
         {% for invitation in invitations %}
         <tr>
-          <td>{{invitation.invited_by.creator}}</a></td>
+          <td>{{invitation.invited_to.creator}}</a></td>
           <td>{{invitation.invited_to.name}}</td>
           <td>
             <div class="cellbutton">
               <a href="../acceptinvit/{{invitation.id}}/{{invitation.invited}}">Accept</a>
+            </div>
+          </td>
+          <td>
+            <div class="cellbutton2">
+              <a href="../declineinvit/{{invitation.id}}">Decline</a>
             </div>
           </td>
         </tr>

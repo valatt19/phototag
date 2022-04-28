@@ -5,6 +5,28 @@
 </head>
 
 <body>
+
+  {% if current_user.invited %}
+  <div class="row d-flex justify-content-center">
+    <div class="col-sm-6">
+      <div class="alert alert-dark" role="alert">
+        Some users has invited you to collaborate on their project <a href="../project/join" style="display: inline-block;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        background-color: #4183c4;
+        text-decoration: none;
+        width: auto!important;
+        text-align: center;
+        border-radius: 5px;
+        letter-spacing: normal;
+        font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;
+        margin: 0 auto;
+        padding: 6px 12px;">view invitation(s)</a>
+      </div>
+    </div>
+  </div>
+  {%endif%}
     <h3 class="text-center text-info">My Project(s)</h3>
     <table id="projects">
         <tr>
