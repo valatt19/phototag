@@ -41,22 +41,15 @@ let img_id;
 // When document is ready do //
 ///////////////////////////////
 
-$(document).ready(function() {
-
+function loading_page() {
     // Set zoom value and image depending on zoom value
-    // The waiting of 100 ms is useful to prevent loading problems on Firefox
-    setTimeout(function(){setZoom();}, 100);
+    setZoom();
 
     // Set colors values
     set_colors();
 
-    // Draw saved annotations and add them in the annotations list
-    ctx.lineWidth = 3;
-    ctxo.lineWidth = 3;
-
     boxes = $('#my_data').data("boxes"); //Load from backend list
-    previous_boxes.push(boxes); //Load 1st version of boces
-    
+    previous_boxes.push(boxes); //Load 1st version of boxes
     setInterval(mainDraw, INTERVAL);
 
     setAnnotationsList(boxes);
@@ -64,5 +57,12 @@ $(document).ready(function() {
 
     img_id = $('#my_data').data("img");
     socket.on("update", update);
+}
+
+$(document).ready(function() {
+
+    // Set zoom value, colors, and previous savec annotations on page
+    // The waiting of 20 ms is useful to prevent loading problems on Firefox
+    setTimeout(function(){loading_page();}, 20);
 
 });

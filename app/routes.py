@@ -123,17 +123,22 @@ def callback():
     # Check if user with same email is not already registred
     user= User.query.filter_by(username=username).first()
 
-    # Doesn't exist? Add it to the database.
+    # Doesn't exist? Add it to the database + redirect to set password page
     if user is None:
         user = User(
             username=username,firstname =userinfo_response.json()["given_name"], surname=second, email=userinfo_response.json()["email"]
         )
-    db.session.add(user)
-    db.session.commit()
-    login_user(user)
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
 
-   # Redirection to create a password
-    return redirect((url_for('set_pswd_get')))
+        # Redirection to create a password
+        return redirect((url_for('set_pswd_get')))
+    
+    # Account already created, google used to login
+    else :
+        login_user(user)
+        return redirect((url_for('project')))
 
 ## Page for choosing a password for the user that used Google login
 @app.route("/set_pswd", methods=["GET"])
@@ -262,7 +267,6 @@ def pwresetrq_post():
         pwd = smtpConfig.PASSWORD
 
         yag = yagmail.SMTP(user=email,password=pwd)
-        print(domain)
         contents = ['Please go to this URL to reset your password:', request.host + url_for("pwreset_get",  id = (str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
         flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
@@ -290,7 +294,6 @@ def pwreset_post(id):
                .update({'password':request.form["password"],'password_hash':generate_password_hash(request.form["password"])}))
         db.session.commit()
 
-        print('mdp update ok')
     except IntegrityError:
         flash("Something went wrong", "danger")
         db.session.rollback()
@@ -679,7 +682,6 @@ def refresh(img_id):
 @socketio.on('disconnect')
 def test_disconnect():
     # Remove user in working list
-    print("disconnected " + current_user.username)
     current_user.setImage(None)
     db.session.commit()
 
@@ -693,17 +695,15 @@ def save_json(project_id, img_id):
     if image.project_id != project_id or not project.isMember(current_user):
         return jsonify({"impossible": True, "response": "Can't modify this file"}), 200
 
-    # Get the annotations data and update it for image
+    # Get the annotations data and update it for the image + add element in log
     data = request.get_json()
     user = current_user
     date = datetime.now()
     image.update_annotations(data['html_data'][0], date, user)
-    print(data['html_data'])
     image.add_log(username=user.username, modif=data['html_data'][1], type=data['html_data'][3],
                   tool=data['html_data'][2], date=date)
 
     refresh(img_id)
-
     resp = {"success": True, "response": "File saved"}
     return jsonify(resp), 200
 

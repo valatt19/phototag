@@ -5,6 +5,10 @@ body{background: #f2f6f8;}
     z-index:1;
 }
 
+#pannel{
+    padding-bottom: 5px;
+}
+
 #container{
     display: flex;
 }
@@ -92,6 +96,19 @@ body{background: #f2f6f8;}
     color: black;
 }
 
-#value_box{
+#value_box2{
     width: 150px;
+}
+  
+.next {
+    background-color: #04AA6D;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    padding: 3px 10px;
+}
+
+.next a:hover {
+    background-color: #ddd;
+    color: black;
 }
