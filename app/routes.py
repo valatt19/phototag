@@ -7,7 +7,7 @@ from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
-from app import app, socketio, keygenerator
+from app import app, socketio, keygenerator, plugin_manager
 
 from flask import render_template, redirect
 from flask import url_for, request, flash, jsonify
@@ -27,6 +27,9 @@ import requests
 from app.models import Image, User, users, Project, PWReset,Invitation
 from app import db,domain
 from . import smtpConfig
+
+from flask_plugins import get_enabled_plugins, get_plugin, emit_event
+
 
 ####################
 # For GOOGLE Login #
@@ -353,6 +356,23 @@ def delete_user():
     logout_user()
     return redirect(url_for('home'))
 
+
+###########
+# Plugins #
+###########
+
+@app.route("/disable/<plugin>")
+def disable(plugin):
+    plugin = get_plugin(plugin)
+    plugin_manager.disable_plugins([plugin])
+    return redirect(url_for("home"))
+
+
+@app.route("/enable/<plugin>")
+def enable(plugin):
+    plugin = get_plugin(plugin)
+    plugin_manager.enable_plugins([plugin])
+    return redirect(url_for("home"))
 
 
 ##################
