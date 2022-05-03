@@ -7,3 +7,7 @@ werkzeug~=2.0.3
 flask-socketio
 SQLAlchemy~=1.4.31
 config~=0.5.1
+pytz~=2022.1
+yagmail~=0.15.277
+python-magic~=0.4.25
+opencv-python~=4.5.5.64

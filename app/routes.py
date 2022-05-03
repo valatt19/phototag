@@ -22,7 +22,10 @@ from xml.dom import minidom
 
 from app.models import Image, User, users, Project, PWReset
 from app import db
+import magic
+import mimetypes
 
+from app.utilsPhotoTag import *
 
 ##############
 # Home pages #
@@ -232,6 +235,7 @@ def project():
 @app.route("/project/new/", methods=["GET", "POST"])
 @login_required
 def project_create():
+
     if request.method == 'POST':
         # check that name does not exist
         if Project.query.filter(Project.name == request.form["pname"]).count() != 0:
@@ -297,18 +301,64 @@ def project_create():
             # save the file in the server
             file = uploaded_files[i]
             filename = secure_filename(file.filename)
-            path = new_dir + "/" + filename
-            file.save(path)
 
-            # get the size of the file in KO
-            size = int(os.stat(path).st_size / 1000)
 
-            # create Image object
-            img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
-            db.session.add(img)
-            db.session.commit()
+            """magic = magic.Magic()
+            mimestart = magic.from_file(filename).split('/')[0]"""
+            mimetypes.init()
 
-            ps += 1
+            mimestart = mimetypes.guess_type(filename)[0]
+
+            if mimestart is not None:
+                mimestart = mimestart.split('/')[0]
+
+
+                if mimestart in ['video']:
+                    print("media types")
+                    path = new_dir + "/"+filename
+                    file.save(path)
+
+                    folderVid = filename.strip(".mp4")
+                    folderVid= folderVid.strip(".MP4")
+                    folderVid= folderVid.strip(".mpeg")
+                    folderVid= folderVid.strip(".m4v")
+                    folderVid= folderVid.strip(".mpg")
+                    folderVid= folderVid.strip(".avi")
+
+                    #imageDestination = new_dir + "/"+folderVid+"/"
+                    imageDestination = new_dir + "/"
+                    #os.mkdir(imageDestination)
+
+                    cut_Video(path,imageDestination)
+                    from os import listdir
+                    from os.path import isfile, join
+                    onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
+                    for pic in onlyfiles:
+
+                        # get the size of the file in KO
+                        size = int(os.stat(imageDestination+pic).st_size / 1000)
+
+                        # create Image object
+                        img = Image(name=pic, path=imageDestination[3:]+pic, size=size, last_time=datetime.now(),
+                                    last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+                        db.session.add(img)
+                        db.session.commit()
+                        ps += 1
+
+                else:
+
+                    path = new_dir + "/" + filename
+                    file.save(path)
+
+                    # get the size of the file in KO
+                    size = int(os.stat(path).st_size / 1000)
+
+                    # create Image object
+                    img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+                    db.session.add(img)
+                    db.session.commit()
+
+                    ps += 1
 
         return redirect(url_for('dataset_overview', project_id=pr.id))
 
