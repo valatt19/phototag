@@ -36,9 +36,4 @@ from flask_plugins import PluginManager
 
 plugin_manager = PluginManager(app)
 
-class AppPlugin(Plugin):
-    def register_blueprint(self, blueprint, **kwargs):
-        """Registers a blueprint."""
-        current_app.register_blueprint(blueprint, **kwargs)
-
 from app import routes

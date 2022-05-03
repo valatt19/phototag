@@ -1,8 +1,8 @@
 from flask import flash, Blueprint, render_template, render_template_string
 from flask_plugins import connect_event
-from app import AppPlugin
+from app.models import AppPlugin
 
-__plugin__ = "ZoomImage"
+__plugin__ = "Zoom"
 __version__ = "1.0.0"
 
 
@@ -37,7 +37,7 @@ def index():
     return render_template("hello.html")
 
 
-class HelloWorld(AppPlugin):
+class Zoom(AppPlugin):
 
     def setup(self):
         self.register_blueprint(hello, url_prefix="/hello")

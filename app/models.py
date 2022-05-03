@@ -7,6 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from xml.etree.cElementTree import Element, ElementTree, SubElement, dump, tostring
 from sqlalchemy.ext.mutable import MutableList
+from flask_plugins import Plugin
+from flask import current_app
 
 
 #-----------------------------Projets/User---------------------------------
@@ -219,3 +221,9 @@ users = []
 @login_manager.user_loader
 def user_loader(userid):
     return User.query.get(int(userid))
+
+#-----------------------Parent Class Plugins-----------------------------------
+class AppPlugin(Plugin):
+    def register_blueprint(self, blueprint, **kwargs):
+        """Registers a blueprint."""
+        current_app.register_blueprint(blueprint, **kwargs)

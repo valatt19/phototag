@@ -613,7 +613,7 @@ def project_settings(project_id):
 
     members = project.getMembers()
 
-    return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), classes=project.classes, exportConfig = config)
+    return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), classes=project.classes, exportConfig = config, plugins=get_enabled_plugins())
 
 
 # User removed by creator of project
