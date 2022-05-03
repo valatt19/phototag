@@ -1,6 +1,7 @@
 flask~=2.0.3
 flask_login
 flask_wtf
+flask-plugins
 wtforms~=3.0.1
 flask_sqlalchemy
 werkzeug~=2.0.3
