@@ -3,7 +3,7 @@ from __future__ import annotations
 import mimetypes
 import uuid
 from os import listdir
-from os.path import isfile
+from os.path import isfile, join
 
 import pytz
 import yagmail
