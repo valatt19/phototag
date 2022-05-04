@@ -1,6 +1,10 @@
 from __future__ import annotations
 
+import mimetypes
 import uuid
+from os import listdir
+from os.path import isfile
+
 import pytz
 import yagmail
 from sqlalchemy import exists
@@ -26,6 +30,7 @@ import requests
 
 from app.models import Image, User, users, Project, PWReset,Invitation
 from app import db,domain
+from app.utilsPhotoTag import cut_Video
 from . import smtpConfig
 
 ####################
@@ -371,12 +376,13 @@ def project():
 @app.route("/project/new/", methods=["GET", "POST"])
 @login_required
 def project_create():
+
     if request.method == 'POST':
         # check that name does not exist
         if Project.query.filter(Project.name == request.form["pname"]).count() != 0:
             return redirect(request.url)
 
-        # check that there are files
+        # check that there is files
         if 'files[]' not in request.files:
             return redirect(request.url)
         uploaded_files = request.files.getlist('files[]')
@@ -385,7 +391,7 @@ def project_create():
         if len(uploaded_files) < 1:
             return redirect(request.url)
 
-        # Add new project dir
+        # add new project dir
         new_dir = app.config['UPLOAD_FOLDER'] + "/" + current_user.username + "/" + request.form["pname"]
         if not os.path.isdir(new_dir):
             os.mkdir(new_dir)
@@ -438,21 +444,58 @@ def project_create():
             filename = secure_filename(file.filename)
             path = new_dir + "/" + filename
             file.save(path)
+            mimetypes.init()
 
-            # get the size of the file in KO
-            size = int(os.stat(path).st_size / 1000)
+            mimestart = mimetypes.guess_type(filename)[0]
 
-            # create Image object
-            img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
-            db.session.add(img)
-            db.session.commit()
+            if mimestart is not None:
+                mimestart = mimestart.split('/')[0]
 
-            ps += 1
+
+                if mimestart in ['video']:
+                    print("media types")
+
+                    folderVid = filename.strip(".mp4")
+                    folderVid= folderVid.strip(".MP4")
+                    folderVid= folderVid.strip(".mpeg")
+                    folderVid= folderVid.strip(".m4v")
+                    folderVid= folderVid.strip(".mpg")
+                    folderVid= folderVid.strip(".avi")
+
+                    imageDestination = new_dir + "/"
+
+                    cut_Video(path,folderVid,imageDestination)
+
+                    onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
+                    #vid = Video(name=folderVid, projet = pr)
+
+                    for pic in onlyfiles:
+                        if "_imageFromVideo_" in pic:
+                            # get the size of the file in KO
+                            size = int(os.stat(imageDestination+pic).st_size / 1000)
+
+                            # create Image object
+                            img = Image(name=pic, path=imageDestination[3:]+pic, size=size, last_time=datetime.now(),
+                                        last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+                            db.session.add(img)
+                            db.session.commit()
+                            ps += 1
+
+                else:
+
+                    # get the size of the file in KO
+                    size = int(os.stat(path).st_size / 1000)
+
+                    # create Image object
+                    img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+                    db.session.add(img)
+                    db.session.commit()
+
+                    ps += 1
 
         return redirect(url_for('dataset_overview', project_id=pr.id))
 
     return render_template("project/create.html")
-
 
 # Join a public project or a private project (with invitation)
 @app.route("/project/join/")
