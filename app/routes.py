@@ -20,11 +20,12 @@ from datetime import datetime, timedelta
 import json
 from xml.dom import minidom
 
-from app.models import Image, User, users, Project, PWReset
+from app.models import Image, User, users, Project, PWReset, Video
 from app import db
-import magic
-import mimetypes
 
+import mimetypes
+from os import listdir
+from os.path import isfile, join
 from app.utilsPhotoTag import *
 
 ##############
@@ -301,10 +302,8 @@ def project_create():
             # save the file in the server
             file = uploaded_files[i]
             filename = secure_filename(file.filename)
-
-
-            """magic = magic.Magic()
-            mimestart = magic.from_file(filename).split('/')[0]"""
+            path = new_dir + "/" + filename
+            file.save(path)
             mimetypes.init()
 
             mimestart = mimetypes.guess_type(filename)[0]
@@ -315,8 +314,6 @@ def project_create():
 
                 if mimestart in ['video']:
                     print("media types")
-                    path = new_dir + "/"+filename
-                    file.save(path)
 
                     folderVid = filename.strip(".mp4")
                     folderVid= folderVid.strip(".MP4")
@@ -325,30 +322,26 @@ def project_create():
                     folderVid= folderVid.strip(".mpg")
                     folderVid= folderVid.strip(".avi")
 
-                    #imageDestination = new_dir + "/"+folderVid+"/"
                     imageDestination = new_dir + "/"
-                    #os.mkdir(imageDestination)
 
-                    cut_Video(path,imageDestination)
-                    from os import listdir
-                    from os.path import isfile, join
+                    cut_Video(path,folderVid,imageDestination)
+
                     onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
+                    vid = Video(name=folderVid, projet = pr)
+
                     for pic in onlyfiles:
+                        if "_imageFromVideo_" in pic:
+                            # get the size of the file in KO
+                            size = int(os.stat(imageDestination+pic).st_size / 1000)
 
-                        # get the size of the file in KO
-                        size = int(os.stat(imageDestination+pic).st_size / 1000)
-
-                        # create Image object
-                        img = Image(name=pic, path=imageDestination[3:]+pic, size=size, last_time=datetime.now(),
-                                    last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
-                        db.session.add(img)
-                        db.session.commit()
-                        ps += 1
+                            # create Image object
+                            img = Image(name=pic, path=imageDestination[3:]+pic, size=size, last_time=datetime.now(),
+                                        last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+                            db.session.add(img)
+                            db.session.commit()
+                            ps += 1
 
                 else:
-
-                    path = new_dir + "/" + filename
-                    file.save(path)
 
                     # get the size of the file in KO
                     size = int(os.stat(path).st_size / 1000)
