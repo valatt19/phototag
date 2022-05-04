@@ -436,6 +436,8 @@ def project_create():
         db.session.add(pr)
         db.session.commit()
 
+        #Add image in project
+
         # loop on each file on the folder imported
         ps = 0 # variable used to indicate position of image in dataset
         for i in range(len(uploaded_files)):
@@ -463,12 +465,14 @@ def project_create():
                     folderVid= folderVid.strip(".avi")
 
                     imageDestination = new_dir + "/"
-
-                    cut_Video(path,folderVid,imageDestination)
+                    pathVid = path
+                    cut_Video(pathVid,folderVid,imageDestination)
 
                     onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
                     #vid = Video(name=folderVid, projet = pr)
 
+                    if os.path.exists(pathVid):
+                        os.remove(pathVid)
                     for pic in onlyfiles:
                         if "_imageFromVideo_" in pic:
                             # get the size of the file in KO
