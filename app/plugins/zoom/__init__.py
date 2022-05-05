@@ -5,47 +5,19 @@ from app.models import AppPlugin
 __plugin__ = "Zoom"
 __version__ = "1.0.0"
 
-
-def hello_world():
-    flash("Hello World from {} Plugin".format(__plugin__), "success")
-
-
-def hello_world2():
-    flash("Hello World 2 from {} Plugin".format(__plugin__), "success")
-
-
-def inject_hello_world():
+def inject_zoom_script():
     return "<h1>Hello World Injected</h1>"
 
+zoom = Blueprint("hello", __name__, template_folder="templates")
 
-def inject_hello_world2():
-    return "<h1>Hello World 2 Injected</h1>"
-
-
-def inject_navigation_link():
-    return render_template_string(
-        """
-            <li><a href="{{ url_for('hello.index') }}">Hello</a></li>
-        """)
-
-
-hello = Blueprint("hello", __name__, template_folder="templates")
-
-
-@hello.route("/")
+@zoom.route("/")
 def index():
-    return render_template("hello.html")
+    return render_template("zoom.html")
 
 
 class Zoom(AppPlugin):
 
     def setup(self):
-        self.register_blueprint(hello, url_prefix="/hello")
+        self.register_blueprint(zoom, url_prefix="/zoom")
 
-        connect_event("after_navigation", hello_world)
-        connect_event("after_navigation", hello_world2)
-
-        connect_event("tmpl_before_content", inject_hello_world)
-        connect_event("tmpl_before_content", inject_hello_world2)
-
-        connect_event("tmpl_navigation_last", inject_navigation_link)
+        connect_event("tmpl_before_content", inject_zoom_script)
