@@ -60,7 +60,7 @@ function deleteBoxe(index) {
 // It only ever does something if the canvas gets invalidated
 function mainDraw() {
     if (canvasValid == false) {
-        clear(ctxo);
+        clear(ctx);
     
         // draw all boxes
         let l = boxes.length;
@@ -68,7 +68,7 @@ function mainDraw() {
             let b = boxes[i];
             if (b.tool == "rect") {
                 // Box is a rectangle
-                drawRect(ctxo,b.type,b.x*zoom,b.y*zoom,b.x*zoom+b.w*zoom,b.y*zoom+b.h*zoom);
+                drawRect(ctx,b.type,b.x*zoom,b.y*zoom,b.x*zoom+b.w*zoom,b.y*zoom+b.h*zoom);
             } else {
                 // Box is a free form
                 // Adapt coordinates with zoom factor
@@ -77,7 +77,7 @@ function mainDraw() {
                     let point = b.p[j]
                     bp.push({x:point.x*zoom, y:point.y*zoom})
                 }
-                drawFree(ctxo,b.type,bp);
+                drawFree(ctx,b.type,bp);
             }
         }
         canvasValid = true;

@@ -7,7 +7,8 @@ var img_ele = null,
 function zoom_image(newzoom) {
     zoom = newzoom;
     setImageZoom();
-    mainDraw();
+    invalidate();
+    setInterval(mainDraw, INTERVAL);
 }
   
 function start_drag() {
