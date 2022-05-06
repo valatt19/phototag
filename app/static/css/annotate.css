@@ -11,6 +11,8 @@ body{background: #f2f6f8;}
 
 #container{
     display: flex;
+    height: 100%;
+    width: 100%;
 }
 
 #principal{

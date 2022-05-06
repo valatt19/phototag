@@ -35,7 +35,9 @@
             <a><b>Download:</b></a>
             <button onclick="download_image()">Image</button>
             <button onclick="download_json()">Json</button>
-            <button onclick="download_log()">Log</button>
+            <button onclick="download_log()" style="margin-right: 20px;">Log</button>
+
+            {{ emit_event("tmpl_before_content_annotate_pannel") }}
 
             <div id="username" style="float:right">
             {% for user in working %}
@@ -44,8 +46,9 @@
             </div>
             {% endfor %}
             </div>
-            <a style="float:right ; margin-right: 3px;"><b>Live users:</b></a>
 
+            <a style="float:right ; margin-right: 3px;"><b>Live users:</b></a>
+        
         </div>
 
         <div id="container">

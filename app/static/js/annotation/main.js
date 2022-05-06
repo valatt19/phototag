@@ -4,6 +4,9 @@
 
 // ZOOM
 let zoom = 1;
+let init_zoom = 1;
+let img_h;
+let img_w;
 
 // COLORS
 let colors = [];
@@ -43,7 +46,9 @@ let img_id;
 
 function loading_page() {
     // Set zoom value and image depending on zoom value
-    setZoom();
+    computeZoom();
+    init_zoom = zoom;
+    setImageZoom();
 
     // Set colors values
     set_colors();
