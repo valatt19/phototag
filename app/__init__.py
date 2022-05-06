@@ -1,5 +1,5 @@
 # Import and init flask app
-from flask import Flask
+from flask import Flask, current_app
 from config import Config
 app = Flask(__name__)
 
@@ -30,5 +30,10 @@ db = SQLAlchemy(app)
 from flask_socketio import SocketIO
 
 socketio = SocketIO(app)
+
+# Import and init plugin manager
+from flask_plugins import PluginManager
+
+plugin_manager = PluginManager(app)
 
 from app import routes

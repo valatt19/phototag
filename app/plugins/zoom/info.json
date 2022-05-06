@@ -1,0 +1,8 @@
+{
+    "identifier": "zoom",
+    "name":"Zoom Image",
+    "author": "phototag",
+    "license":"BSD",
+    "description":"A Plugin to zoom images in annotations tasks",
+    "version":"1.0.0"
+}
