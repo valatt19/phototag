@@ -12,7 +12,8 @@ def inject_zoom_script():
             <a><b>Zoom:</b></a>
             <input type='button' id='zoomout' class='button' value='Zoom out'>
             <input type='button' id='zoomin' class='button' value='Zoom in''>
-            <input type='button' id='zoomreset' class='button' value='Reset' style='margin-right: 20px;'>
+            <input type='button' id='zoomreset' class='button' value='Reset'>
+            <a>CTRL + Mouse to move image </a style='margin-right: 20px;'>
             <script src="{{url_for('zoom.static',filename='zoom_image.js')}}"></script>
         """
     )
