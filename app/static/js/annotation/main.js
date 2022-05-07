@@ -36,6 +36,9 @@ let log = "";
 
 let isNearZone = 4; // For polygon tool, distance within magic join is done
 
+let relative_pos_left = 0; // Relative position of image in annotation container (by default on top-left corner)
+let relative_pos_top = 0;
+
 //A web socket connection to the server using socketio.
 const socket = io();
 let img_id;

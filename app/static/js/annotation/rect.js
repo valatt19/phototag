@@ -14,8 +14,8 @@ function addRect(){
         e.stopPropagation();
     
         // save the starting x/y of the rectangle
-        startX = parseInt(e.clientX - offsetX);
-        startY = parseInt(e.clientY - offsetY);
+        startX = parseInt(e.clientX - offsetX) - relative_pos_left;
+        startY = parseInt(e.clientY - offsetY) - relative_pos_top;
     
         // set a flag indicating the drag has begun
         isDown = true;
@@ -56,8 +56,8 @@ function addRect(){
         }
     
         // get the current mouse position
-        mouseX = parseInt(e.clientX - offsetX - scrollX);
-        mouseY = parseInt(e.clientY - offsetY - scrollY);
+        mouseX = parseInt(e.clientX - offsetX - scrollX) - relative_pos_left;
+        mouseY = parseInt(e.clientY - offsetY - scrollY) - relative_pos_top;
     
         // Put your mousemove stuff here
     
@@ -136,20 +136,16 @@ function modifyRect(index) {
 
     // Happens when the mouse is moving inside the canvas
     function myMove(e){
-        if (isDrag) {
-            getMouse(e);
-        
-            boxes[mySel].x = mx - offsetx;
-            boxes[mySel].y = my - offsety;   
-        
-            // something is changing position so we better invalidate the canvas!
-            invalidate();
-        } else if (isResizeDrag) {
+        if (isResizeDrag) {
 
             // time ro resize!
             let oldx = boxes[mySel].x;
             let oldy = boxes[mySel].y;
-        
+            
+            // Adapt coordinates in function of 
+            mx = mx - relative_pos_left;
+            my = my - relative_pos_top;
+
             // 0  1  2
             // 3     4
             // 5  6  7
@@ -217,8 +213,8 @@ function modifyRect(index) {
         
             // we dont need to use the ghost context because
             // selection handles will always be rectangles
-            if (mx >= cur.x && mx <= cur.x + mySelBoxSize &&
-                my >= cur.y && my <= cur.y + mySelBoxSize) {
+            if (mx - relative_pos_left >= cur.x && mx - relative_pos_left <= cur.x + mySelBoxSize &&
+                my - relative_pos_top>= cur.y && my - relative_pos_top <= cur.y + mySelBoxSize) {
                 // we found one!
                 expectResize = i;
                 invalidate();

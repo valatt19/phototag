@@ -82,8 +82,8 @@ function addLasso(){
         ctx.strokeStyle = `hsl(${colors[current]},75%,50%)`;
         ctxo.strokeStyle = `hsl(${colors[current]},75%,50%)`;
 
-        mouseX = parseInt(e.clientX - offsetX);
-        mouseY = parseInt(e.clientY - offsetY);
+        mouseX = parseInt(e.clientX - offsetX) - relative_pos_left;
+        mouseY = parseInt(e.clientY - offsetY) - relative_pos_top;
 
         isDown = true;
         start = {x: mouseX, y: mouseY} ;
@@ -96,8 +96,8 @@ function addLasso(){
     function handleMouseMove(e) {
         e.preventDefault();
         e.stopPropagation();
-        mouseX = parseInt(e.clientX - offsetX);
-        mouseY = parseInt(e.clientY - offsetY);
+        mouseX = parseInt(e.clientX - offsetX) - relative_pos_left;
+        mouseY = parseInt(e.clientY - offsetY) - relative_pos_top;
 
         if (isDown == false) {
             return; 

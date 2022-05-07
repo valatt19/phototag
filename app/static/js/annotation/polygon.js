@@ -10,8 +10,8 @@ function addPolygon(){
         e.preventDefault();
         e.stopPropagation();
         
-        mouseX = parseInt(e.clientX - offsetX);
-        mouseY = parseInt(e.clientY - offsetY);
+        mouseX = parseInt(e.clientX - offsetX) - relative_pos_left;
+        mouseY = parseInt(e.clientY - offsetY) - relative_pos_top;
 
         // Polygon finished : save it on show layer and in annotations list
         if (points.length > 2 && isNear(mouseX,mouseY,points[0].x,points[0].y,isNearZone)) {
@@ -62,8 +62,8 @@ function addPolygon(){
         }
     
         // get the current mouse position
-        mouseX = parseInt(e.clientX - offsetX - scrollX);
-        mouseY = parseInt(e.clientY - offsetY - scrollY);
+        mouseX = parseInt(e.clientX - offsetX - scrollX) - relative_pos_left;
+        mouseY = parseInt(e.clientY - offsetY - scrollY) - relative_pos_top;
 
         // Draw
         clear(ctx);
@@ -122,15 +122,11 @@ function modifyPolygon(index) {
 
     // Happens when the mouse is moving inside the canvas
     function myMove(e){
-        if (isDrag) {
-            getMouse(e);
-        
-            boxes[mySel].p[expectResize].x = mx/zoom - offsetX;
-            boxes[mySel].p[expectResize].y = my/zoom - offsetY;  
-        
-            // something is changing position so we better invalidate the canvas!
-            invalidate();
-        } else if (isResizeDrag) {
+        if (isResizeDrag) {
+            // Adapt coordinates in function of 
+            mx = mx - relative_pos_left;
+            my = my - relative_pos_top;
+
             boxes[mySel].p[expectResize].x = mx/zoom;
             boxes[mySel].p[expectResize].y = my/zoom;
 
@@ -160,8 +156,8 @@ function modifyPolygon(index) {
             
                 // we dont need to use the ghost context because
                 // selection handles will always be rectangles
-                if (mx >= cur.x && mx <= cur.x + mySelBoxSize &&
-                    my >= cur.y && my <= cur.y + mySelBoxSize) {
+                if (mx - relative_pos_left >= cur.x && mx - relative_pos_left <= cur.x + mySelBoxSize &&
+                    my - relative_pos_top >= cur.y && my - relative_pos_top <= cur.y + mySelBoxSize) {
                     // we found one!
                     expectResize = i;
                     invalidate();

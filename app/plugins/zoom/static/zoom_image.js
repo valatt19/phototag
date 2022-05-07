@@ -1,8 +1,5 @@
 var cntrlIsPressed = false;
 
-var relative_pos_left;
-var relative_pos_top;
-
 var img_ele = null,
     x_cursor = 0,
     y_cursor = 0,
@@ -35,34 +32,47 @@ function while_drag() {
         var x_cursor = window.event.clientX;
         var y_cursor = window.event.clientY;
         if (img_ele !== null) {
-            relative_pos_left = (x_cursor - x_img_ele) + 'px';
-            relative_pos_top = (y_cursor - y_img_ele) + 'px';
+            relative_pos_left = (x_cursor - x_img_ele);
+            relative_pos_top = (y_cursor - y_img_ele);
 
-            img_ele.style.left = relative_pos_left;
-            img_ele.style.top = relative_pos_top;
+            img_ele.style.left = relative_pos_left + 'px';
+            img_ele.style.top = relative_pos_top + 'px';
 
             var img = document.getElementById('image');
-            img.style.left = relative_pos_left;
-            img.style.top = relative_pos_top;
+            img.style.left = relative_pos_left + 'px';
+            img.style.top = relative_pos_top + 'px';
 
             var layerShow = document.getElementById('layerShow');
-            layerShow.style.left = relative_pos_left;
-            layerShow.style.top = relative_pos_top;
+            layerShow.style.left = relative_pos_left + 'px';
+            layerShow.style.top = relative_pos_top + 'px';
         }
     }
+}
+
+function reset_drag() {
+    var img = document.getElementById('layerDraw');
+    img.style.left = '0px';
+    img.style.top = '0px';
+
+    var layerShow = document.getElementById('layerShow');
+    layerShow.style.left = '0px';
+    layerShow.style.top = '0px';
 }
 
 function add_listeners() {
     document.getElementById('zoomout').addEventListener('click', function() {
         zoom_image(0.75*zoom);
+        reset_drag();
     });
     
     document.getElementById('zoomin').addEventListener('click', function() {
         zoom_image(1.25*zoom);
+        reset_drag();
     });
 
     document.getElementById('zoomreset').addEventListener('click', function() {
         zoom_image(init_zoom);
+        reset_drag();
     });
 
     $(document).keydown(function(event){
