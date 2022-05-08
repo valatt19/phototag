@@ -10,13 +10,16 @@ def getFrame(sec, vidcap, count, imageDestination, videoName):
     return hasFrames
 
 
-def cut_Video(videopath, videoName, imageDestination):
+def cut_Video(videopath, videoName, imageDestination,frame):
     # vidcap = cv2.VideoCapture('C:/Users/babca/Pictures/Camera Roll/video.mp4')
+
     vidcap = cv2.VideoCapture(videopath)
     sec = 0
-    frameRate = 0.5  # //it will capture image in each 0.5 second
+    frameRate = int(frame)  # //it will capture image in each 0.5 second
     count = 1
+
     success = getFrame(sec, vidcap, count, imageDestination,videoName)
+
     while success:
         count = count + 1
         sec = sec + frameRate

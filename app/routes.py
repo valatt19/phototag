@@ -24,23 +24,21 @@ from datetime import datetime, timedelta
 import json
 from xml.dom import minidom
 
-
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 
-from app.models import Image, User, users, Project, PWReset,Invitation
-from app import db,domain
+from app.models import Image, User, users, Project, PWReset, Invitation, Video
+from app import db, domain
 from app.utilsPhotoTag import cut_Video
 from . import smtpConfig
 
 from flask_plugins import get_enabled_plugins, get_plugin, emit_event
 
-
 ####################
 # For GOOGLE Login #
 ####################
-#store the Google Client ID and Client Secret
-GOOGLE_CLIENT_ID ="790952338581-eo6eir5djsu1cn1j2butat647t7kp0lc.apps.googleusercontent.com"
+# store the Google Client ID and Client Secret
+GOOGLE_CLIENT_ID = "790952338581-eo6eir5djsu1cn1j2butat647t7kp0lc.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
 GOOGLE_DISCOVERY_URL = (
     "https://accounts.google.com/.well-known/openid-configuration"
@@ -58,7 +56,8 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 def home():
     return redirect(url_for("login"))
 
-#This function retrieves Google’s provider configuration
+
+# This function retrieves Google’s provider configuration
 def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
 
@@ -66,60 +65,59 @@ def get_google_provider_cfg():
 # Login with Google
 @app.route("/login/google/login/", methods=["GET", "POST"])
 def login2():
-
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
-   
+
     # Use library to construct the request for Google login and provide
     # scopes that let you retrieve user's profile from Google
-    request_uri=client.prepare_request_uri(
+    request_uri = client.prepare_request_uri(
         authorization_endpoint,
         redirect_uri=request.base_url + "callback",
-        scope=["openid","email","profile"],
+        scope=["openid", "email", "profile"],
     )
     return redirect(request_uri)
+
 
 # When Google sends back that unique code, it will be sending
 # it to this login callback endpoint on your application
 @app.route("/login/google/login/callback")
 def callback():
-
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
     # Find out what URL to hit to get tokens that allow you to ask for
     # things on behalf of a user
     google_provider_cfg = get_google_provider_cfg()
-    token_endpoint=google_provider_cfg["token_endpoint"]
+    token_endpoint = google_provider_cfg["token_endpoint"]
 
     # Prepare and send a request to get tokens
-    token_url,headers,body=client.prepare_token_request(
+    token_url, headers, body = client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,
         redirect_url=request.base_url,
         code=code,
     )
-    token_response=requests.post(
+    token_response = requests.post(
         token_url,
         headers=headers,
         data=body,
-        auth=(GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET),
+        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
     )
     # Parse the tokens
     client.parse_request_body_response(json.dumps(token_response.json()))
 
     # find and hit the URL from Google that gives the user's profile information
-    userinfo_endpoint=google_provider_cfg["userinfo_endpoint"]
-    uri,headers,body=client.add_token(userinfo_endpoint)
-    userinfo_response=requests.get(uri,headers=headers, data=body)
+    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+    uri, headers, body = client.add_token(userinfo_endpoint)
+    userinfo_response = requests.get(uri, headers=headers, data=body)
 
-    #verify if the email is verified
+    # verify if the email is verified
     # The user authenticated with Google authorized
     # we've verified their email through Google!
     if userinfo_response.json().get("email_verified"):
         second = userinfo_response.json()["family_name"]
-        username = userinfo_response.json()["given_name"]+ second
+        username = userinfo_response.json()["given_name"] + second
     else:
         return "User email not available or not verified by Google.", 400
 
@@ -129,12 +127,13 @@ def callback():
         os.mkdir(new_dir)
 
     # Check if user with same email is not already registred
-    user= User.query.filter_by(username=username).first()
+    user = User.query.filter_by(username=username).first()
 
     # Doesn't exist? Add it to the database + redirect to set password page
     if user is None:
         user = User(
-            username=username,firstname =userinfo_response.json()["given_name"], surname=second, email=userinfo_response.json()["email"]
+            username=username, firstname=userinfo_response.json()["given_name"], surname=second,
+            email=userinfo_response.json()["email"]
         )
         db.session.add(user)
         db.session.commit()
@@ -142,18 +141,20 @@ def callback():
 
         # Redirection to create a password
         return redirect((url_for('set_pswd_get')))
-    
+
     # Account already created, google used to login
-    else :
+    else:
         login_user(user)
         return redirect((url_for('project')))
+
 
 ## Page for choosing a password for the user that used Google login
 @app.route("/set_pswd", methods=["GET"])
 def set_pswd_get():
     return render_template('choose_pswd.html')
 
-#[Post] for the password ask
+
+# [Post] for the password ask
 @app.route("/set_pswd", methods=["POST"])
 def set_pswd():
     user = current_user
@@ -211,7 +212,8 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         # Add the user in the dict of users
-        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data, email=form.email.data)
+        user = User(username=form.username.data, firstname=form.firstname.data, surname=form.surname.data,
+                    email=form.email.data)
         user.set_password(form.password.data)
 
         db.session.add(user)
@@ -270,14 +272,14 @@ def pwresetrq_post():
             db.session.add(user_reset)
         db.session.commit()
 
-
         email = smtpConfig.EMAIL
         pwd = smtpConfig.PASSWORD
 
-        yag = yagmail.SMTP(user=email,password=pwd)
-        contents = ['Please go to this URL to reset your password:', request.host + url_for("pwreset_get",  id = (str(key)))]
+        yag = yagmail.SMTP(user=email, password=pwd)
+        contents = ['Please go to this URL to reset your password:',
+                    request.host + url_for("pwreset_get", id=(str(key)))]
         yag.send(request.form["email"], 'Reset your password', contents)
-        flash("Hello "+user.username + ", check your email for a link to reset your password.", "success")
+        flash("Hello " + user.username + ", check your email for a link to reset your password.", "success")
 
         return redirect(url_for("home"))
     else:
@@ -298,8 +300,9 @@ def pwreset_post(id):
 
     user_reset = db.session.query(PWReset).filter_by(reset_key=id).one()
     try:
-        exists(db.session.query(User).filter_by(id = user_reset.user_id)
-               .update({'password':request.form["password"],'password_hash':generate_password_hash(request.form["password"])}))
+        exists(db.session.query(User).filter_by(id=user_reset.user_id)
+               .update(
+            {'password': request.form["password"], 'password_hash': generate_password_hash(request.form["password"])}))
         db.session.commit()
 
     except IntegrityError:
@@ -333,22 +336,22 @@ def pwreset_get(id):
 
 
 # Profile page to update personal infos or to delete profile
-@app.route("/profile/", methods=['GET', 'POST']) #view function to update a task
+@app.route("/profile/", methods=['GET', 'POST'])  # view function to update a task
 @login_required
 def update_user_info():
-        form = EditUserForm()
-        if form.validate_on_submit():
-                current_user.firstname = form.firstname.data
-                current_user.surname = form.surname.data
-                db.session.commit()
-                flash("Your changes have been saved.", "info")
-                return redirect(url_for('project'))
+    form = EditUserForm()
+    if form.validate_on_submit():
+        current_user.firstname = form.firstname.data
+        current_user.surname = form.surname.data
+        db.session.commit()
+        flash("Your changes have been saved.", "info")
+        return redirect(url_for('project'))
 
-        elif request.method == 'GET':
-                form.firstname.data = current_user.firstname
-                form.surname.data = current_user.surname     
-   
-        return render_template ('profile.html', form = form)
+    elif request.method == 'GET':
+        form.firstname.data = current_user.firstname
+        form.surname.data = current_user.surname
+
+    return render_template('profile.html', form=form)
 
 
 # Delete current user (asked by him)
@@ -396,7 +399,6 @@ def project():
 @app.route("/project/new/", methods=["GET", "POST"])
 @login_required
 def project_create():
-
     if request.method == 'POST':
         # check that name does not exist
         if Project.query.filter(Project.name == request.form["pname"]).count() != 0:
@@ -450,16 +452,17 @@ def project_create():
                 final_classes.append(elem.firstChild.data)
 
         # Add project in DB
-        pr = Project(creator=current_user, name=request.form["pname"], privacy=ptype, classes=final_classes, nb_membre=0)
+        pr = Project(creator=current_user, name=request.form["pname"], privacy=ptype, classes=final_classes,
+                     nb_membre=0)
         pr.addMember(current_user)
 
         db.session.add(pr)
         db.session.commit()
 
-        #Add image in project
-
+        # Add image in project
+        listVideo = []
         # loop on each file on the folder imported
-        ps = 0 # variable used to indicate position of image in dataset
+        ps = 0  # variable used to indicate position of image in dataset
         for i in range(len(uploaded_files)):
             # save the file in the server
             file = uploaded_files[i]
@@ -473,37 +476,23 @@ def project_create():
             if mimestart is not None:
                 mimestart = mimestart.split('/')[0]
 
-
                 if mimestart in ['video']:
-                    print("media types")
 
-                    folderVid = filename.strip(".mp4")
-                    folderVid= folderVid.strip(".MP4")
-                    folderVid= folderVid.strip(".mpeg")
-                    folderVid= folderVid.strip(".m4v")
-                    folderVid= folderVid.strip(".mpg")
-                    folderVid= folderVid.strip(".avi")
+                    nameVid = filename.strip(".mp4")
+                    nameVid = nameVid.strip(".MP4")
+                    nameVid = nameVid.strip(".mpeg")
+                    nameVid = nameVid.strip(".m4v")
+                    nameVid = nameVid.strip(".mpg")
+                    nameVid = nameVid.strip(".avi")
 
                     imageDestination = new_dir + "/"
                     pathVid = path
-                    cut_Video(pathVid,folderVid,imageDestination)
 
-                    onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
-                    #vid = Video(name=folderVid, projet = pr)
+                    aVideo = Video(name=nameVid, path=pathVid, imageDestination=imageDestination, project_id=pr.id)
+                    listVideo.append(aVideo)
+                    db.session.add(aVideo)
+                    db.session.commit()
 
-                    if os.path.exists(pathVid):
-                        os.remove(pathVid)
-                    for pic in onlyfiles:
-                        if "_imageFromVideo_" in pic:
-                            # get the size of the file in KO
-                            size = int(os.stat(imageDestination+pic).st_size / 1000)
-
-                            # create Image object
-                            img = Image(name=pic, path=imageDestination[3:]+pic, size=size, last_time=datetime.now(),
-                                        last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
-                            db.session.add(img)
-                            db.session.commit()
-                            ps += 1
 
                 else:
 
@@ -511,20 +500,70 @@ def project_create():
                     size = int(os.stat(path).st_size / 1000)
 
                     # create Image object
-                    img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(), last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
+                    img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(),
+                                last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
                     db.session.add(img)
                     db.session.commit()
 
                     ps += 1
 
-        return redirect(url_for('dataset_overview', project_id=pr.id))
+        if len(listVideo) == 0:
+            return redirect(url_for('dataset_overview', project_id=pr.id))
+        else:
+            return redirect(url_for('chooseframe', project_id=pr.id))
 
     return render_template("project/create.html")
+
+
+@app.route("/project/create/videoFrameRate/<int:project_id>/", methods=["GET", "POST"])
+def chooseframe(project_id):
+
+    listVideo = Video.query.filter((Video.project_id == project_id))
+    if request.method == 'POST':
+
+        project = Project.query.get(project_id)
+        project_name = project.name
+        imageOfProject = Image.query.filter((Image.project_id == project_id))  # Get all images of the dataset
+        ps= 0
+        for img in imageOfProject:
+            ps+=1
+        for video in listVideo:
+
+            id_video = "frame_"+str(video.id)
+            frame = request.form[id_video]
+
+            pathVid = video.path
+            nameVid = video.name
+            imageDestination = video.imageDestination
+            video.setFrameRate(frame)
+            cut_Video(pathVid, nameVid, imageDestination, frame)
+            onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
+
+            if os.path.exists(pathVid):
+                os.remove(pathVid)
+
+            for pic in onlyfiles:
+                if "_imageFromVideo_" in pic:
+                    # get the size of the file in KO
+                    size = int(os.stat(imageDestination + pic).st_size / 1000)
+
+                    # create Image object
+                    img = Image(name=pic, path=imageDestination[3:] + pic, size=size, last_time=datetime.now(),
+                                last_person=current_user, annotations=[], nb_annotations=0, project=project,
+                                project_pos=ps)
+                    db.session.add(img)
+                    db.session.commit()
+                    ps += 1
+        return redirect(url_for('dataset_overview', project_id=project.id))
+
+    else:
+        return render_template("project/chooseframerate",videos=listVideo)
+
 
 # Join a public project or a private project (with invitation)
 @app.route("/project/join/")
 def project_join():
-    public_projects = Project.query.filter(Project.privacy==1)
+    public_projects = Project.query.filter(Project.privacy == 1)
     final_public_projects = []
     for p in public_projects:
         if not p in current_user.getMyProjects():
@@ -564,7 +603,7 @@ def project_accept_invit(invit_id, project_id):
     if project_joined.privacy == 0 and invit.invited == project_id:
         project_joined.addMember(current_user)
         Invitation.query.filter(Invitation.id == invit_id).delete()
-        current_user.invited=False
+        current_user.invited = False
         db.session.commit()
 
         return redirect(url_for('dataset_overview', project_id=project_joined.id))
@@ -576,13 +615,14 @@ def project_accept_invit(invit_id, project_id):
 @app.route("/project/declineinvit/<int:invit_id>")
 def project_decline_invit(invit_id):
     Invitation.query.filter(Invitation.id == invit_id).delete()
-    current_user.invited=False
+    current_user.invited = False
     db.session.commit()
     return redirect(url_for('project'))
 
+
 # [POST] invitation sent to user
 @app.route("/added/<int:project_id>/<int:user_id>/")
-def add_user_private(project_id,user_id):
+def add_user_private(project_id, user_id):
     project_added = Project.query.get(project_id)
     get_user = User.query.get(user_id)
     if project_added.privacy == 0:
@@ -594,7 +634,7 @@ def add_user_private(project_id,user_id):
 
 
 # Page to list users (not already member of a project) and send them invitation to join the project
-@app.route("/project/<int:project_id>/add/") 
+@app.route("/project/<int:project_id>/add/")
 def add(project_id):
     all_users = User.query.all()
     userTo_add = []
@@ -602,8 +642,7 @@ def add(project_id):
     for u in all_users:
         if u.id != project.creator_id and u not in project.getMembers():
             userTo_add.append(u)
-    return render_template("project/users_add.html",project=project, users=userTo_add)
-
+    return render_template("project/users_add.html", project=project, users=userTo_add)
 
 
 ######################
@@ -614,7 +653,7 @@ def add(project_id):
 @app.route("/project/<int:project_id>/dataset/")
 @login_required
 def dataset_overview(project_id):
-    dataset = Image.query.filter((Image.project_id == project_id)) # Get all images of the dataset
+    dataset = Image.query.filter((Image.project_id == project_id))  # Get all images of the dataset
     project = Project.query.get(project_id)
     project_name = project.name
 
@@ -627,7 +666,8 @@ def dataset_overview(project_id):
     for img in dataset:
         working.append(User.query.filter(User.image_id == img.id))
 
-    return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project, user=current_user.username, working = working)
+    return render_template("project/dataset.html", dataset=dataset, id=project_id, name=project_name, project=project,
+                           user=current_user.username, working=working)
 
 
 # Users overview of a project (list of members)
@@ -645,9 +685,9 @@ def project_settings(project_id):
     # User want to add a new class
     if request.method == 'POST':
         if len(request.form["newclass"]) >= 1 and current_user.id == project.creator.id:
-           project.addClass(request.form["newclass"])
-           db.session.commit()
-        
+            project.addClass(request.form["newclass"])
+            db.session.commit()
+
         return redirect(url_for('project_settings', project_id=project_id))
 
     project = Project.query.get(project_id)
@@ -660,7 +700,9 @@ def project_settings(project_id):
 
     members = project.getMembers()
 
-    return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project, user=current_user.username, can_remove = (current_user.id==project.creator.id), classes=project.classes, exportConfig = config, plugins=get_enabled_plugins())
+    return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project,
+                           user=current_user.username, can_remove=(current_user.id == project.creator.id),
+                           classes=project.classes, exportConfig=config, plugins=get_enabled_plugins())
 
 
 # User removed by creator of project
@@ -670,7 +712,7 @@ def project_users_remove(project_id, user_id):
     user = User.query.get(user_id)
 
     # Check that current user is creator of project and not triying to remove creator
-    if current_user.id == project.creator.id and project.creator.id != user_id :
+    if current_user.id == project.creator.id and project.creator.id != user_id:
         project.removeMember(user)
         db.session.commit()
 
@@ -683,7 +725,7 @@ def project_privacy_switch(project_id):
     project = Project.query.get(project_id)
 
     # Check that current user is creator
-    if current_user.id == project.creator.id :
+    if current_user.id == project.creator.id:
         project.changePrivacy()
         db.session.commit()
 
@@ -723,7 +765,8 @@ def annotate_image(project_id, img_id):
 
     refresh(image.id)
 
-    return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next, classes=project.classes, boxes=boxes, project=project, working=working, log=log)
+    return render_template("project/annotate.html", image=image, img_id=image.id, prev=prev, next=next,
+                           classes=project.classes, boxes=boxes, project=project, working=working, log=log)
 
 
 # SOCKET used to refresh annotation page when modifications are made by other user
@@ -739,7 +782,7 @@ def refresh(img_id):
     for user in working:
         users_live.append(user.username)
 
-    #Generate new log with latest updates
+    # Generate new log with latest updates
     log = img.generate_log()
 
     socketio.emit("update", (boxes, img_id, users_live, log))
@@ -775,7 +818,6 @@ def save_json(project_id, img_id):
     return jsonify(resp), 200
 
 
-
 ##################
 # Error handling #
 ##################
@@ -783,20 +825,22 @@ def save_json(project_id, img_id):
 # Show custom error pages
 @app.errorhandler(404)
 def handler404(error):
-    return render_template("error/errorpage.html",code=404)
+    return render_template("error/errorpage.html", code=404)
+
 
 @app.errorhandler(403)
 def handler403(error):
-    return render_template("error/errorpage.html",code=403)
+    return render_template("error/errorpage.html", code=403)
+
 
 @app.errorhandler(400)
 def handler400(error):
-    return render_template("error/errorpage.html",code=400)
+    return render_template("error/errorpage.html", code=400)
+
 
 @app.errorhandler(500)
 def handler404(error):
-    return render_template("error/errorpage.html",code=500)
-
+    return render_template("error/errorpage.html", code=500)
 
 
 ########

@@ -210,6 +210,20 @@ class Image(db.Model):
             txt = txt + "\n" + line["modification"].upper() + " " + line["tool"].upper() + " (Class = " + line["type"] + ")\n\tUser: " + line["user"] + "\n\tDate: " + line["date"].strftime('%Y-%m-%d %H:%M') + "\n"
         return txt
 
+#---------------------------Video------------------------------------------
+class Video(db.Model):
+    __tablename__ = "video"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(80),unique = False, nullable=False)
+    path = db.Column(db.String(80),unique=False,nullable=False)
+    imageDestination = db.Column(db.String(80),unique = False, nullable=False)
+    frameRate = db.Column(db.Integer)
+    project_id = db.Column(db.Integer, db.ForeignKey("project.id"), nullable=False)
+    #project = db.relationship("Project", backref=db.backref('posts3', lazy=True))
+
+    def setFrameRate(self,frame):
+        self.frameRate = frame
 
 #-------------------------Launch DB-------------------------------------------
 db.create_all()

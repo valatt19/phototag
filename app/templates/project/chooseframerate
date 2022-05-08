@@ -1,0 +1,30 @@
+{% extends "parent.html" %}
+{% block content %}
+<head>
+  <title>CHoose your frame rate</title>
+</head>
+
+<body>
+  <h3 class="text-center text-info">Video Cutter</h3>
+  <form action="" method="POST" >
+
+  <table id="videos">
+        <tr>
+          <th>Video name</th>
+          <th>FrameRate</th>
+        </tr>
+        {% for video in videos %}
+        <tr>
+          <td>{{video.name}}</td>
+          <td>
+            <div class="form-group"></div>
+            <input class="form-control" id="frame_{{video.id}}" name="frame_{{video.id}}" required autocomplete="off">
+          </td>
+        </tr>
+        {% endfor %}
+  </table>
+  <input class="btn btn-success" id="submit" type="submit" value="Submit">
+  </form>
+  <br><br>
+</body>
+{% endblock %}
