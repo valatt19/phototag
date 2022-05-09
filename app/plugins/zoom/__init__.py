@@ -8,12 +8,15 @@ __version__ = "1.0.0"
 # Render html code of plugin zoom with button zoom
 def inject_zoom_script():
     return render_template_string(
-        """
-            <a><b>Zoom:</b></a>
-            <input type='button' id='zoomout' class='button' value='Zoom out'>
-            <input type='button' id='zoomin' class='button' value='Zoom in''>
-            <input type='button' id='zoomreset' class='button' value='Reset'>
-            <a>CTRL + Mouse to move image </a style='margin-right: 20px;'>
+        """ <li>
+                <form>
+                    <label>Zoom</label><br>
+                    <input type='button' id='zoomout' class='button' value='&#10134;'>
+                    <input type='button' id='zoomin' class='button' value='&#10133;'>
+                    <input type='button' id='zoomreset' class='button' value='Reset'>
+                    <a>CTRL + Mouse to move image </a>
+                </form>
+            </li>
             <script src="{{url_for('zoom.static',filename='zoom_image.js')}}"></script>
         """
     )

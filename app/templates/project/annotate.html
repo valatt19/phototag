@@ -37,8 +37,6 @@
             <button onclick="download_json()">Json</button>
             <button onclick="download_log()" style="margin-right: 20px;">Log</button>
 
-            {{ emit_event("tmpl_before_content_annotate_pannel") }}
-
             <div id="username" style="float:right">
             {% for user in working %}
             <div class="avatar-circle">
@@ -87,11 +85,12 @@
                                 <input id="value_box2" type="number" name="amountInput" min="0" max="100" value="0" oninput="this.form.amountRange.value=this.value;add_filter();" />
                             </form>
                         </li>
+                        {{ emit_event("tmpl_before_content_annotate_pannel") }}
                     </div>
                 </div>
                 <br>
                 <div id="current">
-                    <h3>Current object</h3>
+                    <h3>Class selected</h3>
                     <ul id="classes">
                         {% for c in classes %}
                             <li id="c{{loop.index-1}}" style="cursor: pointer; padding: 5px; text-align: center; font-size: 14px;" onclick="set_current('{{loop.index-1}}')">{{c}}</li>

@@ -1,4 +1,4 @@
-body{background: #f2f6f8;}
+body{background: white;}
 
 #image{
     position:absolute;
@@ -7,6 +7,8 @@ body{background: #f2f6f8;}
 
 #pannel{
     padding-bottom: 5px;
+    background: #ededed;
+    border-bottom: 3px solid grey;
 }
 
 #container{
@@ -18,7 +20,7 @@ body{background: #f2f6f8;}
 #principal{
     background: white; 
     position:relative; 
-    border: 1px grey;
+    outline: 3px solid grey;
 }
 
 #right-pannel{
@@ -114,4 +116,12 @@ body{background: #f2f6f8;}
 .next a:hover {
     background-color: #ddd;
     color: black;
+}
+
+button {
+    padding: 3px 10px;
+    display: inline-block;
+    font-size: 17px;
+    cursor: pointer;
+    border-radius: 5px;
 }

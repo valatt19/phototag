@@ -34,6 +34,15 @@ from . import smtpConfig
 
 from flask_plugins import get_enabled_plugins, get_plugin, emit_event
 
+##############
+# Home page #
+##############
+
+# Homepage
+@app.route('/')
+def home():
+    return redirect(url_for("login"))
+
 ####################
 # For GOOGLE Login #
 ####################
@@ -45,17 +54,6 @@ GOOGLE_DISCOVERY_URL = (
 )
 # OAuth 2 client setup
 client = WebApplicationClient(GOOGLE_CLIENT_ID)
-
-
-##############
-# Home pages #
-##############
-
-# Homepage
-@app.route('/')
-def home():
-    return redirect(url_for("login"))
-
 
 # This function retrieves Google’s provider configuration
 def get_google_provider_cfg():
@@ -171,6 +169,10 @@ def set_pswd():
     return redirect(url_for('project'))
 
 
+################
+# Normal Login #
+################
+
 # Normal Login
 @app.route("/login/", methods=["GET", "POST"])
 def login():
@@ -229,13 +231,16 @@ def register():
 
     return render_template("register.html", form=form)
 
-
 # Logout
 @app.route("/logout/")
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
+
+###################
+# Password Forget #
+###################
 
 # Display  forgot password page
 @app.route("/pwresetrq", methods=["GET"])
@@ -335,6 +340,10 @@ def pwreset_get(id):
     return render_template('resetPassword.html', id=key)
 
 
+#################
+# Profile pages #
+#################
+
 # Profile page to update personal infos or to delete profile
 @app.route("/profile/", methods=['GET', 'POST'])  # view function to update a task
 @login_required
@@ -365,24 +374,6 @@ def delete_user():
     return redirect(url_for('home'))
 
 
-###########
-# Plugins #
-###########
-
-@app.route("/disable/<plugin>")
-def disable(plugin):
-    plugin = get_plugin(plugin)
-    plugin_manager.disable_plugins([plugin])
-    return redirect(url_for("home"))
-
-
-@app.route("/enable/<plugin>")
-def enable(plugin):
-    plugin = get_plugin(plugin)
-    plugin_manager.enable_plugins([plugin])
-    return redirect(url_for("home"))
-
-
 ##################
 # Projects pages #
 ##################
@@ -394,6 +385,10 @@ def project():
     projects = current_user.getMyProjects()
     return render_template("project/project.html", projects=projects)
 
+
+#####################
+# Projects creation #
+#####################
 
 # Create a new project
 @app.route("/project/new/", methods=["GET", "POST"])
@@ -507,6 +502,7 @@ def project_create():
 
                     ps += 1
 
+        # If there is at least 1 video, redirect user to a select frame rate page
         if len(listVideo) == 0:
             return redirect(url_for('dataset_overview', project_id=pr.id))
         else:
@@ -514,15 +510,17 @@ def project_create():
 
     return render_template("project/create.html")
 
-
+# Page to make the user choose the framerate when parsing video into images
 @app.route("/project/create/videoFrameRate/<int:project_id>/", methods=["GET", "POST"])
 def chooseframe(project_id):
+    project = Project.query.get(project_id)
+    # Check that current user is the creator of the project
+    if project.creator != current_user:
+        return redirect(url_for("project"))
 
     listVideo = Video.query.filter((Video.project_id == project_id))
     if request.method == 'POST':
 
-        project = Project.query.get(project_id)
-        project_name = project.name
         imageOfProject = Image.query.filter((Image.project_id == project_id))  # Get all images of the dataset
         ps= 0
         for img in imageOfProject:
@@ -557,8 +555,12 @@ def chooseframe(project_id):
         return redirect(url_for('dataset_overview', project_id=project.id))
 
     else:
-        return render_template("project/chooseframerate",videos=listVideo)
+        return render_template("project/chooseframerate.html",videos=listVideo)
 
+
+###############################
+# Adding members in projects  #
+###############################
 
 # Join a public project or a private project (with invitation)
 @app.route("/project/join/")
@@ -670,6 +672,10 @@ def dataset_overview(project_id):
                            user=current_user.username, working=working)
 
 
+####################
+# Project settings #
+####################
+
 # Users overview of a project (list of members)
 @app.route("/project/<int:project_id>/settings/", methods=["GET", "POST"])
 @login_required
@@ -731,6 +737,10 @@ def project_privacy_switch(project_id):
 
     return redirect(url_for('project_settings', project_id=project_id))
 
+
+#####################
+# Annotation routes #
+#####################
 
 # Annotate an image of a project
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
