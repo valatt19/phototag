@@ -149,7 +149,7 @@ def callback():
 ## Page for choosing a password for the user that used Google login
 @app.route("/set_pswd", methods=["GET"])
 def set_pswd_get():
-    return render_template('choose_pswd.html')
+    return render_template('login/choose_pswd.html')
 
 
 # [Post] for the password ask
@@ -200,7 +200,7 @@ def login():
             return redirect(url_for("project"))
 
     # GET
-    return render_template("login.html", form=form)
+    return render_template("login/login.html", form=form)
 
 
 # Register
@@ -229,7 +229,7 @@ def register():
 
         return redirect(url_for("login"))
 
-    return render_template("register.html", form=form)
+    return render_template("login/register.html", form=form)
 
 # Logout
 @app.route("/logout/")
@@ -245,7 +245,7 @@ def logout():
 # Display  forgot password page
 @app.route("/pwresetrq", methods=["GET"])
 def pwresetrq_get():
-    return render_template('forgotPage.html')
+    return render_template('login/forgotPage.html')
 
 
 # Send a request to change password
@@ -337,7 +337,7 @@ def pwreset_get(id):
               " here.", "danger")
 
         return redirect(url_for("pwresetrq_get"))
-    return render_template('resetPassword.html', id=key)
+    return render_template('login/resetPassword.html', id=key)
 
 
 #################
@@ -360,7 +360,7 @@ def update_user_info():
         form.firstname.data = current_user.firstname
         form.surname.data = current_user.surname
 
-    return render_template('profile.html', form=form)
+    return render_template('login/profile.html', form=form)
 
 
 # Delete current user (asked by him)
