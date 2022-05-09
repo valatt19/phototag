@@ -834,22 +834,22 @@ def save_json(project_id, img_id):
 
 # Show custom error pages
 @app.errorhandler(404)
-def handler404(error):
+def handler404():
     return render_template("error/errorpage.html", code=404)
 
 
 @app.errorhandler(403)
-def handler403(error):
+def handler403():
     return render_template("error/errorpage.html", code=403)
 
 
 @app.errorhandler(400)
-def handler400(error):
+def handler400():
     return render_template("error/errorpage.html", code=400)
 
 
 @app.errorhandler(500)
-def handler404(error):
+def handler404():
     return render_template("error/errorpage.html", code=500)
 
 

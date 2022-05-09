@@ -4,10 +4,12 @@ import sys
 sys.path.append('../')
 
 from app.models import Project, User, Image
-from app import db
-
+from app import app
+from flask_sqlalchemy import SQLAlchemy
 import random
 import string
+
+testdb = SQLAlchemy(app)
 
 # Class of unit tests for models
 class Test_models(unittest.TestCase):
@@ -16,8 +18,8 @@ class Test_models(unittest.TestCase):
     def test_user_creation_same_username(self):
         
         # Reinit DB
-        db.drop_all()
-        db.create_all()
+        testdb.drop_all()
+        testdb.create_all()
 
         admin = User(username="admin",firstname="Admin",surname="Admin")
 
@@ -28,29 +30,29 @@ class Test_models(unittest.TestCase):
             result_str = ''.join(random.choice(characters) for j in range(length))
 
             admin.set_password(result_str)
-            db.session.add(admin)
+            testdb.session.add(admin)
 
             self.assertTrue(admin.check_password(result_str))
 
-        db.drop_all()
+        testdb.drop_all()
 
     # Test that 2 userscan't have same username
     def test_project_add_member(self):
         
         # Reinit DB
-        db.drop_all()
-        db.create_all()
+        testdb.drop_all()
+        testdb.create_all()
 
         # Double creation of project and user added
         admin = User(username="admin",firstname="Admin",surname="Admin")
         admin.set_password("admin")
-        db.session.add(admin)
+        testdb.session.add(admin)
         pr = Project(creator = admin, name = "name", privacy=1, classes=["first class", "second class"], nb_membre=0)
         pr.addMember(admin)
 
         self.assertTrue(pr.nb_membre==1)
 
-        db.drop_all()
+        testdb.drop_all()
 
 if __name__ == "__main__":
         unittest.main()
