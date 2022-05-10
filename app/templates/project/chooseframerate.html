@@ -1,17 +1,17 @@
 {% extends "parent.html" %}
 {% block content %}
 <head>
-  <title>CHoose your frame rate</title>
+  <title>Choose your frame rate</title>
 </head>
 
-<body>
+<body style="margin:auto">
   <h3 class="text-center text-info">Video Cutter</h3>
   <form action="" method="POST" >
 
-  <table id="videos">
+  <table id="videos" style="margin-left: 20px;">
         <tr>
           <th>Video name</th>
-          <th>FrameRate</th>
+          <th>Frame rate <br>(Interval between each image cut in sec)</th>
         </tr>
         {% for video in videos %}
         <tr>
@@ -23,7 +23,7 @@
         </tr>
         {% endfor %}
   </table>
-  <input class="btn btn-success" id="submit" type="submit" value="Submit">
+  <input class="btn btn-success" id="submit" type="submit" value="Submit" style="margin-left: 20px;">
   </form>
   <br><br>
 </body>
