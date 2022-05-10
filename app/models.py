@@ -83,6 +83,18 @@ class Project(db.Model):
         xmlstr = tostring(node_config, encoding='utf8',method="xml")
         return xmlstr
 
+    def getNbAnnotatedTotalsImages(self):
+        images = Image.query.filter((Image.project_id == self.id))
+        nb_images = 0
+        nb_annotated_images = 0
+
+        for img in images:
+            nb_images+=1
+            if img.nb_annotations > 0 :
+                nb_annotated_images += 1
+
+        return nb_images, nb_annotated_images
+
 
 #----------------------------User-----------------------------------------------
 """ Table representing an User, it uses the UserMixin layout (for logins, lougout, ...). 

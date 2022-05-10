@@ -30,15 +30,19 @@
     <h3 class="text-center text-info">My Project(s)</h3>
     <table id="projects">
         <tr>
+          <th>Creator</th>
           <th>Name</th>
           <th>Privacy</th>
           <th>Members</th>
+          <th>Images annotated</th>
         </tr>
         {% for project in projects %}
         <tr>
-          <td><a href="../project/{{project.id}}/dataset"><b>{{project.creator.username}}/{{project.name}}</b></a></td>
-          <td><a href="../project/{{project.id}}/dataset">{% if project.privacy %}Public{% else %}Private{%endif%}</a></td>
+          <td><a href="../project/{{project.id}}/dataset"><b>{{project.creator.username}}</b></a></td>
+          <td><a href="../project/{{project.id}}/dataset"><b>{{project.name}}</b></a></td>
+          <td><a href="../project/{{project.id}}/dataset">{% if project.privacy %}Public &#127760;{% else %}Private &#128274;{%endif%}</a></td>
           <td><a href="../project/{{project.id}}/dataset">{{project.members}}</a></td>
+          <td><a href="../project/{{project.id}}/dataset">{{project.getNbAnnotatedTotalsImages()[1]}}/{{project.getNbAnnotatedTotalsImages()[0]}}</a></td>
         </tr>
         {% endfor %}
   </table>

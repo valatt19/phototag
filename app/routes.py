@@ -360,7 +360,7 @@ def update_user_info():
         form.firstname.data = current_user.firstname
         form.surname.data = current_user.surname
 
-    return render_template('login/profile.html', form=form)
+    return render_template('profile.html', form=form)
 
 
 # Delete current user (asked by him)
