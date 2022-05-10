@@ -708,7 +708,7 @@ def project_settings(project_id):
 
     return render_template("project/settings.html", members=members, id=project_id, name=project_name, project=project,
                            user=current_user.username, can_remove=(current_user.id == project.creator.id),
-                           classes=project.classes, exportConfig=config, plugins=get_enabled_plugins())
+                           classes=project.classes, exportConfig=config)
 
 
 # User removed by creator of project
@@ -834,22 +834,22 @@ def save_json(project_id, img_id):
 
 # Show custom error pages
 @app.errorhandler(404)
-def handler404():
+def handler404(error):
     return render_template("error/errorpage.html", code=404)
 
 
 @app.errorhandler(403)
-def handler403():
+def handler403(error):
     return render_template("error/errorpage.html", code=403)
 
 
 @app.errorhandler(400)
-def handler400():
+def handler400(error):
     return render_template("error/errorpage.html", code=400)
 
 
 @app.errorhandler(500)
-def handler404():
+def handler404(error):
     return render_template("error/errorpage.html", code=500)
 
 

@@ -64,29 +64,7 @@
         </tr>
         {% endfor %}
     </table>
-    <br>
-    <h3 class="text-center text-info">Plugins</h3>
 
-    <table id="users">
-      <tr>
-        <th>Plugin</th>
-        <th>Author</th>
-        <th>Description</th>
-        <th>Disable</th>
-        <th>Enable</th>
-      </tr>
-
-      {% for plugin in plugins %}
-      <tr>
-        <td><b>{{ plugin.name }}</b></td> 
-        <td>{{ plugin.author }}</td>
-        <td><i>{{ plugin.description }}</i></td>
-        <td><a href="{{ url_for('disable', plugin=plugin.identifier) }}">Disable</a></td>
-        <td><a href="{{ url_for('enable', plugin=plugin.identifier) }}">Enable</a></td>
-        <!--(<small>The Blueprint is still accessible via /hello because a blueprint cannot be unregistered _and_ needs to be registered before the app is serving requests.</small>)-->
-      </tr>
-      {% endfor %}
-    </table>
 </body>
 
 <meta id="my_config" data-config="{{project.exportConfig()}}" data-name="{{ project.name }}">

@@ -15,7 +15,7 @@ def cut_Video(videopath, videoName, imageDestination,frame):
 
     vidcap = cv2.VideoCapture(videopath)
     sec = 0
-    frameRate = int(frame)  # //it will capture image in each 0.5 second
+    frameRate = float(frame)  # //it will capture image in each <frame> second
     count = 1
 
     success = getFrame(sec, vidcap, count, imageDestination,videoName)
