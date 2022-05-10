@@ -5,8 +5,8 @@
   border: 1px solid #ddd; /* Gray border */
   border-radius: 4px;  /* Rounded border */
   padding: 10px; /* Some padding */
-  width: 170px; /* Set a small width */
-  height: 200px;
+  width: 200px; /* Set a small width */
+  height: 170px;
 }
 
 /* Add a hover effect (blue shadow) */
@@ -18,9 +18,10 @@
 .content_img{
  position: relative;
  width: 200px;
- height: 210px;
+ height: 180px;
  float: left;
- margin-right: 8px;
+ margin-right: 15px;
+ margin-bottom: 20px;
 }
 
 /* Child Text Container */
@@ -54,9 +55,25 @@
 }
 </style>
     <body>
+      <div style="background-color: #ededed; width:100%; border-bottom: 3px solid grey;">
+        <table>
+          <tr>
+            <td style="background: #04aa6d; width: 50px;"> </td>
+            <td>&nbsp;1+ annotations</td>
+            <td style="width: 20px;"></td>
+            <td style="background: #aa0404; width: 50px;"> </td>
+            <td>&nbsp;0 annotation</td>
+          </tr>
+        </table>
+      </div>
+        <br>
 
             {% for file in dataset %}
-            <div class="content_img">
+            {% if file.nb_annotations > 0 %}
+            <div class="content_img" style="border-top: 15px solid #04aa6d;">
+            {% else %}
+            <div class="content_img" style="border-top: 15px solid #aa0404;">
+            {% endif %}
 
               <a href="../annotate/{{file.project_pos}}">
 
