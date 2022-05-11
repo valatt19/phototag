@@ -41,6 +41,7 @@ from flask_plugins import get_enabled_plugins, get_plugin, emit_event
 # Homepage
 @app.route('/')
 def home():
+    """the view redirect to login"""
     return redirect(url_for("login"))
 
 ####################
@@ -63,6 +64,8 @@ def get_google_provider_cfg():
 # Login with Google
 @app.route("/login/google/login/", methods=["GET", "POST"])
 def login2():
+    """This views allow a connection with google
+    """
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
@@ -81,6 +84,11 @@ def login2():
 # it to this login callback endpoint on your application
 @app.route("/login/google/login/callback")
 def callback():
+    """
+    When Google sends back that unique code, it will be sending
+    it to this login callback endpoint on your application
+    :return:
+    """
     # Get authorization code Google sent back to you
     code = request.args.get("code")
 
@@ -149,12 +157,20 @@ def callback():
 ## Page for choosing a password for the user that used Google login
 @app.route("/set_pswd", methods=["GET"])
 def set_pswd_get():
+    """
+    this view [Get method] display a form for choosing a password for the user that used Google login
+
+    """
     return render_template('login/choose_pswd.html')
 
 
 # [Post] for the password ask
 @app.route("/set_pswd", methods=["POST"])
 def set_pswd():
+    """
+    This view [Post method] save the password of user from google
+    :return: It redirect to the project page of the user
+    """
     user = current_user
 
     # Password checks
@@ -176,6 +192,10 @@ def set_pswd():
 # Normal Login
 @app.route("/login/", methods=["GET", "POST"])
 def login():
+    """ Normal login with username and password
+    get : display the form login
+    post : redirect to the project page
+    """
     # check is current user already authenticated
     if current_user.is_authenticated:
         return redirect(url_for("project_create"))
@@ -206,6 +226,11 @@ def login():
 # Register
 @app.route("/register/", methods=["GET", "POST"])
 def register():
+    """
+    Register a new user
+    get : a register form
+    post : save the user and redirect to login page
+    """
     # check is current user already authenticated
     if current_user.is_authenticated:
         return redirect(url_for("project"))
@@ -234,6 +259,7 @@ def register():
 # Logout
 @app.route("/logout/")
 def logout():
+    """Logout a user"""
     logout_user()
     return redirect(url_for("login"))
 
@@ -245,12 +271,21 @@ def logout():
 # Display  forgot password page
 @app.route("/pwresetrq", methods=["GET"])
 def pwresetrq_get():
+    """
+    display a form to enter the email of password recuparation
+
+
+    """
     return render_template('login/forgotPage.html')
 
 
 # Send a request to change password
 @app.route("/pwresetrq", methods=["POST"])
 def pwresetrq_post():
+    """
+    the view send a request to change password
+    :return: return to login page
+    """
     if db.session.query(User).filter_by(email=request.form["email"]).first():
 
         user = db.session.query(User).filter_by(email=request.form["email"]).one()
@@ -277,6 +312,7 @@ def pwresetrq_post():
             db.session.add(user_reset)
         db.session.commit()
 
+        #send the email
         email = smtpConfig.EMAIL
         pwd = smtpConfig.PASSWORD
 
@@ -292,10 +328,42 @@ def pwresetrq_post():
         flash("Your email was never registered.", "danger")
         return redirect(url_for("pwresetrq_get"))
 
+# Display the reset password page
+@app.route("/pwreset/<id>", methods=["GET"])
+def pwreset_get(id):
+    """
+    Display a form to enter new password
+    :param id: id of password reset link
+    :return:
+    """
+    key = id
+    pwresetkey = db.session.query(PWReset).filter_by(reset_key=id).one()
+    generated_by = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(hours=24)
+    #if the pwd has been already change by the URL
+    if pwresetkey.has_activated is True:
+        flash("You already reset your password with the URL you are using." +
+              "If you need to reset your password again, please make a" +
+              " new request here.", "danger")
+
+        return redirect(url_for("pwresetrq_get"))
+    #if the password reset link expired
+    if pwresetkey.datetime.replace(tzinfo=pytz.utc) < generated_by:
+        flash("Your password reset link expired.  Please generate a new one" +
+              " here.", "danger")
+
+        return redirect(url_for("pwresetrq_get"))
+    #Display a form to enter new pasword
+    return render_template('login/resetPassword.html', id=key)
 
 # Send the new password
 @app.route("/pwreset/<id>", methods=["POST"])
 def pwreset_post(id):
+    """
+    update the user's password
+    :param id: id of password reset link
+    :return: to login page
+    """
+    #check the new password
     if request.form["password"] != request.form["password2"]:
         flash("Your password and password verification didn't match.", "danger")
         return redirect(url_for("pwreset_get", id=id))
@@ -305,6 +373,7 @@ def pwreset_post(id):
 
     user_reset = db.session.query(PWReset).filter_by(reset_key=id).one()
     try:
+        #update the password
         exists(db.session.query(User).filter_by(id=user_reset.user_id)
                .update(
             {'password': request.form["password"], 'password_hash': generate_password_hash(request.form["password"])}))
@@ -314,30 +383,14 @@ def pwreset_post(id):
         flash("Something went wrong", "danger")
         db.session.rollback()
         return redirect(url_for("home"))
+
     user_reset.has_activated = True
     db.session.commit()
     flash("Your new password is saved.", "success")
     return redirect(url_for("home"))
 
 
-# Display the reset password page
-@app.route("/pwreset/<id>", methods=["GET"])
-def pwreset_get(id):
-    key = id
-    pwresetkey = db.session.query(PWReset).filter_by(reset_key=id).one()
-    generated_by = datetime.utcnow().replace(tzinfo=pytz.utc) - timedelta(hours=24)
-    if pwresetkey.has_activated is True:
-        flash("You already reset your password with the URL you are using." +
-              "If you need to reset your password again, please make a" +
-              " new request here.", "danger")
 
-        return redirect(url_for("pwresetrq_get"))
-    if pwresetkey.datetime.replace(tzinfo=pytz.utc) < generated_by:
-        flash("Your password reset link expired.  Please generate a new one" +
-              " here.", "danger")
-
-        return redirect(url_for("pwresetrq_get"))
-    return render_template('login/resetPassword.html', id=key)
 
 
 #################
@@ -348,6 +401,10 @@ def pwreset_get(id):
 @app.route("/profile/", methods=['GET', 'POST'])  # view function to update a task
 @login_required
 def update_user_info():
+    """
+    This view allows the users to update their profile page
+    :return:
+    """
     form = EditUserForm()
     if form.validate_on_submit():
         current_user.firstname = form.firstname.data
@@ -367,6 +424,9 @@ def update_user_info():
 @app.route("/delete_user/", methods=['POST'])
 @login_required
 def delete_user():
+    """
+    This view allows to delete the current user (asked by him)
+    """
     User.query.filter(User.id == current_user.id).delete()
     db.session.commit()
 
@@ -382,6 +442,10 @@ def delete_user():
 @app.route("/project/")
 @login_required
 def project():
+    """
+    Display all projects of the user
+    :return:
+    """
     projects = current_user.getMyProjects()
     return render_template("project/project.html", projects=projects)
 
@@ -394,6 +458,13 @@ def project():
 @app.route("/project/new/", methods=["GET", "POST"])
 @login_required
 def project_create():
+    """
+    This function allows you to create a project
+    It displays a project configuration form
+    on the basis of the chosen configuration, the project is created
+    get : display form
+    post : save the project
+    """
     if request.method == 'POST':
         # check that name does not exist
         if Project.query.filter(Project.name == request.form["pname"]).count() != 0:
@@ -420,20 +491,19 @@ def project_create():
         else:
             ptype = False
 
-        # configuration----------------------------------------
+        # configuration of class----------------------------------------
         if 'importConfig' not in request.files:
+            #if there are not a configuration for annotations class
             if len(request.form.getlist('mytext[]')) < 1:
                 return redirect(request.url)
         final_classes = []
 
         if request.form.getlist('mytext[]') != ['']:
-
             # manual configuration
             final_classes = request.form.getlist('mytext[]')
 
         else:
-
-            # xml configuration
+            # xml configuration (imported)
             uploaded_importConfig = request.files['importConfig']
 
             filename = secure_filename(uploaded_importConfig.filename)
@@ -454,7 +524,7 @@ def project_create():
         db.session.add(pr)
         db.session.commit()
 
-        # Add image in project
+        # Add uploaded images in project
         listVideo = []
         # loop on each file on the folder imported
         ps = 0  # variable used to indicate position of image in dataset
@@ -472,7 +542,7 @@ def project_create():
                 mimestart = mimestart.split('/')[0]
 
                 if mimestart in ['video']:
-
+                    #if the file of file is a video
                     nameVid = filename.strip(".mp4")
                     nameVid = nameVid.strip(".MP4")
                     nameVid = nameVid.strip(".mpeg")
@@ -483,6 +553,7 @@ def project_create():
                     imageDestination = new_dir + "/"
                     pathVid = path
 
+                    #create a video object and save it in DB
                     aVideo = Video(name=nameVid, path=pathVid, imageDestination=imageDestination, project_id=pr.id)
                     listVideo.append(aVideo)
                     db.session.add(aVideo)
@@ -490,11 +561,11 @@ def project_create():
 
 
                 else:
-
+                    #if the file is a image
                     # get the size of the file in KO
                     size = int(os.stat(path).st_size / 1000)
 
-                    # create Image object
+                    # create Image object and save it
                     img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(),
                                 last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
                     db.session.add(img)
@@ -508,11 +579,19 @@ def project_create():
         else:
             return redirect(url_for('chooseframe', project_id=pr.id))
 
+    #[get]
     return render_template("project/create.html")
 
 # Page to make the user choose the framerate when parsing video into images
 @app.route("/project/create/videoFrameRate/<int:project_id>/", methods=["GET", "POST"])
 def chooseframe(project_id):
+    """
+    this view cut video into image
+    get : dispay a form to select the framerate of each video
+    post : cut videos into image
+    :param project_id: project id
+
+    """
     project = Project.query.get(project_id)
     # Check that current user is the creator of the project
     if project.creator != current_user:
@@ -522,9 +601,12 @@ def chooseframe(project_id):
     if request.method == 'POST':
 
         imageOfProject = Image.query.filter((Image.project_id == project_id))  # Get all images of the dataset
-        ps= 0
+
+        ps= 0  # variable used to indicate position of image in dataset
+        #update the position of image
         for img in imageOfProject:
             ps+=1
+        #for each video, cut into many image
         for video in listVideo:
 
             id_video = "frame_"+str(video.id)
@@ -533,13 +615,20 @@ def chooseframe(project_id):
             pathVid = video.path
             nameVid = video.name
             imageDestination = video.imageDestination
+
+            #set the framerate
             video.setFrameRate(frame)
+
+            #cut the video into image
             cut_Video(pathVid, nameVid, imageDestination, frame)
+
+            #get the name of each image
             onlyfiles = [f for f in listdir(imageDestination) if isfile(join(imageDestination, f))]
 
+            #delete the video
             if os.path.exists(pathVid):
                 os.remove(pathVid)
-
+            #save the image in dataset
             for pic in onlyfiles:
                 if "_imageFromVideo_" in pic:
                     # get the size of the file in KO
@@ -565,12 +654,18 @@ def chooseframe(project_id):
 # Join a public project or a private project (with invitation)
 @app.route("/project/join/")
 def project_join():
+    """
+    this view displays a page with all publics projects and all invitations to privates ones
+    [Get method]
+    """
+    # public projects
     public_projects = Project.query.filter(Project.privacy == 1)
     final_public_projects = []
+
     for p in public_projects:
         if not p in current_user.getMyProjects():
             final_public_projects.append(p)
-
+    # invitations to privates projects
     private_projects = Invitation.query.all()
     private = []
     for p2 in private_projects:
@@ -583,6 +678,7 @@ def project_join():
 # User click on join a project
 @app.route("/project/joined/<int:project_id>")
 def project_joined(project_id):
+    """ """
     project_joined = Project.query.get(project_id)
 
     # Check that project is public
@@ -598,6 +694,12 @@ def project_joined(project_id):
 # User click on accept an invitation
 @app.route("/project/acceptinvit/<int:invit_id>/<int:project_id>")
 def project_accept_invit(invit_id, project_id):
+    """
+    The function add an user to a private project
+    :param invit_id:
+    :param project_id:
+    :return:
+    """
     project_joined = Project.query.get(project_id)
     invit = Invitation.query.get(invit_id)
 
@@ -616,28 +718,21 @@ def project_accept_invit(invit_id, project_id):
 # User click on decline an invitation
 @app.route("/project/declineinvit/<int:invit_id>")
 def project_decline_invit(invit_id):
+    """This function delete an invitation"""
     Invitation.query.filter(Invitation.id == invit_id).delete()
     current_user.invited = False
     db.session.commit()
     return redirect(url_for('project'))
 
 
-# [POST] invitation sent to user
-@app.route("/added/<int:project_id>/<int:user_id>/")
-def add_user_private(project_id, user_id):
-    project_added = Project.query.get(project_id)
-    get_user = User.query.get(user_id)
-    if project_added.privacy == 0:
-        project_added.invit(get_user)
-        get_user.invited = True
-        db.session.commit()
-        return redirect(url_for('project'))
-    return redirect(url_for('add'))
-
-
-# Page to list users (not already member of a project) and send them invitation to join the project
+# Page to list users (not already member of a project)
 @app.route("/project/<int:project_id>/add/")
 def add(project_id):
+    """
+    this view displays a list users (not already member of a project)
+    :param project_id: project id
+    [get method]
+    """
     all_users = User.query.all()
     userTo_add = []
     project = Project.query.get(project_id)
@@ -645,6 +740,30 @@ def add(project_id):
         if u.id != project.creator_id and u not in project.getMembers():
             userTo_add.append(u)
     return render_template("project/users_add.html", project=project, users=userTo_add)
+
+
+# [POST] invitation sent to user
+@app.route("/added/<int:project_id>/<int:user_id>/")
+def add_user_private(project_id, user_id):
+    """
+    This function allows to the admin of a projet to add collaborators
+    [Post method]
+    :param project_id: project id
+    :param user_id: id of collaborator
+
+    """
+    project_added = Project.query.get(project_id)
+    #get the collaborator
+    get_user = User.query.get(user_id)
+    if project_added.privacy == 0:
+        #send an invitation
+        project_added.invit(get_user)
+        get_user.invited = True
+        db.session.commit()
+        return redirect(url_for('project'))
+    return redirect(url_for('add'))
+
+
 
 
 ######################
@@ -655,6 +774,10 @@ def add(project_id):
 @app.route("/project/<int:project_id>/dataset/")
 @login_required
 def dataset_overview(project_id):
+    """
+    This view displays all images in the project
+    :param project_id: project id
+    """
     dataset = Image.query.filter((Image.project_id == project_id))  # Get all images of the dataset
     project = Project.query.get(project_id)
     project_name = project.name
@@ -680,6 +803,10 @@ def dataset_overview(project_id):
 @app.route("/project/<int:project_id>/settings/", methods=["GET", "POST"])
 @login_required
 def project_settings(project_id):
+    """
+    This function allows to project's admin to modify the setting of his project
+    :param project_id: project id
+    """
     project = Project.query.get(project_id)
     project_name = project.name
     config = project.exportConfig()
@@ -714,6 +841,12 @@ def project_settings(project_id):
 # User removed by creator of project
 @app.route("/project/<int:project_id>/remove/<int:user_id>")
 def project_users_remove(project_id, user_id):
+    """
+    This function allows to project's admin to delete an user
+    :param project_id: project id
+    :param user_id: id of user to remove
+    :return:
+    """
     project = Project.query.get(project_id)
     user = User.query.get(user_id)
 
@@ -728,6 +861,10 @@ def project_users_remove(project_id, user_id):
 # Privacy of project changed
 @app.route("/project/<int:project_id>/switch/")
 def project_privacy_switch(project_id):
+    """
+    This function allows to project's admin to change the privacy of project
+    :param project_id: project id
+    """
     project = Project.query.get(project_id)
 
     # Check that current user is creator
@@ -746,6 +883,12 @@ def project_privacy_switch(project_id):
 @app.route("/project/<int:project_id>/annotate/<int:img_id>")
 @login_required
 def annotate_image(project_id, img_id):
+    """
+    This function allows to annotate  an image
+    :param project_id:
+    :param img_id:
+    :return:
+    """
     project = Project.query.get(project_id)
 
     # Check that user can access this project
@@ -783,6 +926,10 @@ def annotate_image(project_id, img_id):
 # It updates also the Users live working on the same image
 @socketio.on("refresh")
 def refresh(img_id):
+    """
+    This function refresh annotations
+    :param img_id: id of image
+    """
     img = Image.query.get(img_id)
     boxes = img.annotations
 
@@ -810,6 +957,12 @@ def test_disconnect():
 @app.route("/project/<int:project_id>/annotate/<int:img_id>/save_json", methods=['POST'])
 @login_required
 def save_json(project_id, img_id):
+    """
+    This function allows to download the json file of annotations
+    :param project_id:
+    :param img_id:
+    :return:
+    """
     project = Project.query.get(project_id)
     image = Image.query.get(img_id)
     if image.project_id != project_id or not project.isMember(current_user):

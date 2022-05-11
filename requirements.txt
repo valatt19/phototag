@@ -21,3 +21,4 @@ yagmail~=0.15.277
 email-validator
 
 PyYAML~=6.0
+opencv-python~=4.5.5.64

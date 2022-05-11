@@ -2,6 +2,15 @@ import cv2
 
 
 def getFrame(sec, vidcap, count, imageDestination, videoName):
+    """
+    get the frame as image and save it
+    :param sec: secondes in video
+    :param vidcap: the video
+    :param count: num of frame
+    :param imageDestination: folder where the images will be saved
+    :param videoName: name of video
+    :return: true if the frame is saved
+    """
     vidcap.set(cv2.CAP_PROP_POS_MSEC, sec * 1000)
     hasFrames, image = vidcap.read()
     if hasFrames:
@@ -11,7 +20,13 @@ def getFrame(sec, vidcap, count, imageDestination, videoName):
 
 
 def cut_Video(videopath, videoName, imageDestination,frame):
-    # vidcap = cv2.VideoCapture('C:/Users/babca/Pictures/Camera Roll/video.mp4')
+    """
+    cut video into many images
+    :param videopath: path of video
+    :param videoName: name of video
+    :param imageDestination: folder where the images will be saved
+    :param frame: framerate
+    """
 
     vidcap = cv2.VideoCapture(videopath)
     sec = 0
