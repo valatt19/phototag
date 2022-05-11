@@ -678,7 +678,8 @@ def project_join():
 # User click on join a project
 @app.route("/project/joined/<int:project_id>")
 def project_joined(project_id):
-    """ """
+    """ Join a public project
+    """
     project_joined = Project.query.get(project_id)
 
     # Check that project is public
