@@ -3,7 +3,13 @@ from flask import Flask, current_app
 from config import Config
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'app/static/datasets' # where files uploaded go
+from os.path import abspath
+
+abs = abspath('app') 
+print(abs)
+absolute = abs.replace('\\','/')
+
+UPLOAD_FOLDER = absolute+'/static/datasets' # where files uploaded go
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER 
 

@@ -563,7 +563,7 @@ def project_create():
                     size = int(os.stat(path).st_size / 1000)
 
                     # create Image object and save it
-                    img = Image(name=filename, path=path[3:], size=size, last_time=datetime.now(),
+                    img = Image(name=filename, path=path, size=size, last_time=datetime.now(),
                                 last_person=current_user, annotations=[], nb_annotations=0, project=pr, project_pos=ps)
                     db.session.add(img)
                     db.session.commit()
@@ -632,7 +632,7 @@ def chooseframe(project_id):
                     size = int(os.stat(imageDestination + pic).st_size / 1000)
 
                     # create Image object
-                    img = Image(name=pic, path=imageDestination[3:] + pic, size=size, last_time=datetime.now(),
+                    img = Image(name=pic, path=imageDestination + pic, size=size, last_time=datetime.now(),
                                 last_person=current_user, annotations=[], nb_annotations=0, project=project,
                                 project_pos=ps)
                     db.session.add(img)

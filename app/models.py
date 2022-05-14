@@ -107,8 +107,7 @@ class User(UserMixin, db.Model):
     firstname = db.Column(db.String(80), nullable=False)
     surname = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80),unique=True, nullable=False)
-    password = db.Column(db.String(16))
-    password_hash = db.Column(db.String(16))
+    password_hash = db.Column(db.String(256))
     projects = db.relationship("Project", secondary=ProjectUser.__table__,overlaps="Project,members")
     invited= db.Column(db.Boolean,default=False)
     
@@ -121,13 +120,14 @@ class User(UserMixin, db.Model):
         return self.invitations
         
     def set_password(self, password):
-        self.password = password
         self.password_hash = generate_password_hash(password)
+        print(self.password_hash)
 
     def setImage(self, img):
         self.image = img
 
     def check_password(self, password):
+        print(generate_password_hash(password))
         return check_password_hash(self.password_hash, password)
 
     def getUsername(self):

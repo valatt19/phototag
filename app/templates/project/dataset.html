@@ -77,7 +77,7 @@
 
               <a href="../annotate/{{file.project_pos}}">
 
-                  <img id="image_dataset" class='img_dataset' src="{{url_for('static', filename='../../'+file.path)}}" alt="" />
+                  <img id="image_dataset" class='img_dataset' src="{{url_for('static', filename='datasets/'+project.creator.username+'/'+project.name+'/'+file.name)}}" alt="" />
                   <div>
                 <p>Last: {{file.last_time.strftime('%Y-%m-%d %H:%M')}} by {{file.last_person.username}}</p>
                 <p>Live: {% for user in working[loop.index-1] %}{{user.username}}, {% endfor %}</p>
