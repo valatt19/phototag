@@ -272,7 +272,6 @@ def pwresetrq_get():
     """
     display a form to enter the email of password recuparation
 
-
     """
     return render_template('login/forgotPage.html')
 
@@ -327,7 +326,7 @@ def pwresetrq_post():
         return redirect(url_for("pwresetrq_get"))
 
 # Display the reset password page
-@app.route("/pwreset/<id>", methods=["GET"])
+@app.route("/pwreset/<id>", methods= ["GET"])
 def pwreset_get(id):
     """
     Display a form to enter new password
