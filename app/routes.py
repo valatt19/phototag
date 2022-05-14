@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-import mimetypes
-import uuid
+import mimetypes 
 from os import listdir
 from os.path import isfile, join
 
 import pytz
 import yagmail
+import uuid
 from sqlalchemy import exists
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import generate_password_hash
 
-from app import app, socketio, keygenerator, plugin_manager
+from app import app, socketio
+from app.utils import keygenerator,smtpConfig
+from app.utils.utilsPhotoTag import cut_Video
 
 from flask import render_template, redirect
 from flask import url_for, request, flash, jsonify
@@ -27,12 +29,8 @@ from xml.dom import minidom
 from oauthlib.oauth2 import WebApplicationClient
 import requests
 
-from app.models import Image, User, users, Project, PWReset, Invitation, Video
-from app import db, domain
-from app.utilsPhotoTag import cut_Video
-from . import smtpConfig
-
-from flask_plugins import get_enabled_plugins, get_plugin, emit_event
+from app.models import Image, User, Project, PWReset, Invitation, Video
+from app import db
 
 ##############
 # Home page #
@@ -728,9 +726,10 @@ def project_decline_invit(invit_id):
 
 # Page to list users (not already member of a project)
 @app.route("/project/<int:project_id>/add/")
+@login_required
 def add(project_id):
     """
-    this view displays a list users (not already member of a project)
+    This view displays a list users (not already member of a project)
     :param project_id: project id
     [get method]
     """
@@ -745,6 +744,7 @@ def add(project_id):
 
 # [POST] invitation sent to user
 @app.route("/added/<int:project_id>/<int:user_id>/")
+@login_required
 def add_user_private(project_id, user_id):
     """
     This function allows to the admin of a projet to add collaborators
@@ -1006,10 +1006,3 @@ def handler400(error):
 def handler404(error):
     return render_template("error/errorpage.html", code=500)
 
-
-########
-# MAIN #
-########
-
-if __name__ == '__main__':
-    socketio.run(app)

@@ -1,17 +1,16 @@
 {% extends "parent.html" %}
 
+{% block content scoped %}
 
 <!-- Script for searching in table -->
 <link rel="stylesheet" href="{{url_for('static', filename='css/search.css')}}">
-
-{% block content scoped %}
-
+<link rel="stylesheet" href="{{url_for('static', filename='css/adduser.css')}}">
 <script src="{{url_for('static', filename='js/searchbar.js')}}"></script>
 
-<h2> All Users</h2>
-<input onblur="this.focus()" autofocus type = "text" id="searchInput" onkeyup="search('searchInput', 'users-table',0)" placeholder="Search for usernames... &#128270;" title="Type in a username">
+<h2 style="margin: auto;"> All Users</h2>
+<input style="margin: auto;" onblur="this.focus()" autofocus type = "text" id="searchInput" onkeyup="search('searchInput', 'users-table',0)" placeholder="Search for usernames... &#128270;" title="Type in a username">
 
-<table id="users-table">
+<table id="users-table" style="margin: auto;">
     <tr>
         <th>Username</th>
         <th> Action</th>
